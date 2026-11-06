@@ -22,3 +22,6 @@ The YouTube example `https://www.youtube.com/watch?v=ferZnZ0_rSM` is an NPR Musi
 
 ## Other
 Lucide React icons: ISC license, installed package. System Arial/Helvetica/sans-serif font stack. All stickers and abstract graphic shapes are CSS/text, not artist artwork.
+
+## Addendum 01 original decoration assets
+`public/decorations/pixel-heart.gif` is an original 64×64, four-frame pixel heart constructed locally from a hand-specified 8×7 bitmap using Pillow. It has a slow 1.6-second cycle and an 809-byte file size. `src/lib/demo-heart.json` embeds that same GIF for instant local preview and persistence without a remote request. No third-party artwork or generated artist imagery is used. All other theme decorations (hearts, stars, butterfly-like glyphs, CSS flame silhouettes, pixel bits, glitter, checkerboards, chrome and soft gradients) are original CSS or Unicode text using installed fonts. They are pointer-inert, scoped and covered by motion controls.

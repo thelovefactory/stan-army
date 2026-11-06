@@ -39,3 +39,8 @@ Separate plans, subscriptions, entitlements, provider webhook events, polls, pol
 
 ## Data lifecycle decisions still open
 Region, retention periods, chat edit/delete history, minimum user age, public fan visibility, account export/delete behaviour, artist ownership transfer, copyright reporting and anonymous browsing must be agreed before production. Plan deletion cascades carefully: remove private user data while preserving necessary pseudonymized moderation/audit evidence under a documented retention policy.
+
+## Addendum 01 — future presentation persistence
+Implemented now: version-1 structured JSON in browser localStorage at `stan-army:theme:v1:artist:<slug>` or `stan-army:theme:v1:fan:<handle>`. Content and membership records are never placed in this theme object. Raw data URLs are a prototype-only asset representation.
+
+Proposed later: `profile_themes` with `profile_kind`, target artist/profile UUID, `schema_version`, validated `settings` JSONB, revision, `updated_by`, and timestamps. Enforce one theme per target, with owner/editor/explicit manager RLS for artists and self-only fan writes. Public readers may retrieve published presentation settings, but must retain their independent clean-view preference. Do not trust an ownership field inside the JSON. Replace data URLs with validated storage asset references after authenticated upload processing; preserve one shared theme schema using a typed asset-reference layer. Migrate v1 settings through explicit version converters and reject unsupported future versions. Keep old settings available for rollback. This is a design only: no table, SQL migration, service or endpoint is created.

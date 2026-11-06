@@ -1,7 +1,7 @@
 # Stan Army — Product specification
 
 ## Authority and review gate
-Confirmed requirements come from the unchanged root `STAN_ARMY_CODEX_BUILD_BRIEF.md` and the current Milestone 1 request. The current request narrows the master brief: local prototype only; stop for visual review before backend development. No backend resources, migrations, API endpoints, account system, persistent storage, payment flow or deployment are part of this deliverable.
+Confirmed requirements come from the unchanged root `STAN_ARMY_CODEX_BUILD_BRIEF.md` and the current Milestone 1 request. The current request narrows the master brief: local prototype only; stop for visual review before backend development. No backend resources, migrations, API endpoints, account system, persistent community storage, payment flow or deployment are part of this deliverable. Addendum 01 explicitly authorises browser-local persistence for visual themes only.
 
 ## Confirmed product direction
 Every artist needs an army. The heartbeat of every artist is their community. Music and conversation should have equal visual weight. Balance personal MySpace-style expression with modern navigation, readable text, responsive layouts, visible keyboard focus and reduced-motion support. Preserve the user’s hand-drawn logo as an image; no generated artist imagery.
@@ -18,7 +18,7 @@ Every artist needs an army. The heartbeat of every artist is their community. Mu
 Every identity, conversation, event, post and count is fictional. Photography represents illustrative people and performances, not the fictional artists. Demo content is labeled across landing, discovery, artist and room views. No verified badges. No real online-user count, streaming statistics or synchronized-playback claims.
 
 ## State and expected behaviour
-Enlistment, submitted chat messages and reactions change the interface only. Enlistment and submitted chat messages survive client navigation through the shared provider and reset on refresh. Likes reset when their page unmounts. Composer drafts reset on navigation. Wizard state remains while the wizard is mounted and resets on refresh or leaving the route. Nothing uses localStorage, cookies or a server database. Text is rendered through React escaping.
+Enlistment, submitted chat messages and reactions change the interface only. Enlistment and submitted chat messages survive client navigation through the shared provider and reset on refresh. Likes reset when their page unmounts. Composer drafts reset on navigation. Wizard state remains while the wizard is mounted and resets on refresh or leaving the route. Community content does not use localStorage, cookies or a server database. Addendum 01 visual themes and their selected image data are saved to namespaced localStorage keys. Text is rendered through React escaping.
 
 Messages must contain non-whitespace text and are limited to 280 characters. A blank composer disables Send. A new message is visibly attributed to `@you.demo` and acknowledged as local only. Messages do not reach any other person.
 
@@ -31,7 +31,7 @@ One fixed public YouTube example is loaded using the privacy-enhanced iframe aft
 - Nova Reign and five other fictional artists establish the first content set.
 - Blue is the primary action colour; mint anchors music and community; pink and orange provide personal sticker details.
 - Generic UK/EU locations, illustrative events and free enlistment demonstrate the intended shape.
-- Stock image choice replaces image uploads in this milestone. Typography uses local system fonts to avoid network dependencies.
+- The creation wizard uses stock image choices; Addendum 01 profile editors additionally support browser-local raster selection. Typography uses local system fonts to avoid network dependencies.
 - This prototype’s desktop content hierarchy puts media on the left and chat in the wider right column; mobile stacks media, chat, fans and posts.
 
 ## Out of scope until later milestones
@@ -39,3 +39,10 @@ Auth, real roles and manager rosters, image uploads, persistent artist pages, re
 
 ## Visual review questions
 Does the artist page feel personal enough without losing usability? Is Army Chat prominent enough? Does the nostalgia/modern balance fit? Review desktop and mobile before approving accounts and persistence.
+
+## Addendum 01 — confirmed in this milestone
+The root `STAN_ARMY_ADDENDUM_01.md` is part of the specification. A shared live visual editor customises existing artist pages, their listening rooms, and `/fans/jess-wav`. Six presets: Glitter Bomb, Scene Queen, Burning Desire, Digital Dream, Cyber Trash, Blank Canvas. Settings include raster/GIF backgrounds, cover/contain/tile/natural sizing, positioning and fixed/scroll attachment; six colour roles; six system font stacks; panel colour/opacity/border/corners; original animated CSS decorations; custom banner/avatar imagery.
+
+Save persists versioned JSON per profile in localStorage. Cancel and Escape discard drafts. Reset previews defaults, with an explicit Save required to persist. Visitor clean/custom and pause controls preserve all content. The editor is available only in simulated owner/manager views; real role authorisation remains Milestone 2. Reduced motion hides animated uploads and stops CSS animations. Text contrast and opaque core surfaces are protected. Advanced CSS is disabled, with a token preview only.
+
+Fan space includes a fictional biography, licensed imagery, favourites, and the actual session-local enlistment list. It uses the same schema/editor as artist pages. See `THEME_ENGINE.md` for asset limits, migration and acceptance evidence.

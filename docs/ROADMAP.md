@@ -1,7 +1,7 @@
 # Roadmap and review gates
 
 ## Milestone 1 — current visual prototype
-Confirmed scope: responsive landing, working seeded discovery, demo artist spaces, focused listening room, local enlistment/chat/reactions, click-to-load media with fallback, creation wizard and documentation. No live community, storage or deployment. Review screenshots/local views and the behaviour inventory before proceeding. See `VALIDATION.md` for actual checks and environment limits.
+Confirmed scope: responsive landing, working seeded discovery, demo artist spaces, focused listening room, local enlistment/chat/reactions, click-to-load media with fallback, creation wizard and documentation. No live community, backend storage or deployment. Addendum 01 browser-local theme persistence is included now, not deferred. Review screenshots/local views and the behaviour inventory before proceeding. See `VALIDATION.md` for actual checks and environment limits.
 
 **Review gate:** approve or revise typography, colour, personal expression, chat prominence, mobile hierarchy and wizard preview. Backend work has not started.
 
@@ -21,3 +21,6 @@ Only after approval: polls, one-vote rules, anti-abuse, premium artist entitleme
 
 ## Open product assumptions
 Trial lengths and founding-artist promotions, room membership model, manager reporting scope, geographic rollout, moderation staffing, upload limits and retention. No assumption here authorizes a paid service or deployment.
+
+## Addendum 01 is part of Milestone 1
+Artist/fan visual customisation, all six presets, local theme persistence, raster/GIF selection, shared live editor, clean/custom viewing and animation controls are current prototype work. This is not a later milestone. The next backend milestone will add ownership enforcement, asset processing and database-backed theme records while keeping the same structured presentation boundary. Browser-based acceptance and visual review remain necessary before calling the milestone fully verified.

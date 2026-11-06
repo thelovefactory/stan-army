@@ -3,7 +3,7 @@
 ## Implemented now
 Next.js App Router + TypeScript + Tailwind CSS v4 (PostCSS integration), with CSS design tokens and responsive component styles in `src/app/globals.css`. Lucide supplies interface icons; original supplied images and licensed stock photographs are local assets. No remote font or image request is needed for initial rendering.
 
-App Router pages render the static shell and seeded artist records. Discovery, artist actions, chat, media consent and wizard use client components. `DemoProvider` wraps the app and holds session-in-memory enlistments and messages keyed by artist slug. No API route handlers, server actions, services, Supabase client, storage, credentials or external data fetch are implemented. Browser state changes do not persist.
+App Router pages render the static shell and seeded artist records. Discovery, artist actions, chat, media consent and wizard use client components. `DemoProvider` wraps the app and holds session-in-memory enlistments and messages keyed by artist slug. No API route handlers, server actions, services, Supabase client, backend storage, credentials or external data fetch are implemented. Community state changes do not persist; Addendum 01 visual settings use browser-local persistence.
 
 ## Source boundaries
 - `src/lib/data.ts`: typed artist seed, discovery selection, fixed media example, wizard validation.
@@ -13,7 +13,7 @@ App Router pages render the static shell and seeded artist records. Discovery, a
 - `army-wizard.tsx`: four-stage controlled form and preview.
 - `tests/demo-logic.test.ts`: meaningful filtering and validation checks using the Node test runner through tsx.
 
-Dynamic artist routes use `generateStaticParams` for all six seed slugs; unknown artists render the custom 404. Shared provider state follows client-side navigation, while page-local state unmounts normally. No runtime secret is required. Root metadata discourages search indexing for this prototype; that is not access control.
+Dynamic artist routes use `generateStaticParams` for all six seed slugs; unknown artists render the custom 404. Shared provider state follows client-side navigation, while page-local state unmounts normally. No runtime secret is required. Addendum 01 introduces client-only localStorage for theme settings, separate from in-memory community content. Root metadata discourages search indexing for this prototype; that is not access control.
 
 ## Accessibility design
 Semantic page landmarks, skip link, labeled controls, native links/buttons/radios/selects, visible focus styles, pressed state on toggles, polite status messages, alert validation errors and keyboard-focusable mobile navigation. Wizard stage changes focus the stage heading. Reduced-motion CSS removes transitions and smooth scrolling. Input limits and wrapping protect conversation and preview layouts. See validation report for what was actually checked; these implementation provisions are not a claim of a completed accessibility audit.
@@ -34,3 +34,10 @@ Future Supabase and Stripe plans are unselected. Record then-current database/st
 
 ## Validation
 Run `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`. Browser review should exercise all routes at desktop/mobile widths and both keyboard/reduced-motion settings, then verify the consented embed separately with network access. No claim of live playback availability follows from a successful local build.
+
+## Addendum 01 architecture
+`src/lib/theme.ts` defines one versioned presentation schema, six presets, strict enum/hex/raster validation, contrast resolution and storage helpers. `ProfileTheme` uses `useSyncExternalStore` for hydration-safe storage and reduced-motion subscriptions. It keeps saved configuration separate from an unsaved editor draft. `ThemeEditor` is shared by artist/fan wrappers and applies changes to their real children; no second mock preview tree or cloned chat state is used. Artist pages and focused rooms share one profile ID.
+
+`src/app/profile-theme.css` scopes every personalised rule below `.profile-canvas.profile-custom`. Global header, footer, role controls and editor are outside that scope. Core media/chat/control surfaces keep readable fonts, opaque backplates and contrast fallbacks. Decoration layers cannot capture pointer events. The editor is a nonmodal right rail on wide screens and bottom sheet at 1100px and below; Escape cancels and focus returns to Customise. Actual browser focus/layout verification remains outstanding.
+
+Asset file reads enforce raster MIME, base64/signature consistency, browser decoding, dimensions and byte limits. No user-supplied CSS string or HTML reaches a style sheet. Allowed inline raster data is the only upload URL accepted. Settings are revalidated on storage reads and writes. Storage-denial/quota errors leave the editor open and announce failure. See `THEME_ENGINE.md` for the persistence contract and proposed database transition; no backend is implemented.
