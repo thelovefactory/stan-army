@@ -60,3 +60,12 @@ Music uses consented, permitted third-party playback with a fallback. The NPR sa
 
 ## Remaining simulated / out of scope
 All people, identities, counts, posts, conversations and events are fictional. Roles are an explicit UI simulation. Community activity and creation/request previews are in memory; only successful visual-theme saves persist locally. No accounts, database, global duplicate detection, DNS, real official access, moderation enforcement, transfers, payments, campaigns, ad delivery, exclusive-media hosting or deployment. Desktop/mobile browser journeys and screenshots remain unverified because managed browser tooling is unavailable.
+
+## Living Fan Space — latest approved creative direction
+The source `STAN_ARMY_LIVING_FAN_SPACE.md` and subsequent user clarification guide this revision: it need not look ugly or manufacture a crowd. A single stan should be able to leave a visible personal mark. Research links, original period screenshot and evidence/interpretation distinctions live in `research/MYSPACE_2003_2008.md`.
+
+Nova remains the hero. An oversized founder panel no longer interrupts the artist-to-community hierarchy. The prominent fan feed has distinct fictional personalities and controlled note/photo/notebook/after-hours treatments, local composition, hearts and threaded replies. The sample-conversation switch supports a first-stan feed without sample hearts/replies on its sole founding note. Root-provider state keeps local contributions through client navigation; refresh clears them.
+
+The compact communal shoebox/video previews lead to `/armies/nova/gallery` and `/armies/nova/videos`. Gallery filtering, original CSS print/keepsake visuals, stock photo provenance, native-dialog detail navigation and session-only saving work locally. Two real, original six-second silent typography videos play manually; they are not described as actual fan concert/cover footage. No real upload infrastructure or media hosting rights claims are introduced.
+
+From the Army and From the Artist stay separate in an expandable notes area with their existing role simulation. Chat, music, events, membership/identity, all themes and preferences, clean view, pause and FAN. THE FLAMES. remain. Founder recognition is a warm bottom credit linking to Jess's own profile. Fan decorative treatments also respect clean view; actual authored artwork remains content rather than being erased. Fictional participation is labelled; no fake live activity or presence indicator is added.

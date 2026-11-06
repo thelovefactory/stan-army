@@ -30,6 +30,8 @@ npm start
 - `/discover` — find fan-run Armies, filter/search, or start a missing Army with the search prefilled.
 - `/armies/nova` — Nova Reign's fan-run Army, founded by Jess.wav.
 - `/armies/nova/room` — wider listening/chat view with the same saved theme.
+- `/armies/nova/gallery` — the communal shoebox: photographs, original prints and keepsakes.
+- `/armies/nova/videos` — two playable original silent fan-video studies.
 - `/fans/jess-wav` — the founding stan's own profile and local enlistments.
 - `/create?artist=Echo%20Valentine` — artist-without-an-Army onboarding example.
 - `/official-access?army=nova` — local artist/representative verification-request preview.
@@ -42,6 +44,17 @@ Artist, founding fan and Army are separate records and visible identities. Enlis
 **From the Army** belongs to fan administrators. **From the Artist** is a distinct surface for verified artists/representatives. The visible role dropdown is explicitly simulated: founder/admin can customise and compose community announcements; official roles on Nova can compose official announcements, but cannot customise or moderate. Added announcements remain page-local and clear on navigation/refresh. No real identity has been verified.
 
 Creation is unmistakably fan-led: search/select/add an artist; route existing canonical matches to their Army; validate a separate reserved-aware Army address; choose starting imagery and a shared theme preset; write a fan welcome; finish an editable preview. Completion creates no public Army or reserved address. Invite text is marked non-live. Official-request validation likewise submits nothing and changes no permissions.
+
+## The living fan space — leave your mark
+Nova now leads into a fan-authored feed rather than a promotional noticeboard. Write a note, choose Simple note / Notebook heart / After hours / Demo photo, and **Leave my mark**. It appears first in the feed. Hearts and threaded replies work locally; notes/replies/hearts and kept gallery memories survive client navigation in the root provider, then clear on refresh. Unlike themes, none of this content is persisted or published.
+
+Switch off **Show sample conversations** to try a first-stan feed: only the founder's first note (without sample hearts/replies) and your contributions remain. There is still something meaningful to do without a crowd. Other fixture areas remain explicitly labelled examples, never a real online-user claim.
+
+A small gallery preview opens the deeper filtered shoebox, with keyboard-native modal viewing, previous/next and a local keepsake shelf. The video shelf contains real six-second silent typography clips created for this prototype; manual playback only, not claimed concert/cover footage. No copyrighted performance was hosted. The short gallery/video previews keep the main Army from becoming a feature catalogue.
+
+Artist first, then community and fan contributions. The oversized founder panel is removed; Jess gets a warm credit near the bottom. From the Army and From the Artist remain in a compact expandable area with their existing separate permissions. Chat, music, events, clean view, animation controls and theme compatibility remain. Existing six community fixtures are retained; this revision focuses on Nova.
+
+The research and original 2007 screenshot are documented in [MYSPACE_2003_2008.md](docs/research/MYSPACE_2003_2008.md), distinguishing historical evidence, inaccessible archive replays, a modern reconstruction and design interpretation. The supplied brief is preserved in [STAN_ARMY_LIVING_FAN_SPACE.md](STAN_ARMY_LIVING_FAN_SPACE.md). This is a reinterpretation, not a copy of MySpace branding/layout.
 
 ## Customisation and preservation
 CUSTOMISE opens the shared live editor for Army fan-administrator or fan-profile-owner simulation. Six presets, raster/GIF backgrounds, cover/contain/tile/natural sizing, positions, fixed/scroll attachment, colours, retro font stacks, panel styles, original CSS decorations, banner and avatar selection remain.

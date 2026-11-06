@@ -29,6 +29,8 @@ import {
 } from "@/lib/theme";
 
 type ThemeContext = {
+  clean: boolean;
+  animationsEnabled: boolean;
   role: string;
   canEditCommunity: boolean;
   canPostOfficial: boolean;
@@ -36,6 +38,8 @@ type ThemeContext = {
   visibleAsset: (asset: Theme["background"]["image"]) => string | null;
 };
 const Context = createContext<ThemeContext>({
+  clean: false,
+  animationsEnabled: false,
   role: "visitor",
   canEditCommunity: false,
   canPostOfficial: false,
@@ -200,6 +204,8 @@ export function ProfileTheme({
   return (
     <Context.Provider
       value={{
+        clean,
+        animationsEnabled: playing,
         role,
         canEditCommunity,
         canPostOfficial,
@@ -322,6 +328,7 @@ export function ProfileTheme({
         <div
           className={`profile-canvas ${custom ? "profile-custom" : ""} theme-${theme.preset} ${playing ? "theme-motion" : "theme-still"}`}
           data-profile={profileId}
+          data-clean={clean}
           style={vars}
         >
           <div className="profile-pattern" aria-hidden="true" />

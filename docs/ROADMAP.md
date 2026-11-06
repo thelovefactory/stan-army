@@ -27,3 +27,6 @@ Promotional campaigns need explicit goals/budgets, optional contributions, moder
 
 ## Current review gate
 The fan-led implementation is ready for product/visual review with available automated checks reported. A broader reskin can follow once the community experience is right. No deployment, paid service or complex backend is authorized by this roadmap alone.
+
+## Current visual review: the living fan space
+Prioritise authored community experience over a generic feature catalogue. This revision adds Nova's varied local fan feed, a first-stan feed mode, replies/hearts, a focused gallery/keepsake shelf and original playable video studies, grounded in 2006–2007 historical evidence. The artist remains the hero; founder credit moves down. It does not start a social-network backend or introduce real uploads/hosting. Judge whether a single person's contribution changes the emotional character of the place before adding more product surface.

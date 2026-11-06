@@ -38,3 +38,8 @@ Keep the presentation schema separate from its target/authorization envelope. Au
 
 ## Verification limits
 Unit tests cover all six presets, unsafe inputs, asset budgets, contrast, independent keys, save/load/reset/failures and legacy-to-Army fallback precedence. Actual browser refresh/file-picking/GIF playback, keyboard journeys and mobile rail/sheet behaviour remain outstanding because managed browser tooling is unavailable. See `VALIDATION.md`.
+
+## Living fan contributions
+The saved presentation schema and all localStorage keys are unchanged. `ProfileTheme` exposes clean-view/motion state so note treatments and gallery framing can respond without remounting content or overwriting the Army theme. Clean view neutralises contribution backgrounds/fonts/rotations and decorative ornaments while retaining text, replies, photographs and original artwork. Original art content is not a background theme to discard. Notes choose only fixed local style tokens; no author HTML/CSS/JS runs.
+
+Local video studies never autoplay or loop. The pause/reduced-motion state pauses currently playing local videos when it switches off; a deliberate native Play action remains available for user-controlled media. Existing GIF hiding and CSS animation controls remain. Native dialog and note/reply controls use fixed readable interaction styling. Authored note data is separate from theme configuration and resets on refresh.

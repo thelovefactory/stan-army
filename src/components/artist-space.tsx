@@ -15,6 +15,8 @@ import {
   Check,
 } from "lucide-react";
 import { ArmyView, armyPath, armyAddress } from "@/lib/data";
+import { LivingFanSpace, OrbitFans } from "./living-fan-space";
+import { FanMediaPreviews } from "./fan-media";
 import { ArmyAnnouncements } from "./army-announcements";
 import { DemoNote } from "./shell";
 import { MusicPanel } from "./music-panel";
@@ -48,6 +50,7 @@ function ArmySpaceContent({
   room?: boolean;
 }) {
   const { artist, army, founder } = view;
+  const isNova = army.id === "army-nova";
   const { theme, visibleAsset } = useProfileTheme();
   const customBanner = visibleAsset(theme.images.banner);
   const customAvatar = visibleAsset(theme.images.avatar);
@@ -102,7 +105,10 @@ function ArmySpaceContent({
       </main>
     );
   return (
-    <main id="main" className={`artist-page accent-${army.accent}`}>
+    <main
+      id="main"
+      className={`artist-page accent-${army.accent} ${isNova ? "living-army" : ""}`}
+    >
       <div className="container">
         <div className="artist-breadcrumb">
           <Link href="/discover">
@@ -112,7 +118,7 @@ function ArmySpaceContent({
         </div>
         <section className="artist-banner" aria-label={`${artist.name} banner`}>
           <Image
-            src={customBanner || "/images/crowd.jpg"}
+            src={customBanner || (isNova ? artist.image : "/images/crowd.jpg")}
             unoptimized={!!customBanner}
             fill
             priority
@@ -120,7 +126,7 @@ function ArmySpaceContent({
             alt={
               customBanner
                 ? "Locally selected custom artist banner"
-                : "Festival crowd, licensed stock banner for this demo artist"
+                : "Licensed stock photograph representing this fictional artist"
             }
           />
           <div className="banner-overlay" />
@@ -197,46 +203,11 @@ function ArmySpaceContent({
             </button>
           </div>
         </section>
-        <section
-          className="founder-spotlight"
-          aria-label="Meet the founding stan"
-        >
-          <div className="founder-photo">
-            <Image
-              src={founder.image}
-              width={66}
-              height={66}
-              alt="Stock portrait representing the fictional founding stan"
-            />
-          </div>
-          <div>
-            <p className="eyebrow">ONE FAN STARTED THIS. LOOK WHAT WE BUILT.</p>
-            <h2>
-              Founded by{" "}
-              {founder.id === "fan-jess" ? (
-                <Link href="/fans/jess-wav">@{founder.handle}</Link>
-              ) : (
-                <span>@{founder.handle}</span>
-              )}{" "}
-              <span>✳</span>
-            </h2>
-            <p>
-              A fan-run Army for {artist.name}. The community stewards its own
-              space.
-            </p>
-          </div>
-          <div className="army-address">
-            <b>{armyAddress(army)}</b>
-            <span>Intended public address · local demo</span>
-            <code>{armyPath(army)}</code>
-          </div>
-        </section>
-        <p className="army-identity-note">
-          Artist identity: @{artist.officialHandle} · Fan founder: @
-          {founder.handle} · Army address: {armyAddress(army)}. These are
-          separate identities. Official participation never transfers community
-          ownership.
-        </p>
+        <div className="army-address-strip">
+          <span>FAN-RUN · FAN-MADE</span>
+          <b>{armyAddress(army)}</b>
+          <small>Intended address · local prototype</small>
+        </div>
         <div className="artist-about-row">
           <p>{artist.bio}</p>
           <span role="status" className="share-status">
@@ -247,153 +218,237 @@ function ArmySpaceContent({
           </span>
         </div>
         <div className="artist-section-nav">
-          <a href="#army-room" className="active">
+          <a href={isNova ? "#fan-space" : "#army-room"} className="active">
             The army <span>✳</span>
           </a>
-          <a href="#artist-posts">From {artist.name.split(" ")[0]}</a>
+          {isNova && <a href="#army-room">Army chat</a>}
+          <a href="#artist-posts">Army & artist notes</a>
+          {isNova && <Link href="/armies/nova/gallery">Our gallery</Link>}
           <a href="#events">Events & links</a>
           <Link className="room-link" href={`${armyPath(army)}/room`}>
             <Maximize2 size={14} /> Open listening room
           </Link>
         </div>
-        <div id="army-room" className="army-grid">
-          <div className="artist-left-column">
-            <MusicPanel />
-            <section className="panel faces-panel">
-              <div className="panel-title">
-                <h2>The people behind the plays</h2>
-                <span className="mint-text">↗</span>
-              </div>
-              <div className="fan-faces">
-                <Image
-                  src="/images/sienna.jpg"
-                  width={46}
-                  height={46}
-                  alt="Stock fan portrait"
-                />
-                <Image
-                  src="/images/atlas.jpg"
-                  width={46}
-                  height={46}
-                  alt="Stock fan portrait"
-                />
-                {["JW", "LL", "MT", "+"].map((t, i) => (
-                  <span
-                    key={t}
-                    className={`fan-avatar fan-${["pink", "mint", "orange", "blue"][i]}`}
-                  >
-                    {t}
+        {isNova ? (
+          <div className="living-layout">
+            <div className="living-primary">
+              <LivingFanSpace armyId={army.id} />
+              <FanMediaPreviews />
+              <details className="army-voices-fold" id="artist-posts">
+                <summary>
+                  <span>
+                    From the Army <b>♡</b>
                   </span>
-                ))}
-              </div>
-              <p>
-                Different people. One shared obsession.
-                <br />
-                <span>Illustrative faces & fictional fans.</span>
-              </p>
-            </section>
-          </div>
-          <ArmyChat view={view} />
-        </div>
-        <section id="artist-posts" className="artist-post-section">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">BUILT BY FANS. OPEN TO THE ARTIST.</p>
-              <h2>The voices behind the Army.</h2>
+                  <span>
+                    From the Artist <b>✳</b>
+                  </span>
+                  <small>Two distinct voices. Open their notes ↘</small>
+                </summary>
+                <ArmyAnnouncements view={view} />
+              </details>
             </div>
-            <span className="micro-label">DEMO POSTS</span>
-          </div>
-          <ArmyAnnouncements view={view} />
-          <div className="posts-grid community-posts">
-            <article className="panel announcement">
-              <p className="eyebrow">THE ARMY NOTICEBOARD · DEMO</p>
-              <h3>
-                Three songs.
-                <br />
-                One new friend.
-              </h3>
-              <p>
-                This week’s fan challenge: send one of their songs to someone who needs
-                it. Bring back the story, not a streaming screenshot. No
-                targets, no fake plays. Just music finding people.
-              </p>
-              <div className="post-byline">
-                <span>@{founder.handle} · Community post</span>
-                <span>✳</span>
+            <div className="living-sidebar">
+              <div id="army-room">
+                <ArmyChat view={view} />
               </div>
-            </article>
-            <article className="panel photo-post">
-              <div className="post-image">
-                <Image
-                  src="/images/room.jpg"
-                  fill
-                  sizes="(max-width:800px) 90vw, 35vw"
-                  alt="A concert stage photographed from the audience"
-                />
-                <span>FROM THE STAGE</span>
+              <div className="living-music">
+                <MusicPanel />
               </div>
-              <div className="post-body">
-                <p>
-                  Still thinking about this feeling. Nothing beats a room
-                  singing back. See you at the next one. 🖤
-                </p>
-                <div className="post-byline">
-                  <span>Fan photo diary · Demo</span>
-                  <button
-                    className="like-button"
-                    aria-pressed={liked}
-                    onClick={() => setLiked(!liked)}
-                    aria-label={
-                      liked ? "Remove demo reaction" : "Like demo post"
-                    }
+              <OrbitFans />{" "}
+              <aside id="events" className="panel events-panel">
+                <div className="panel-title">
+                  <h2>
+                    <CalendarDays size={17} /> Out in the world
+                  </h2>
+                </div>
+                <p className="micro-label">ILLUSTRATIVE EVENT · NOT BOOKABLE</p>
+                <div className="event-entry">
+                  <div className="date-block">
+                    <span>DEC</span>
+                    <b>12</b>
+                  </div>
+                  <div>
+                    <h3>Fan listening meetup</h3>
+                    <p>{artist.city} · Fictional venue</p>
+                    <span className="mint-text">
+                      Fan-organised example · No artist appearance implied
+                    </span>
+                  </div>
+                </div>
+                <div className="artist-links">
+                  <p className="micro-label">EXPLORE THE PLATFORMS</p>
+                  <a
+                    href="https://bandcamp.com/discover"
+                    target="_blank"
+                    rel="noreferrer"
                   >
-                    <Heart size={15} fill={liked ? "currentColor" : "none"} />{" "}
-                    {42 + (liked ? 1 : 0)}
-                  </button>
+                    Discover music on Bandcamp <ExternalLink size={14} />
+                  </a>
+                  <a
+                    href="https://www.youtube.com/@nprmusic"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    NPR Music on YouTube <ArrowUpRight size={16} />
+                  </a>
+                  <p>
+                    Platform examples, not this fictional artist’s profiles.
+                  </p>
                 </div>
-              </div>
-            </article>
-            <aside id="events" className="panel events-panel">
-              <div className="panel-title">
-                <h2>
-                  <CalendarDays size={17} /> Out in the world
-                </h2>
-              </div>
-              <p className="micro-label">ILLUSTRATIVE EVENT · NOT BOOKABLE</p>
-              <div className="event-entry">
-                <div className="date-block">
-                  <span>DEC</span>
-                  <b>12</b>
-                </div>
-                <div>
-                  <h3>Fan listening meetup</h3>
-                  <p>{artist.city} · Fictional venue</p>
-                  <span className="mint-text">
-                    Fan-organised example · No artist appearance implied
-                  </span>
-                </div>
-              </div>
-              <div className="artist-links">
-                <p className="micro-label">EXPLORE THE PLATFORMS</p>
-                <a
-                  href="https://bandcamp.com/discover"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Discover music on Bandcamp <ExternalLink size={14} />
-                </a>
-                <a
-                  href="https://www.youtube.com/@nprmusic"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  NPR Music on YouTube <ArrowUpRight size={16} />
-                </a>
-                <p>Platform examples, not this fictional artist’s profiles.</p>
-              </div>
-            </aside>
+              </aside>
+            </div>
           </div>
-        </section>
+        ) : (
+          <>
+            {" "}
+            <div id="army-room" className="army-grid">
+              <div className="artist-left-column">
+                <MusicPanel />
+                <section className="panel faces-panel">
+                  <div className="panel-title">
+                    <h2>The people behind the plays</h2>
+                    <span className="mint-text">↗</span>
+                  </div>
+                  <div className="fan-faces">
+                    <Image
+                      src="/images/sienna.jpg"
+                      width={46}
+                      height={46}
+                      alt="Stock fan portrait"
+                    />
+                    <Image
+                      src="/images/atlas.jpg"
+                      width={46}
+                      height={46}
+                      alt="Stock fan portrait"
+                    />
+                    {["JW", "LL", "MT", "+"].map((t, i) => (
+                      <span
+                        key={t}
+                        className={`fan-avatar fan-${["pink", "mint", "orange", "blue"][i]}`}
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                  <p>
+                    Different people. One shared obsession.
+                    <br />
+                    <span>Illustrative faces & fictional fans.</span>
+                  </p>
+                </section>
+              </div>
+              <ArmyChat view={view} />
+            </div>
+            <section id="artist-posts" className="artist-post-section">
+              <div className="section-heading">
+                <div>
+                  <p className="eyebrow">BUILT BY FANS. OPEN TO THE ARTIST.</p>
+                  <h2>The voices behind the Army.</h2>
+                </div>
+                <span className="micro-label">DEMO POSTS</span>
+              </div>
+              <ArmyAnnouncements view={view} />
+              <div className="posts-grid community-posts">
+                <article className="panel announcement">
+                  <p className="eyebrow">THE ARMY NOTICEBOARD · DEMO</p>
+                  <h3>
+                    Three songs.
+                    <br />
+                    One new friend.
+                  </h3>
+                  <p>
+                    This week’s fan challenge: send one of their songs to
+                    someone who needs it. Bring back the story, not a streaming
+                    screenshot. No targets, no fake plays. Just music finding
+                    people.
+                  </p>
+                  <div className="post-byline">
+                    <span>@{founder.handle} · Community post</span>
+                    <span>✳</span>
+                  </div>
+                </article>
+                <article className="panel photo-post">
+                  <div className="post-image">
+                    <Image
+                      src="/images/room.jpg"
+                      fill
+                      sizes="(max-width:800px) 90vw, 35vw"
+                      alt="A concert stage photographed from the audience"
+                    />
+                    <span>FROM THE STAGE</span>
+                  </div>
+                  <div className="post-body">
+                    <p>
+                      Still thinking about this feeling. Nothing beats a room
+                      singing back. See you at the next one. 🖤
+                    </p>
+                    <div className="post-byline">
+                      <span>Fan photo diary · Demo</span>
+                      <button
+                        className="like-button"
+                        aria-pressed={liked}
+                        onClick={() => setLiked(!liked)}
+                        aria-label={
+                          liked ? "Remove demo reaction" : "Like demo post"
+                        }
+                      >
+                        <Heart
+                          size={15}
+                          fill={liked ? "currentColor" : "none"}
+                        />{" "}
+                        {42 + (liked ? 1 : 0)}
+                      </button>
+                    </div>
+                  </div>
+                </article>
+                <aside id="events" className="panel events-panel">
+                  <div className="panel-title">
+                    <h2>
+                      <CalendarDays size={17} /> Out in the world
+                    </h2>
+                  </div>
+                  <p className="micro-label">
+                    ILLUSTRATIVE EVENT · NOT BOOKABLE
+                  </p>
+                  <div className="event-entry">
+                    <div className="date-block">
+                      <span>DEC</span>
+                      <b>12</b>
+                    </div>
+                    <div>
+                      <h3>Fan listening meetup</h3>
+                      <p>{artist.city} · Fictional venue</p>
+                      <span className="mint-text">
+                        Fan-organised example · No artist appearance implied
+                      </span>
+                    </div>
+                  </div>
+                  <div className="artist-links">
+                    <p className="micro-label">EXPLORE THE PLATFORMS</p>
+                    <a
+                      href="https://bandcamp.com/discover"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Discover music on Bandcamp <ExternalLink size={14} />
+                    </a>
+                    <a
+                      href="https://www.youtube.com/@nprmusic"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      NPR Music on YouTube <ArrowUpRight size={16} />
+                    </a>
+                    <p>
+                      Platform examples, not this fictional artist’s profiles.
+                    </p>
+                  </div>
+                </aside>
+              </div>
+            </section>
+          </>
+        )}
         <section className="flames-concept panel">
           <span>✳</span>
           <div>
@@ -406,6 +461,22 @@ function ArmySpaceContent({
             </p>
           </div>
         </section>
+        <div className="founder-love-credit">
+          <span aria-hidden="true">♡</span>
+          <p>
+            This little corner of the internet was made possible by{" "}
+            {founder.id === "fan-jess" ? (
+              <Link href="/fans/jess-wav">@{founder.handle}</Link>
+            ) : (
+              <b>@{founder.handle}</b>
+            )}
+            .<br />
+            <span>
+              Give {founder.id === "fan-jess" ? "her" : "them"} some love. The
+              fans make this place.
+            </span>
+          </p>
+        </div>
         <div className="artist-bottom-note">
           <span>✳</span>
           <p>

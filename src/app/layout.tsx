@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./profile-theme.css";
 import "./pivot.css";
+import "./living.css";
 import { Header, Footer } from "@/components/shell";
 import { DemoProvider } from "@/components/demo-provider";
 export const metadata: Metadata = {

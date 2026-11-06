@@ -8,8 +8,8 @@ Checkout `/workspace/stan-army`; review branch `codex/milestone-1-visual-prototy
 | --- | --- |
 | `npm run lint` | Passed, exit 0, no errors/warnings |
 | `npm run typecheck` | Passed, exit 0; runs `next typegen && tsc --noEmit` |
-| `npm test` | Passed, exit 0; 15 named tests, 15 passed, 0 failed |
-| `npm run build` | Passed, exit 0; optimized webpack build, TypeScript and 31 generated route outputs including legacy redirects; create/official-access render on demand |
+| `npm test` | Passed, exit 0; 19 named tests, 19 passed, 0 failed |
+| `npm run build` | Passed, exit 0; optimized webpack build, TypeScript and 33 generated route outputs including legacy redirects; create/official-access render on demand |
 | `git diff --check` | Passed |
 | `git diff --numstat -- STAN_ARMY_CODEX_BUILD_BRIEF.md STAN_ARMY_ADDENDUM_01.md STAN_ARMY_PRODUCT_PIVOT.md public` | Empty; source briefs and supplied/licensed/original public assets preserved |
 
@@ -73,3 +73,18 @@ The [Sites skill](skill://plugin_connector_1p_689987207de08191979cf68eca2941c6/s
 
 ## Remaining simulation and next engineering step
 No authentication, real permissions, database, realtime, global artist/address conflict checks, DNS, verification, moderation enforcement, transfers, payments, campaigns, ads or deployment. No invented streaming/royalty metrics or synchronized playback. Next engineering work is authenticated fan accounts, canonical persistent Armies, explicit stewardship roles and real enlistment, with server/database enforcement and reviewed infrastructure choices.
+
+## Living Fan Space validation update
+All existing tests still pass. Four additional tests cover text limits, restricted contribution-style tokens, safe fixed gallery lookup and existence/type/size of playable local MP4 files. The latest total is **19 passed / 0 failed**. `npm run lint`, `npm run typecheck` and `npm run build` pass; build output includes 33 generated routes plus dynamic pages (including the gallery query page). No package dependency was added.
+
+The already-authorised workspace development server remains running. HTTP checks returned 200 for `/armies/nova`, `/armies/nova/gallery?memory=bside-print` and `/armies/nova/videos`. Parsed main HTML confirms Nova, Leave your mark, sample-conversation controls, the shoebox and both announcement labels, with founder credit after fan content and no oversized founder-panel markup. The local MP4 serves `206 video/mp4` for a range request. `ffprobe` confirms the sample clip is six-second H.264, 800×450, with no audio stream. These are HTTP/generated-media checks, not browser playback or visual screenshots.
+
+### Additional manual visual review
+1. Write a note using each of the four treatments; confirm it appears first. Leave a heart, expand replies and answer; navigate to the gallery and back. Confirm session state survives and refresh clears content but retains saved themes.
+2. Disable sample conversations. The feed should retain only the founding note, with no sample hearts/replies, plus anything you wrote. Does one personal note feel like a beginning rather than an empty dashboard?
+3. Open gallery previews, filter Photos/Fan art/Keepsakes, navigate details with native dialog controls/Escape, and keep/unkeep a memory. Inspect stock/original provenance captions and return-focus behaviour.
+4. Play the two original silent clips manually. Confirm no autoplay/loop, local file delivery, download links and pause when motion controls switch off. These are original typography studies, not artist performance uploads.
+5. Check artist-first hierarchy, varied contribution compositions and bottom founder credit at 1440/390/320px and 200% zoom. Ensure the chat/music/sidebar stack remains useful. Open From the Army / From the Artist and verify existing role-gated composers.
+6. Test custom/clean view on main/gallery/video pages, including existing saved themes and a bright/clashing theme. Contribution treatments should neutralise without erasing their content. Check focus, contrasts and reduced-motion behaviour.
+
+The actual historical research screenshot is in `docs/research/`; product browser screenshots remain unavailable. No browser visual/keyboard/dialog/playback pass is claimed because the required managed tool is still absent. The existing user-requested server was used for HTTP checks; no alternative browser was installed or controlled. No production backend, real upload service, payments or deployment was added.

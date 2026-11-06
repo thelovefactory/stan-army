@@ -41,3 +41,10 @@ Future financial domains stay separate: Army entitlements/subscriptions, contrib
 
 ## Validation and operational limits
 Commands: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`. Tests cover entities/permissions, canonical aliases, discovery/onboarding/request validation, theme safeguards and old-to-new key compatibility. Build output can verify rendered headings and redirect metadata. Actual browser desktop/mobile/keyboard/file-upload/playback journeys remain unverified in this environment; see `VALIDATION.md`.
+
+## Living fan space implementation
+`fan-space.ts` holds typed fictional note/reply, memory, member and video fixtures with original/stock provenance. `LivingFanSpace` handles controlled text/style composition and threaded reply controls. `MemoryVisual` renders allowlisted local photographs and original CSS/text print/keepsake designs. `FanMediaPreviews` leads to two Nova-only deeper experiences; `FanMediaPage` reuses the same Army theme wrapper. The gallery uses native dialog focus/Escape behaviour. Local MP4 video elements have controls, no autoplay/loop, and pause when the existing motion preference switches off.
+
+`DemoProvider` adds in-memory notes, replies, heart toggles and kept-memory IDs alongside unchanged enlistment/chat state. It is still a small React context, not a social backend. Text is validated for useful length and React-escaped; style choices are a fixed enum. Gallery query IDs resolve only to known memory fixtures, never user-provided remote asset URLs. Saved theme schema/storage keys and legacy fallback are unchanged. `ProfileTheme` exposes clean/motion settings to contributions and sets a clean-view data attribute for scoped CSS.
+
+Only Nova gets this authored community composition; the original other fixtures remain compatible. `living.css` styles contribution content independently from core platform controls, with responsive layouts and clean treatments. Existing official/community publishing capabilities are unchanged. No database, real uploads, new auth or payment infrastructure is introduced. See research and validation documents for the historical and verification boundaries.
