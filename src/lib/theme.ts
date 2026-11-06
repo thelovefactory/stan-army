@@ -469,3 +469,21 @@ export function loadProfileTheme(
     return structuredClone(defaultTheme);
   }
 }
+
+/** Read-through compatibility: never writes or removes a legacy key while rendering. */
+export function profileThemeSnapshot(
+  storage: Pick<Storage, "getItem">,
+  profileId: string,
+  legacyProfileId?: string,
+): string | null {
+  try {
+    const current = storage.getItem(storageKey(profileId));
+    return current !== null
+      ? current
+      : legacyProfileId
+        ? storage.getItem(storageKey(legacyProfileId))
+        : null;
+  } catch {
+    return null;
+  }
+}

@@ -1,43 +1,43 @@
-# Architecture
+# Architecture — fan accounts, artists and Armies
 
-## Implemented now
-Next.js App Router + TypeScript + Tailwind CSS v4 (PostCSS integration), with CSS design tokens and responsive component styles in `src/app/globals.css`. Lucide supplies interface icons; original supplied images and licensed stock photographs are local assets. No remote font or image request is needed for initial rendering.
+## Implemented application
+Next.js App Router, TypeScript, Tailwind CSS v4 and scoped CSS design tokens. Lucide icons, original logo, local licensed photographs and original decorative assets. No backend client, API endpoints, server actions, auth, billing, secrets or deployment resources. `/create` and `/official-access` read query parameters through ordinary server-rendered pages; neither is a mutation endpoint.
 
-App Router pages render the static shell and seeded artist records. Discovery, artist actions, chat, media consent and wizard use client components. `DemoProvider` wraps the app and holds session-in-memory enlistments and messages keyed by artist slug. No API route handlers, server actions, services, Supabase client, backend storage, credentials or external data fetch are implemented. Community state changes do not persist; Addendum 01 visual settings use browser-local persistence.
+`src/lib/data.ts` now separates:
+- `User`: stable identity, personal handle/name/image.
+- `Artist`: catalogue identity, artist reference, biography, genre and location.
+- `Army`: stable community ID, unique slug, artist reference, historical founder, welcome and demo community metrics.
+- `ArmyMembership`: user/Army community role.
+- `ArtistRelationship`: portable user/artist relationship, artist vs representative kind, verification state.
+- `ArmyView`: explicit joined `{army, artist, founder}` projection for reusable presentation.
 
-## Source boundaries
-- `src/lib/data.ts`: typed artist seed, discovery selection, fixed media example, wizard validation.
-- `src/components/shell.tsx`: navigation, mobile menu, footer and demo labels.
-- `artist-card.tsx`, `discovery.tsx`: reusable discovery surfaces.
-- `artist-space.tsx`, `music-panel.tsx`, `army-chat.tsx`: artist room and reusable media/chat panels.
-- `army-wizard.tsx`: four-stage controlled form and preview.
-- `tests/demo-logic.test.ts`: meaningful filtering and validation checks using the Node test runner through tsx.
+Seed invariants are tested: one Army per artist, unique addresses, distinct founder/artist/Army IDs. Membership-based administration/moderation functions do not consult verified relationships; official publishing checks the artist relationship and scope instead. No monetary property is consulted for either. UI roles remain explicitly simulated and are not production authorization.
 
-Dynamic artist routes use `generateStaticParams` for all six seed slugs; unknown artists render the custom 404. Shared provider state follows client-side navigation, while page-local state unmounts normally. No runtime secret is required. Addendum 01 introduces client-only localStorage for theme settings, separate from in-memory community content. Root metadata discourages search indexing for this prototype; that is not access control.
+## Rendering and state
+`ArmySpace` in the retained `artist-space.tsx` composes existing media/chat/post surfaces and the shared theme wrapper. New founder/identity hierarchy and `ArmyAnnouncements` expose community vs official contributions. Announcement composers are capability-separated; added posts stay page-local with their author type captured at posting. The original post-heart reaction is preserved.
 
-## Accessibility design
-Semantic page landmarks, skip link, labeled controls, native links/buttons/radios/selects, visible focus styles, pressed state on toggles, polite status messages, alert validation errors and keyboard-focusable mobile navigation. Wizard stage changes focus the stage heading. Reduced-motion CSS removes transitions and smooth scrolling. Input limits and wrapping protect conversation and preview layouts. See validation report for what was actually checked; these implementation provisions are not a claim of a completed accessibility audit.
+`DemoProvider` keeps enlistments and submitted chat messages in memory, now keyed by stable Army ID rather than artist slug. They survive client navigation under the root provider, then clear on refresh. Fan profile enlistments join these IDs to Army views. Favourite artist presentation and community membership remain different concepts. Creation and official-request drafts are local component state, never backend writes.
 
-## Future Supabase boundary — proposed, not implemented
-Use Supabase Postgres/Auth/Storage/Realtime if review confirms fit and costs. Server-rendered/session-aware reads and authenticated server mutations should sit behind a typed data-access layer. Never replace demo provider methods with unauthenticated direct writes.
+The four-stage `ArmyWizard` searches catalogue identities, detects seeded canonical Armies, validates address/welcome/optional HTTPS music link, and makes a themed preview. It reuses `ThemePresetPicker` from the shared editor and `ProfileTheme`'s preview mode, rather than duplicating the theme engine. A completed preview does not create a public or session-routable Army. Copied invite text explicitly says preview-only and non-live. This is the existing M1 preview boundary, now fan-led.
 
-Auth must map multiple provider identities onto one internal user ID. Passwordless email is the initial candidate; Google/Apple require provider setup. Link accounts only with verified ownership, never an unverified email match. Enforce roles on the server and with RLS, including manager access scoped to explicit artist invitations. Never expose service-role credentials to the browser.
+## Routing
+`armyPath` and `armyAddress` centralize local routes and intended public addresses. `/armies/[slug]` and `/armies/[slug]/room` render seeded communities. Legacy `/artists/[slug]` routes use the explicit legacy mapping and return permanent redirects; Nova maps `nova-reign` to `nova`. Unknown slugs return the existing 404.
 
-Artist/public discovery reads may be anonymous; page edits require explicit owner/editor authorization. Enlistment mutations need authenticated fan identity, uniqueness and idempotency. Storage needs private upload processing, MIME/signature/size limits, safe image transformation and copyright handling. Artist media links need provider-specific allowlists; unknown safe links should remain link cards instead of arbitrary embeds.
+Future wildcard-host routing must validate a configured base domain and exactly one permitted subdomain label, exclude reserved platform hosts, resolve the Army on the server and render the same route content. Host/proxy trust, wildcard DNS/TLS, cross-subdomain identity/cookie rules, canonical URLs and unknown-host behaviour require infrastructure review. No such infrastructure is provisioned now. Local fallback is the supported implementation. LocalStorage does not cross subdomain origins; future public themes must be database-backed.
 
-Chat will need persistent per-artist rooms, server-authorized membership, paginated history, rate limits, report/mute/delete/ban actions and an audit trail before realtime delivery. Realtime is delivery infrastructure, not authorization. Slow mode and retention are open decisions. Scale by paginated history, indexed room/time queries and bounded presence; reassess managed chat if expected concurrency exceeds measured Supabase limits.
+## Theme compatibility
+`ProfileTheme` now targets `army:<stableArmyId>` and accepts an explicit `artist:<legacySlug>` fallback. `profileThemeSnapshot` prefers the new key; if absent, it reads the corresponding legacy key. Reads never write/delete anything, and values are validated before use. Save writes the new key; old data stays untouched, even on failed saves. Reset writes an explicit default to the new key, so the old customised theme cannot reappear accidentally. Fan keys are unchanged.
 
-## Dependencies, costs and decisions before selection
-Current application is local and requires no paid account. Node/npm and the installed packages run locally. YouTube is optional external playback with provider restrictions and privacy effects. Unsplash photos are downloaded locally under their license, with provenance in `ASSET_SOURCES.md`.
+The same theme schema, upload limits, six presets, contrast resolution, clean view and motion policies remain. Scope is the canvas; global navigation and role/editor controls sit outside it. The official role has no ability to open the Army theme editor unless a separate community grant is deliberately introduced later. See `THEME_ENGINE.md` for the exact contract.
 
-Future Supabase and Stripe plans are unselected. Record then-current database/storage/egress/MAU/realtime quotas and regional hosting cost before provisioning. Stripe fees and email-provider costs also need explicit review. Environment variable names, secrets and service configuration will be introduced only in the approved backend milestone; `.env.example` currently documents that none are needed.
+## Future data/service boundary — proposed only
+Supabase remains a candidate for Postgres/Auth/Storage/Realtime after region, quota and cost review. Separate repositories for users, catalogue artists, Armies, memberships and verified relationships should feed the joined display model. Authenticated server mutations and RLS must enforce both community grants and artist-specific official scopes. Never trust the role dropdown, JSON settings or submitted actor IDs.
 
-## Validation
-Run `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`. Browser review should exercise all routes at desktop/mobile widths and both keyboard/reduced-motion settings, then verify the consented embed separately with network access. No claim of live playback availability follows from a successful local build.
+Creation needs a unique artist/canonical-Army constraint and unique reserved-aware address constraint, enforced transactionally. Artist matching uses reviewed catalogue/provider identities, not names alone. New/ambiguous identities enter conflict review. Verification needs evidence handling, reviewer decisions, scope, expiry/revocation, sensitive-handle reservation and appeals. A payment cannot satisfy an identity or ownership check.
 
-## Addendum 01 architecture
-`src/lib/theme.ts` defines one versioned presentation schema, six presets, strict enum/hex/raster validation, contrast resolution and storage helpers. `ProfileTheme` uses `useSyncExternalStore` for hydration-safe storage and reduced-motion subscriptions. It keeps saved configuration separate from an unsaved editor draft. `ThemeEditor` is shared by artist/fan wrappers and applies changes to their real children; no second mock preview tree or cloned chat state is used. Artist pages and focused rooms share one profile ID.
+Future uploads require authenticated processing, content-type/signature/size restrictions, metadata handling, safe storage and copyright operations. Chat needs membership authorization, moderation/reporting, rate limits, pagination and delivery infrastructure. Official publishing needs an independently verified relationship, audit trail and rights-aware content rules. Realtime is not authorization.
 
-`src/app/profile-theme.css` scopes every personalised rule below `.profile-canvas.profile-custom`. Global header, footer, role controls and editor are outside that scope. Core media/chat/control surfaces keep readable fonts, opaque backplates and contrast fallbacks. Decoration layers cannot capture pointer events. The editor is a nonmodal right rail on wide screens and bottom sheet at 1100px and below; Escape cancels and focus returns to Customise. Actual browser focus/layout verification remains outstanding.
+Future financial domains stay separate: Army entitlements/subscriptions, contribution accounting, promotional campaigns, labelled inventory placements, budget ledger, refunds and reporting. Only agreed entitlements should influence premium features; none influence community ownership or artist identity. No fees, providers or infrastructure plans are selected in this change.
 
-Asset file reads enforce raster MIME, base64/signature consistency, browser decoding, dimensions and byte limits. No user-supplied CSS string or HTML reaches a style sheet. Allowed inline raster data is the only upload URL accepted. Settings are revalidated on storage reads and writes. Storage-denial/quota errors leave the editor open and announce failure. See `THEME_ENGINE.md` for the persistence contract and proposed database transition; no backend is implemented.
+## Validation and operational limits
+Commands: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`. Tests cover entities/permissions, canonical aliases, discovery/onboarding/request validation, theme safeguards and old-to-new key compatibility. Build output can verify rendered headings and redirect metadata. Actual browser desktop/mobile/keyboard/file-upload/playback journeys remain unverified in this environment; see `VALIDATION.md`.

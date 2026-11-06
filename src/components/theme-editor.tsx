@@ -145,23 +145,7 @@ export function ThemeEditor({
           <Sparkles size={16} /> The grossness library
         </h3>
         <p>Six moods. Absolutely no taste police.</p>
-        <div className="preset-grid">
-          {presets.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              aria-pressed={theme.preset === p.id}
-              className={`preset-button preset-${p.id}`}
-              onClick={() => update(structuredClone(p.theme))}
-              disabled={busy}
-              style={{ "--preset-color": p.color } as CSSProperties}
-            >
-              <span>{p.symbol}</span>
-              <b>{p.name}</b>
-              <small>{p.line}</small>
-            </button>
-          ))}
-        </div>
+        <ThemePresetPicker theme={theme} onChange={onChange} busy={busy} />
         <p className="editor-hint">
           Presets replace the current preview, including uploads. Cancel
           restores your saved theme.
@@ -552,6 +536,36 @@ function AssetInput({
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+export function ThemePresetPicker({
+  theme,
+  onChange,
+  busy = false,
+}: {
+  theme: Theme;
+  onChange: (theme: Theme) => void;
+  busy?: boolean;
+}) {
+  return (
+    <div className="preset-grid">
+      {presets.map((p) => (
+        <button
+          key={p.id}
+          type="button"
+          aria-pressed={theme.preset === p.id}
+          className={`preset-button preset-${p.id}`}
+          onClick={() => onChange(structuredClone(p.theme))}
+          disabled={busy}
+          style={{ "--preset-color": p.color } as CSSProperties}
+        >
+          <span>{p.symbol}</span>
+          <b>{p.name}</b>
+          <small>{p.line}</small>
+        </button>
+      ))}
     </div>
   );
 }

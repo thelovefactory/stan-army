@@ -4,8 +4,15 @@ import Link from "next/link";
 import { ArrowUpRight, Heart, Headphones, Users } from "lucide-react";
 import { ProfileTheme, useProfileTheme } from "./profile-theme";
 import { useDemo } from "./demo-provider";
-import { artists } from "@/lib/data";
-import { ArtistCard } from "./artist-card";
+import {
+  armies,
+  armyView,
+  armyPath,
+  armyForArtist,
+  fanFavourites,
+  currentFan,
+} from "@/lib/data";
+import { ArmyCard } from "./artist-card";
 export function FanProfile() {
   return (
     <ProfileTheme profileId="fan:jess-wav" kind="fan" name="Jess.wav">
@@ -18,7 +25,13 @@ function FanProfileContent() {
   const { enlisted } = useDemo();
   const banner = visibleAsset(theme.images.banner);
   const avatar = visibleAsset(theme.images.avatar);
-  const joined = artists.filter((a) => enlisted.includes(a.slug));
+  const joined = armies.filter((a) => enlisted.includes(a.id)).map(armyView);
+  const favourites = fanFavourites
+    .filter((f) => f.userId === currentFan.id)
+    .flatMap((f) => {
+      const army = armyForArtist(f.artistId);
+      return army ? [army] : [];
+    });
   return (
     <main id="main" className="container fan-profile">
       <div className="fan-profile-banner">
@@ -61,7 +74,7 @@ function FanProfileContent() {
           <h1>
             Jess.wav <span>♡</span>
           </h1>
-          <p>@jess.wav · Bristol, UK · Here for the B-sides</p>
+          <p>@jess.wav · Bristol, UK · Founding stan of Nova’s Army</p>
         </div>
         <span className="fan-status">
           ♫ Probably listening to something sad.
@@ -99,7 +112,8 @@ function FanProfileContent() {
           </div>
           <p>
             Personal imagery, decorative stickers, and a whole lot of
-            personality. Hit Customise to try the same editor used by artists.
+            personality. Hit Customise to try the same editor used by fan Army
+            administrators.
           </p>
         </aside>
       </div>
@@ -114,8 +128,8 @@ function FanProfileContent() {
           <span className="micro-label">SEEDED DEMO FAVOURITES</span>
         </div>
         <div className="artist-grid">
-          {artists.slice(0, 3).map((a, i) => (
-            <ArtistCard artist={a} index={i} key={a.slug} />
+          {favourites.map((a, i) => (
+            <ArmyCard view={armyView(a)} index={i} key={a.id} />
           ))}
         </div>
       </section>
@@ -133,12 +147,12 @@ function FanProfileContent() {
         {joined.length ? (
           <ul>
             {joined.map((a) => (
-              <li key={a.slug}>
-                <Link href={`/artists/${a.slug}`}>
+              <li key={a.army.id}>
+                <Link href={armyPath(a.army)}>
                   <Heart size={16} />
                   <span>
-                    {a.name}
-                    <small>@{a.handle}</small>
+                    {a.artist.name}’s Army
+                    <small>{a.army.slug}.stan.army</small>
                   </span>
                   <ArrowUpRight size={18} />
                 </Link>

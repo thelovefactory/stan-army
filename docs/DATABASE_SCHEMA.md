@@ -1,46 +1,47 @@
-# Database design — conceptual only
+# Database design — fan-led model (conceptual only)
 
-No database, SQL, migrations, Supabase project or backend endpoints are created in Milestone 1. This document describes proposed future boundaries. UUIDs, normalized memberships and timestamps are assumptions for design review, not deployed contracts.
+No database, migrations, SQL, Supabase service or API endpoints are created. The following is a proposed persistent model, revised from the original artist-owned-page design. UUIDs and timestamps are design assumptions.
 
-## Proposed entities
-| Entity | Key fields and relationships | Integrity / access requirement |
+| Entity | Proposed responsibilities and relationships | Integrity / access boundary |
 | --- | --- | --- |
-| profiles | internal user UUID, auth subject reference, unique handle, display name, avatar reference, timestamps | Self-edit; private email stays in auth; public view excludes private fields |
-| artists | UUID, unique slug, name, bio, genre, location, avatar/banner references, creation time | Anonymous published reads; owner/editor write via explicit grants |
-| artist_memberships | artist UUID, user UUID, role (`owner`, `editor`, `moderator`, `manager`), inviter | Unique artist/user; roles server-enforced; last owner cannot be removed |
-| artist_invitations | UUID, artist, invitee identity, role, token digest, expiry, inviter, accepted time | Single-use, expiring; explicit acceptance; avoid plaintext invite secrets |
-| enlistments | user UUID, artist UUID, joined time | Unique user/artist pair; self insert/delete; no impersonation |
-| artist_links | UUID, artist, provider, normalized HTTPS URL, display order | Provider-specific validation; no arbitrary script/embed HTML |
-| posts | UUID, artist, author, content, visibility, published time | Public vs enlisted-only enforced in reads; authorized artist editor writes |
-| post_reactions | post UUID, user UUID, reaction, timestamp | Unique user/post/reaction; entitled readers only |
-| rooms | UUID, artist UUID, pinned message UUID | One persistent room per artist |
-| messages | UUID, room, author, body, sent time, moderation state | Bounded body; membership policy, bans and server rate limit |
-| message_reactions | message, user, reaction | Unique tuple, authorized room participants |
-| room_sanctions | UUID, room, target user, moderator, kind, expiry, reason | Authorized moderator/admin writes, enforced before message creation |
-| reports | UUID, reporter, target type/UUID, reason, state, timestamps | Reporter create; restricted moderation read; protect reporter identity |
-| events | UUID, artist, title, start time/timezone, venue, validated ticket URL | Artist editors write, published public reads |
-| editorial_picks | artist, ordering, curator, active interval | Admin curation only; never paid placement |
-| audit_events | actor, artist/target, action, time, safe metadata | Privileged actions recorded server-side, immutable to clients |
+| users / profiles | Stable internal user ID, auth subject, unique personal handle, public profile and privacy settings | Self-edit; provider linking requires verified control; private data excluded from public views |
+| artists | Catalogue identity, name, disambiguation, public artist references | Not inherently a user, community owner or verified account |
+| artist_catalogue_refs | Artist, provider, provider artist ID, review provenance | Unique reviewed provider identity where appropriate; catalogue presence does not verify a user |
+| armies | Artist, unique community address, historical founder user, community welcome, lifecycle state | One canonical Army per artist; unique reserved-aware address; public published reads |
+| army_memberships | Army, user, community role, granted-by/at, status | Unique Army/user; owner/admin/moderator/member permissions independent of artist verification |
+| army_invitations | Army, recipient, role, expiry, token digest and acceptance | Explicit scoped grants; single-use expiring invitation; protect last owner |
+| artist_relationships | User, artist, artist/representative type, verification state, approved scopes, review record, expiry/revocation | Official status only after review; portable across platform; no implicit Army grant |
+| verification_requests | Applicant, artist, relationship claim, evidence references, review state | Restricted evidence access; no public sensitive documents; never grant on payment |
+| handle_reservations / identity_disputes | Sensitive user identities, claims, reviewer decisions and appeal history | Prevent impersonation; separate from fan community stewardship |
+| army_links | Army, validated provider URL and ordering | Fan steward edits; provider-aware embeds, safe fallback |
+| army_announcements | Army, community author, body, timestamps/pin state | Explicit fan admin publishing/pinning permission |
+| official_announcements | Artist, optional Army context, author relationship, content, timestamp | Verified scoped relationship required; displayed distinctly from community pins |
+| posts / reactions | Army, author, content, visibility; reaction tuples | Role/access rules and unique reactions; no UI-only visibility protection |
+| rooms / messages | One room per Army; author, body, timestamps and moderation state | Membership policy, sanctions and rate limits apply before writes/delivery |
+| reports / sanctions | Reporter, target, scoped moderator/reviewer, reasons, actions and appeal | Protect reporter identity; audit restricted actions |
+| events | Army, organiser user/type, venue/time/timezone, validated ticket link | Fan event must not imply artist appearance; official events need authorized provenance |
+| editorial_picks | Army, curator, ordering and active interval | Editorial/organic only; paid campaigns cannot modify this ranking |
+| profile_themes | Target Army or fan user, schema version, settings JSONB, revision, updater and timestamps | One record per target; Army grant or self-only fan update; settings contain no authorization fields |
+| stewardship_reviews / transfers | Army, current/recipient stewards, consent, notices, reviewer decision, continuity assessment, appeal | No automatic transfer; preserve founder attribution and history |
+| audit_events | Actor, target, action, timestamp and safe metadata | Privileged changes recorded server-side; immutable to clients |
 
-`profiles.id` should remain stable across auth-provider changes. A Supabase auth user may initially map one-to-one to it; lifecycle and account-linking details need review. Manager access is per-artist membership, not ownership inferred from an email domain.
+## Confirmed identity and permission rules
+Community ownership is a membership/grant concept. Historical founding attribution is distinct from current administrative stewardship. Artist verification is a user/artist relationship. An Army address is a community identifier, not an artist's official handle. These relationships must not collapse into one slug, account flag or subscription record.
 
-## Policy principles and query patterns
-- Enable RLS before exposing any table to a public client; default deny writes.
-- Never trust a submitted `user_id`, `role`, `artist_id`, published flag or entitlement without a server-side authorization check.
-- Public artist/discovery views expose only intended fields. Enlistment counts are aggregate reads; full fan membership visibility needs a privacy decision.
-- Enlisted-only post/media access is enforced in database policies and signed storage URLs, not hidden in UI alone.
-- Index published artist slugs, genre/location search fields, artist/time posts, room/time messages and artist/user membership pairs. Consider full-text or trigram search only once measured needs justify it.
-- Query message history with cursor pagination by `(sent_at, id)`; never subscribe to unbounded history.
-- Enlistment uniqueness, grants and reaction uniqueness need database constraints plus tests under concurrent requests.
-- Moderation authorization and bans must apply to HTTP writes and realtime channels consistently.
+Artist/representative verification never automatically grants Army ownership, theme edit rights, community pin control or moderation. A fan founder is not authorized to publish as the artist merely by founding an Army. Explicit separate grants can coexist, but authorization must check the capability relevant to each operation. Official relationship revocation must stop future official writes without deleting community history or transferring ownership.
 
-## Later billing and Battleground
-Separate plans, subscriptions, entitlements, provider webhook events, polls, poll options and votes are later entities. Entitlements come from verified server-side billing state. Unique fan/poll vote constraints plus abuse controls will prevent duplicates. Provider playback remains individual unless genuinely supported. No billing schema is finalized now.
+Creation requires transactional artist/address uniqueness, conflict review and duplicate-resolution redirects. No public claim should be finalized from a display-name match alone. Subdomain aliases should reference stable Army IDs. A duplicate merge or stewardship transfer must preserve membership/history references and provide an audited, reviewed process.
 
-## Data lifecycle decisions still open
-Region, retention periods, chat edit/delete history, minimum user age, public fan visibility, account export/delete behaviour, artist ownership transfer, copyright reporting and anonymous browsing must be agreed before production. Plan deletion cascades carefully: remove private user data while preserving necessary pseudonymized moderation/audit evidence under a documented retention policy.
+## Stewardship continuity
+Inactivity is not abandonment; active moderators and continuing care matter. Use notices, platform review, continuity planning, documented decisions and appeal. The 90-day/30-day examples remain provisional and are not implemented as timers or policy enforcement. Voluntary transfer needs owner consent and recipient acceptance; no automated ownership transfer, paid takeover or artist takeover is permitted.
 
-## Addendum 01 — future presentation persistence
-Implemented now: version-1 structured JSON in browser localStorage at `stan-army:theme:v1:artist:<slug>` or `stan-army:theme:v1:fan:<handle>`. Content and membership records are never placed in this theme object. Raw data URLs are a prototype-only asset representation.
+## Future financial entities — not implemented
+`army_plans`, `army_subscriptions`, `army_entitlements`, `funding_contributions`, `campaigns`, `campaign_approvals`, `budget_ledger`, `placements`, `performance_reports`, `refunds` and provider webhook records should be separate domains. Entitlements attach to an Army, while payer identity and contributor consent are separate. Professional tools may attach to a verified organisation/user relationship without acquiring the Army. Final pooled-funding, credit and refund models remain undecided. No billing schema is finalized.
 
-Proposed later: `profile_themes` with `profile_kind`, target artist/profile UUID, `schema_version`, validated `settings` JSONB, revision, `updated_by`, and timestamps. Enforce one theme per target, with owner/editor/explicit manager RLS for artists and self-only fan writes. Public readers may retrieve published presentation settings, but must retain their independent clean-view preference. Do not trust an ownership field inside the JSON. Replace data URLs with validated storage asset references after authenticated upload processing; preserve one shared theme schema using a typed asset-reference layer. Migrate v1 settings through explicit version converters and reject unsupported future versions. Keep old settings available for rollback. This is a design only: no table, SQL migration, service or endpoint is created.
+## Security, indexing and lifecycle
+Enable RLS with default-deny mutations. Authenticate actors server-side; never trust submitted user IDs, dropdown roles or JSON ownership flags. Index canonical artist/address lookup, Army/user membership, room/time message cursors, and announcement/post timelines. Constrain last-owner transitions, idempotent enlistment and unique reactions. Use signed storage access for entitled media.
+
+Define regions, retention, export/deletion, evidence protection, minimum age, public membership visibility, abuse/copyright operations and audit retention before production. Verified identity is not a copyright licence. Auth linking, representative authority and official media rights need separate proofs.
+
+## Local theme migration implemented now
+The browser reads `stan-army:theme:v1:army:<stableArmyId>`, falling back to the explicitly mapped `stan-army:theme:v1:artist:<legacySlug>` only when the new key is absent. The schema remains v1 because presentation fields did not change; only the target identity changes. Old keys are retained. New-key saves are validated; storage failure never deletes an old theme. Fan keys stay unchanged. Future storage processing should replace inline image data with reviewed asset references while retaining explicit schema migration and rollback support.

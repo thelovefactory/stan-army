@@ -1,26 +1,29 @@
-# Roadmap and review gates
+# Roadmap — fan-led Stan Army
 
-## Milestone 1 — current visual prototype
-Confirmed scope: responsive landing, working seeded discovery, demo artist spaces, focused listening room, local enlistment/chat/reactions, click-to-load media with fallback, creation wizard and documentation. No live community, backend storage or deployment. Addendum 01 browser-local theme persistence is included now, not deferred. Review screenshots/local views and the behaviour inventory before proceeding. See `VALIDATION.md` for actual checks and environment limits.
+## Milestone 1 — current prototype and approved pivot
+Keep the brand and reusable components, then correct ownership and onboarding around fans. Nova's Army is the primary community, founded by Jess.wav. Artist identity, fan account and Army have separate records. New Army routes preserve old links; legacy saved themes remain readable. Existing customisation, music consent/fallback, discovery, chat, enlistment and fan profile functionality remain.
 
-**Review gate:** approve or revise typography, colour, personal expression, chat prominence, mobile hierarchy and wizard preview. Backend work has not started.
+Two announcement areas are implemented: From the Army (community administrators) and From the Artist (fictional verified artist/representative participation). Official identity does not open the community editor, confer moderation or transfer the Army. Fan-led creation validates local catalogue/address conflicts and produces a non-live preview. Official access is a validated request preview, not real verification.
 
-## Milestone 2 — best next engineering milestone
-Accounts, persistent artist pages, roles and enlistment. Prefer Supabase after a cost, region and provider review. Build passwordless identity, stable internal user IDs, explicit artist/manager invitations, safe image upload, provider-aware link validation and a real page editor. Replace demo data behind a typed data-access boundary. Enforce owner/editor/manager permissions server-side and with RLS. Add real enlistment with a unique user/artist constraint and safe concurrent toggling.
+Original six community fixtures are retained for compatibility; no additional generic Armies are added. One catalogue-only artist allows the create flow to be explored. FAN. THE FLAMES. is explanatory product framing only. Browser acceptance evidence remains outstanding; see `VALIDATION.md`.
 
-Exit criteria: a fan can sign in and enlist; an artist can persist and edit a page; an invited manager can edit only assigned artists; refreshing retains authorized data. Tests cover unauthenticated denial, cross-artist access denial, last-owner protection, duplicate/concurrent enlistment, account linking and storage policies. Record actual service cost assumptions before creating infrastructure. Stop for review if security or service setup changes scope.
+## Milestone 2 — accounts, canonical Armies and real stewardship
+Select auth/database/storage after cost, region and quota review. Implement stable fan accounts, catalogue artist disambiguation, persistent Armies, unique canonical artist/address creation, safe uploads, membership-based owner/admin/moderator roles and real enlistment. Sensitive handle reservation and artist/community identity separation must be foundational.
 
-## Milestone 3 — community
-Persistent chat history and managed realtime delivery, pinned messages, report/mute/delete/ban, spam/rate limits, public/enlisted-only posts and reactions. Real timestamps, moderation audit events and permission tests. Load test expected concurrency. No fake online presence or synchronized playback claims.
+Persist Army and fan themes with explicit server authorization and safe asset processing. Plan wildcard-host routing, DNS/TLS and cross-subdomain identity separately from local route fallback. Do not rely on localStorage across subdomains. Test cross-Army denial, founder/artist distinction, duplicate/concurrent creation, last-owner protection, enlistment idempotency and upload policies.
 
-## Milestone 4 — discovery and reporting
-Database search, editorial curation, truthful measured metrics, manager reporting, export/deletion workflows, mobile usability testing, WCAG audit, privacy/copyright operations and reliability monitoring. Engagement counts measure platform activity; do not imply streams or royalties from embeds.
+## Milestone 3 — community and verified participation
+Persistent chat, announcements, posts, reporting, scoped moderation, rate limits, history, realtime delivery and continuity operations. Add official artist/representative review, authority scopes, expiry/revocation and disputes. Preserve separate community/official announcement surfaces and tests proving verification cannot grant administrative powers.
 
-## Milestone 5 — Battleground and subscriptions
-Only after approval: polls, one-vote rules, anti-abuse, premium artist entitlements, Stripe test-mode billing and cancellation. Review provisional $19/$59 pricing and trial/refund policy. Validate webhooks/idempotency and entitlement expiry. Live charges require separate explicit approval; participation by fans remains free unless product requirements change.
+Stewardship changes require notice, platform review, community continuity and appeal. Inactivity alone is insufficient, especially with active moderators. No automatic ownership transfer. Earlier 90-day/30-day suggestions remain provisional until a reviewed policy exists.
 
-## Open product assumptions
-Trial lengths and founding-artist promotions, room membership model, manager reporting scope, geographic rollout, moderation staffing, upload limits and retention. No assumption here authorizes a paid service or deployment.
+## Milestone 4 — discovery, truthful reporting and reliability
+Catalogue matching/search, organic/editorial curation, real engagement metrics, access/privacy/export/delete workflows, accessibility/mobile review and load testing. Paid inventory is visually and operationally separate from organic ranking. Do not manufacture streaming statistics or imply royalties from embeds.
 
-## Addendum 01 is part of Milestone 1
-Artist/fan visual customisation, all six presets, local theme persistence, raster/GIF selection, shared live editor, clean/custom viewing and animation controls are current prototype work. This is not a later milestone. The next backend milestone will add ownership enforcement, asset processing and database-backed theme records while keeping the same structured presentation boundary. Browser-based acceptance and visual review remain necessary before calling the milestone fully verified.
+## Later — fan-funded upgrades and FAN. THE FLAMES.
+Armies remain free to create/join. PRO $19 and ELITE $59 monthly pricing is provisional for optional Army upgrades, funded by eligible supporters individually or collectively. Final entitlements, ad removal, promotional credits, contribution consent, renewal responsibility, shortfall handling and refunds need agreement before billing. Professional tools may be paid separately and never buy fan community control.
+
+Promotional campaigns need explicit goals/budgets, optional contributions, moderation/creative approval, labelled inventory, ledger/reporting and responsible payments/refunds. No fake engagement, manipulated organic ranking or guaranteed streams. Battleground/polls, ad delivery and licensed exclusive media require separately agreed scope. No live or test-mode billing, campaign collection or exclusive hosting is implemented now.
+
+## Current review gate
+The fan-led implementation is ready for product/visual review with available automated checks reported. A broader reskin can follow once the community experience is right. No deployment, paid service or complex backend is authorized by this roadmap alone.

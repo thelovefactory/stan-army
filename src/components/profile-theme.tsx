@@ -24,15 +24,21 @@ import {
   parseTheme,
   readableColor,
   saveProfileTheme,
-  storageKey,
+  profileThemeSnapshot,
   Theme,
 } from "@/lib/theme";
 
 type ThemeContext = {
+  role: string;
+  canEditCommunity: boolean;
+  canPostOfficial: boolean;
   theme: Theme;
   visibleAsset: (asset: Theme["background"]["image"]) => string | null;
 };
 const Context = createContext<ThemeContext>({
+  role: "visitor",
+  canEditCommunity: false,
+  canPostOfficial: false,
   theme: defaultTheme,
   visibleAsset: () => null,
 });
@@ -69,18 +75,27 @@ export function ProfileTheme({
   kind,
   name,
   children,
+  legacyProfileId,
+  officialParticipation = false,
+  previewTheme,
 }: {
   profileId: string;
-  kind: "artist" | "fan";
+  kind: "army" | "fan";
+  legacyProfileId?: string;
+  officialParticipation?: boolean;
+  previewTheme?: Theme;
   name: string;
   children: React.ReactNode;
 }) {
-  const key = storageKey(profileId);
   const raw = useSyncExternalStore(
     subscribe,
     () => {
       try {
-        return window.localStorage.getItem(key);
+        return profileThemeSnapshot(
+          window.localStorage,
+          profileId,
+          legacyProfileId,
+        );
       } catch {
         return null;
       }
@@ -98,13 +113,22 @@ export function ProfileTheme({
   const [draft, setDraft] = useState<Theme>(defaultTheme);
   const [clean, setClean] = useState(false);
   const [paused, setPaused] = useState(false);
-  const [role, setRole] = useState("owner");
+  const [role, setRole] = useState(kind === "army" ? "founder" : "owner");
   const [status, setStatus] = useState("");
   const trigger = useRef<HTMLButtonElement>(null);
-  const theme = clean && !editing ? defaultTheme : editing ? draft : saved;
+  const theme =
+    previewTheme ??
+    (clean && !editing ? defaultTheme : editing ? draft : saved);
+  const canEditCommunity =
+    kind === "army" && ["founder", "admin"].includes(role);
+  const canPostOfficial =
+    kind === "army" &&
+    officialParticipation &&
+    ["official-artist", "official-representative"].includes(role);
+  const canEdit = kind === "fan" ? role === "owner" : canEditCommunity;
   const playing = theme.decorations.animated && !paused && !reduced;
   const custom =
-    (editing || (!clean && raw !== null)) &&
+    (!!previewTheme || editing || (!clean && raw !== null)) &&
     JSON.stringify(theme) !== JSON.stringify(defaultTheme);
   function visibleAsset(asset: Theme["background"]["image"]) {
     return asset && (!asset.animated || playing) ? asset.dataUrl : null;
@@ -176,6 +200,9 @@ export function ProfileTheme({
   return (
     <Context.Provider
       value={{
+        role,
+        canEditCommunity,
+        canPostOfficial,
         theme: custom ? theme : defaultTheme,
         visibleAsset: (asset) => (custom ? visibleAsset(asset) : null),
       }}
@@ -189,88 +216,109 @@ export function ProfileTheme({
           }
         }}
       >
-        <div className="theme-toolbar">
-          <div>
-            <span className="theme-kicker">
-              MY {kind === "artist" ? "ARMY" : "PROFILE"}, MY RULES.
-            </span>
-            <strong>
-              {name}’s space <span>· Local demo</span>
-            </strong>
-          </div>
-          <div className="theme-toolbar-actions">
-            <label className="demo-role">
-              Demo role
-              <select
-                value={role}
-                onChange={(e) => {
-                  setRole(e.target.value);
-                  if (editing) close();
-                }}
-              >
-                <option value="owner">
-                  {kind === "artist" ? "Artist" : "Fan"} owner
-                </option>
-                {kind === "artist" && (
-                  <option value="manager">Authorised manager</option>
+        {!previewTheme && (
+          <>
+            <div className="theme-toolbar">
+              <div>
+                <span className="theme-kicker">
+                  MY {kind === "army" ? "ARMY" : "PROFILE"}, MY RULES.
+                </span>
+                <strong>
+                  {name}’s space <span>· Local demo</span>
+                </strong>
+              </div>
+              <div className="theme-toolbar-actions">
+                <label className="demo-role">
+                  Demo role
+                  <select
+                    value={role}
+                    onChange={(e) => {
+                      setRole(e.target.value);
+                      if (editing) close();
+                    }}
+                  >
+                    {kind === "fan" ? (
+                      <option value="owner">Fan profile owner</option>
+                    ) : (
+                      <>
+                        <option value="founder">Founding stan</option>
+                        <option value="admin">Community admin</option>
+                        <option value="moderator">Community moderator</option>
+                        {officialParticipation && (
+                          <>
+                            <option value="official-artist">
+                              Official artist · demo
+                            </option>
+                            <option value="official-representative">
+                              Official representative · demo
+                            </option>
+                          </>
+                        )}
+                      </>
+                    )}
+                    <option value="visitor">Visitor</option>
+                  </select>
+                </label>
+                <button
+                  className="theme-control"
+                  aria-pressed={clean}
+                  onClick={() => {
+                    setClean(!clean);
+                    setStatus(
+                      !clean
+                        ? "Clean view: custom visuals hidden, content unchanged."
+                        : "Custom view restored.",
+                    );
+                  }}
+                  disabled={editing}
+                >
+                  <Eye size={15} />
+                  {clean ? "View custom" : "View clean"}
+                </button>
+                <button
+                  className="theme-control"
+                  aria-pressed={paused || reduced}
+                  onClick={() => setPaused(!paused)}
+                  disabled={reduced}
+                >
+                  <span>
+                    {paused || reduced ? (
+                      <Play size={14} />
+                    ) : (
+                      <Pause size={14} />
+                    )}
+                  </span>
+                  {reduced
+                    ? "Reduced motion"
+                    : paused
+                      ? "Play animations"
+                      : "Pause animations"}
+                </button>
+                {canEdit && (
+                  <button
+                    ref={trigger}
+                    className="button customise-trigger"
+                    onClick={open}
+                    disabled={editing}
+                  >
+                    <Paintbrush size={16} /> CUSTOMISE
+                  </button>
                 )}
-                <option value="visitor">Visitor</option>
-              </select>
-            </label>
-            <button
-              className="theme-control"
-              aria-pressed={clean}
-              onClick={() => {
-                setClean(!clean);
-                setStatus(
-                  !clean
-                    ? "Clean view: custom visuals hidden, content unchanged."
-                    : "Custom view restored.",
-                );
-              }}
-              disabled={editing}
-            >
-              <Eye size={15} />
-              {clean ? "View custom" : "View clean"}
-            </button>
-            <button
-              className="theme-control"
-              aria-pressed={paused || reduced}
-              onClick={() => setPaused(!paused)}
-              disabled={reduced}
-            >
-              <span>
-                {paused || reduced ? <Play size={14} /> : <Pause size={14} />}
-              </span>
-              {reduced
-                ? "Reduced motion"
-                : paused
-                  ? "Play animations"
-                  : "Pause animations"}
-            </button>
-            {role !== "visitor" && (
-              <button
-                ref={trigger}
-                className="button customise-trigger"
-                onClick={open}
-                disabled={editing}
-              >
-                <Paintbrush size={16} /> CUSTOMISE
-              </button>
-            )}
-          </div>
-        </div>
-        <div className="theme-status-row">
-          <p role="status">
-            {status ||
-              "Local role simulation, not authentication. Only this profile’s visual settings are saved on this device."}
-          </p>
-          {playing ? (
-            <span>Animation on</span>
-          ) : (
-            <span>Motion off · animated uploads hidden</span>
-          )}
-        </div>
+              </div>
+            </div>
+            <div className="theme-status-row">
+              <p role="status">
+                {status ||
+                  "Local role simulation, not authentication. Community roles and official identity are separate. Visual settings save on this device only."}
+              </p>
+              {playing ? (
+                <span>Animation on</span>
+              ) : (
+                <span>Motion off · animated uploads hidden</span>
+              )}
+            </div>
+          </>
+        )}
         <div
           className={`profile-canvas ${custom ? "profile-custom" : ""} theme-${theme.preset} ${playing ? "theme-motion" : "theme-still"}`}
           data-profile={profileId}

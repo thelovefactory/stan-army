@@ -9,59 +9,60 @@ import {
   Users,
   MapPin,
   Maximize2,
-  Pin,
   CalendarDays,
   ExternalLink,
   Copy,
   Check,
 } from "lucide-react";
-import { Artist } from "@/lib/data";
+import { ArmyView, armyPath, armyAddress } from "@/lib/data";
+import { ArmyAnnouncements } from "./army-announcements";
 import { DemoNote } from "./shell";
 import { MusicPanel } from "./music-panel";
 import { ArmyChat } from "./army-chat";
 import { useDemo } from "./demo-provider";
 import { ProfileTheme, useProfileTheme } from "./profile-theme";
-export function ArtistSpace({
-  artist,
+export function ArmySpace({
+  view,
   room = false,
 }: {
-  artist: Artist;
+  view: ArmyView;
   room?: boolean;
 }) {
   return (
     <ProfileTheme
-      profileId={`artist:${artist.slug}`}
-      kind="artist"
-      name={artist.name}
+      profileId={`army:${view.army.id}`}
+      legacyProfileId={`artist:${view.artist.slug}`}
+      kind="army"
+      name={`${view.artist.name}’s Army`}
+      officialParticipation={view.artist.id === "artist-nova"}
     >
-      <ArtistSpaceContent artist={artist} room={room} />
+      <ArmySpaceContent view={view} room={room} />
     </ProfileTheme>
   );
 }
-function ArtistSpaceContent({
-  artist,
+function ArmySpaceContent({
+  view,
   room = false,
 }: {
-  artist: Artist;
+  view: ArmyView;
   room?: boolean;
 }) {
+  const { artist, army, founder } = view;
   const { theme, visibleAsset } = useProfileTheme();
   const customBanner = visibleAsset(theme.images.banner);
   const customAvatar = visibleAsset(theme.images.avatar);
   const { enlisted, toggle } = useDemo();
-  const isEnlisted = enlisted.includes(artist.slug);
+  const isEnlisted = enlisted.includes(army.id);
   const [share, setShare] = useState("");
   const [liked, setLiked] = useState(false);
   async function copyLink() {
     try {
       await navigator.clipboard.writeText(
-        `${window.location.origin}/artists/${artist.slug}`,
+        `${window.location.origin}${armyPath(army)}`,
       );
       setShare("Demo army link copied.");
     } catch {
-      setShare(
-        `Copy this demo link from your address bar: /artists/${artist.slug}`,
-      );
+      setShare(`Copy this demo link from your address bar: ${armyPath(army)}`);
     }
   }
   if (room)
@@ -69,15 +70,15 @@ function ArtistSpaceContent({
       <main id="main" className="container listening-page">
         <div className="room-heading">
           <div>
-            <Link className="back-link" href={`/artists/${artist.slug}`}>
+            <Link className="back-link" href={armyPath(army)}>
               <ArrowLeft size={15} /> Back to {artist.name}’s army
             </Link>
             <h1>
               The listening room<span>✳</span>
             </h1>
             <p>
-              {artist.name}’s space. Your own playback. A little room to
-              connect.
+              A fan-run room for {artist.name}. Your own playback. A little room
+              to connect.
             </p>
           </div>
           <span className="demo-pill">LOCAL DEMO · NO LIVE MESSAGING</span>
@@ -96,12 +97,12 @@ function ArtistSpaceContent({
               </div>
             </div>
           </div>
-          <ArmyChat artist={artist} focused />
+          <ArmyChat view={view} focused />
         </div>
       </main>
     );
   return (
-    <main id="main" className={`artist-page accent-${artist.accent}`}>
+    <main id="main" className={`artist-page accent-${army.accent}`}>
       <div className="container">
         <div className="artist-breadcrumb">
           <Link href="/discover">
@@ -156,7 +157,7 @@ function ArtistSpaceContent({
             </div>
             <div>
               <p className="eyebrow">
-                THE ARMY OF{" "}
+                FANS RALLYING AROUND{" "}
                 <span className="mint-text">{artist.genre.toUpperCase()}</span>
               </p>
               <h1>
@@ -164,7 +165,7 @@ function ArtistSpaceContent({
                 <span className="identity-star">✳</span>
               </h1>
               <p className="identity-meta">
-                @{artist.handle} <span>·</span> <MapPin size={13} />{" "}
+                @{artist.officialHandle} <span>·</span> <MapPin size={13} />{" "}
                 {artist.city}
               </p>
             </div>
@@ -172,7 +173,7 @@ function ArtistSpaceContent({
           <div className="identity-actions">
             <div className="enlist-count" aria-live="polite">
               <strong>
-                {(artist.count + (isEnlisted ? 1 : 0)).toLocaleString("en-GB")}
+                {(army.count + (isEnlisted ? 1 : 0)).toLocaleString("en-GB")}
               </strong>
               <span>
                 <Users size={12} /> demo stans & counting
@@ -181,7 +182,7 @@ function ArtistSpaceContent({
             <button
               className={`button ${isEnlisted ? "button-mint" : "button-blue"}`}
               aria-pressed={isEnlisted}
-              onClick={() => toggle(artist.slug)}
+              onClick={() => toggle(army.id)}
             >
               {isEnlisted ? <Check size={17} /> : <Heart size={17} />}{" "}
               {isEnlisted ? "Enlisted · demo" : "STAN · join demo"}
@@ -196,6 +197,46 @@ function ArtistSpaceContent({
             </button>
           </div>
         </section>
+        <section
+          className="founder-spotlight"
+          aria-label="Meet the founding stan"
+        >
+          <div className="founder-photo">
+            <Image
+              src={founder.image}
+              width={66}
+              height={66}
+              alt="Stock portrait representing the fictional founding stan"
+            />
+          </div>
+          <div>
+            <p className="eyebrow">ONE FAN STARTED THIS. LOOK WHAT WE BUILT.</p>
+            <h2>
+              Founded by{" "}
+              {founder.id === "fan-jess" ? (
+                <Link href="/fans/jess-wav">@{founder.handle}</Link>
+              ) : (
+                <span>@{founder.handle}</span>
+              )}{" "}
+              <span>✳</span>
+            </h2>
+            <p>
+              A fan-run Army for {artist.name}. The community stewards its own
+              space.
+            </p>
+          </div>
+          <div className="army-address">
+            <b>{armyAddress(army)}</b>
+            <span>Intended public address · local demo</span>
+            <code>{armyPath(army)}</code>
+          </div>
+        </section>
+        <p className="army-identity-note">
+          Artist identity: @{artist.officialHandle} · Fan founder: @
+          {founder.handle} · Army address: {armyAddress(army)}. These are
+          separate identities. Official participation never transfers community
+          ownership.
+        </p>
         <div className="artist-about-row">
           <p>{artist.bio}</p>
           <span role="status" className="share-status">
@@ -211,7 +252,7 @@ function ArtistSpaceContent({
           </a>
           <a href="#artist-posts">From {artist.name.split(" ")[0]}</a>
           <a href="#events">Events & links</a>
-          <Link className="room-link" href={`/artists/${artist.slug}/room`}>
+          <Link className="room-link" href={`${armyPath(army)}/room`}>
             <Maximize2 size={14} /> Open listening room
           </Link>
         </div>
@@ -252,32 +293,32 @@ function ArtistSpaceContent({
               </p>
             </section>
           </div>
-          <ArmyChat artist={artist} />
+          <ArmyChat view={view} />
         </div>
         <section id="artist-posts" className="artist-post-section">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">A NOTE FROM THE OTHER SIDE OF THE MIC.</p>
-              <h2>From {artist.name.split(" ")[0]}, with love.</h2>
+              <p className="eyebrow">BUILT BY FANS. OPEN TO THE ARTIST.</p>
+              <h2>The voices behind the Army.</h2>
             </div>
             <span className="micro-label">DEMO POSTS</span>
           </div>
-          <div className="posts-grid">
+          <ArmyAnnouncements view={view} />
+          <div className="posts-grid community-posts">
             <article className="panel announcement">
-              <span className="eyebrow">
-                <Pin size={13} /> PINNED ANNOUNCEMENT
-              </span>
+              <p className="eyebrow">THE ARMY NOTICEBOARD · DEMO</p>
               <h3>
-                The next chapter
+                Three songs.
                 <br />
-                starts with you.
+                One new friend.
               </h3>
               <p>
-                New songs are taking shape. There’s a notebook full of lyrics
-                and a room full of ideas. This army gets the first look.
+                This week’s fan challenge: send one of their songs to someone who needs
+                it. Bring back the story, not a streaming screenshot. No
+                targets, no fake plays. Just music finding people.
               </p>
               <div className="post-byline">
-                <span>@{artist.handle} · Sample post</span>
+                <span>@{founder.handle} · Community post</span>
                 <span>✳</span>
               </div>
             </article>
@@ -297,7 +338,7 @@ function ArtistSpaceContent({
                   singing back. See you at the next one. 🖤
                 </p>
                 <div className="post-byline">
-                  <span>Sample post · Public</span>
+                  <span>Fan photo diary · Demo</span>
                   <button
                     className="like-button"
                     aria-pressed={liked}
@@ -325,10 +366,10 @@ function ArtistSpaceContent({
                   <b>12</b>
                 </div>
                 <div>
-                  <h3>An evening with {artist.name}</h3>
+                  <h3>Fan listening meetup</h3>
                   <p>{artist.city} · Fictional venue</p>
                   <span className="mint-text">
-                    Details coming in a future milestone
+                    Fan-organised example · No artist appearance implied
                   </span>
                 </div>
               </div>
@@ -353,12 +394,24 @@ function ArtistSpaceContent({
             </aside>
           </div>
         </section>
+        <section className="flames-concept panel">
+          <span>✳</span>
+          <div>
+            <p className="eyebrow">FUTURE CONCEPT · NO PAYMENTS</p>
+            <h2>FAN. THE FLAMES.</h2>
+            <p>
+              Fans can one day pool optional support for transparent, clearly
+              labelled promotional campaigns. Organic discovery stays organic.
+              No guaranteed streams, fake engagement or ownership for sale.
+            </p>
+          </div>
+        </section>
         <div className="artist-bottom-note">
           <span>✳</span>
           <p>
-            Artists bring the music.
+            The artist brings the music.
             <br />
-            <b>You bring the heartbeat.</b>
+            <b>The fans bring the Army.</b>
           </p>
           <Link href="/create" className="text-link">
             Make a space of your own <ArrowUpRight size={18} />

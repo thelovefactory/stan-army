@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  profileThemeSnapshot,
   contrast,
   defaultTheme,
   loadProfileTheme,
@@ -194,5 +195,53 @@ test("saved artist and fan settings survive store reloads; cancellation drafts c
       "fan:jess-wav",
     ),
     defaultTheme,
+  );
+});
+
+test("Army theme migration reads legacy customisation without overwriting it; new key wins and failed writes preserve it", () => {
+  const map = new Map<string, string>();
+  const storage = {
+    getItem: (key: string) => map.get(key) ?? null,
+    setItem: (key: string, value: string) => {
+      map.set(key, value);
+    },
+  };
+  const legacy = JSON.stringify(presets[1].theme);
+  map.set(storageKey("artist:nova-reign"), legacy);
+  assert.equal(
+    profileThemeSnapshot(storage, "army:army-nova", "artist:nova-reign"),
+    legacy,
+  );
+  assert.equal(map.has(storageKey("army:army-nova")), false);
+  assert.throws(() =>
+    saveProfileTheme(
+      {
+        setItem: () => {
+          throw new Error("Quota");
+        },
+      },
+      "army:army-nova",
+      presets[3].theme,
+    ),
+  );
+  assert.equal(map.get(storageKey("artist:nova-reign")), legacy);
+  saveProfileTheme(storage, "army:army-nova", presets[4].theme);
+  assert.equal(
+    parseTheme(
+      profileThemeSnapshot(storage, "army:army-nova", "artist:nova-reign"),
+    ).preset,
+    "digital-dream",
+  );
+  assert.equal(map.get(storageKey("artist:nova-reign")), legacy);
+  saveProfileTheme(storage, "army:army-nova", defaultTheme);
+  assert.deepEqual(
+    parseTheme(
+      profileThemeSnapshot(storage, "army:army-nova", "artist:nova-reign"),
+    ),
+    defaultTheme,
+  );
+  assert.equal(
+    profileThemeSnapshot(storage, "army:army-atlas", "artist:atlas-noir"),
+    null,
   );
 });

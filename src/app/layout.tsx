@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./profile-theme.css";
+import "./pivot.css";
 import { Header, Footer } from "@/components/shell";
 import { DemoProvider } from "@/components/demo-provider";
 export const metadata: Metadata = {
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
     template: "%s · Stan Army",
   },
   description:
-    "A local visual prototype for a music-first artist community. Discover fictional artists, explore their spaces, and find your people.",
+    "A local visual prototype for a music-first fan-led community. Discover fictional artists, explore their spaces, and find your people.",
   robots: { index: false, follow: false },
 };
 export default function RootLayout({

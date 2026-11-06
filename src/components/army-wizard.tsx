@@ -1,15 +1,512 @@
-'use client';
-import { useState, useRef } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { ArrowRight, ArrowLeft, Check, ArrowUpRight, Headphones, MessageCircle, Heart } from 'lucide-react';
-import { initialDraft, validateDraft, WizardDraft } from '@/lib/data';
-const steps = ['Your identity','Make it yours','Connect the dots','The first look'];
-export function ArmyWizard(){
-  const [step,setStep]=useState(0);const [draft,setDraft]=useState<WizardDraft>(initialDraft);const [error,setError]=useState('');const [complete,setComplete]=useState(false);const heading=useRef<HTMLHeadingElement>(null);
-  function update<K extends keyof WizardDraft>(key:K,value:WizardDraft[K]){setDraft(d=>({...d,[key]:value}));setError('');}
-  function move(next:number){setStep(next);setError('');requestAnimationFrame(()=>heading.current?.focus());}
-  function submit(e:React.FormEvent){e.preventDefault();const problem=validateDraft(draft,step);if(problem){setError(problem);return;}if(step<3)move(step+1);else{setComplete(true);requestAnimationFrame(()=>heading.current?.focus());}}
-  function restart(){setDraft(initialDraft);setComplete(false);move(0);}
-  return <main id="main" className="container wizard-page"><div className="wizard-heading"><p className="eyebrow"><span className="mint-dot"/> YOUR SOUND DESERVES A SPACE.</p><h1>Every army starts<br />with <span>one artist.</span></h1><p>Let’s make this little corner of the internet yours.</p></div><div className="wizard-layout"><aside className="wizard-sidebar"><ol>{steps.map((label,i)=><li className={step===i?'current':step>i?'done':''} key={label}><span>{step>i?<Check size={15}/>:String(i+1).padStart(2,'0')}</span><div><small>STEP {i+1}</small><b>{label}</b></div></li>)}</ol><div className="wizard-sidebar-note"><span>✳</span><h3>Built around you.<br />Filled by your people.</h3><p>This is a local demo. No account, upload, payment or publication. Refreshing clears your draft.</p></div></aside><div className="wizard-main"><form onSubmit={submit} noValidate className="panel wizard-form"><div className="wizard-step-meta"><span className="micro-label">{complete?'YOUR DEMO SPACE':`STEP 0${step+1} OF 04`}</span><span className="demo-pill">PREVIEW ONLY</span></div><h2 ref={heading} tabIndex={-1}>{complete?'Your first look is ready.':step===0?'First, what’s your name?':step===1?'Let your personality in.':step===2?'Give your music a way in.':'Looking like your kind of place?'}</h2><p className="wizard-description">{complete?'This preview exists only in your browser session. Nothing has been published.':step===0?'The name on the posters. The handle your people will remember.':step===1?'A few words, a mood, and a little bit of you.':step===2?'Add a public link. We’ll keep it as a link in this demo.':'This is the beginning. Make changes, or finish your local demo preview.'}</p>{!complete&&step===0&&<div className="form-fields"><label htmlFor="artist-name">Artist name <span>Required</span></label><input id="artist-name" value={draft.name} onChange={e=>update('name',e.target.value)} maxLength={60} placeholder="e.g. Nova Reign" required aria-describedby={error?'wizard-error':undefined}/><label htmlFor="artist-handle">Your handle <span>Required</span></label><div className="handle-input"><span>stan.army/artists/</span><input id="artist-handle" value={draft.handle} onChange={e=>update('handle',e.target.value.toLowerCase())} maxLength={30} placeholder="your-name" required aria-describedby="handle-help"/></div><p id="handle-help" className="input-help">3–30 lowercase letters, numbers or hyphens. Availability is not checked in this demo.</p><label htmlFor="artist-genre">Your sound</label><select id="artist-genre" value={draft.genre} onChange={e=>update('genre',e.target.value)}>{['Alternative R&B','Indie pop','Electronic','Alternative','Other'].map(g=><option key={g}>{g}</option>)}</select></div>}{!complete&&step===1&&<div className="form-fields"><label htmlFor="artist-bio">A little about you <span>Required</span></label><textarea id="artist-bio" rows={4} maxLength={300} value={draft.bio} onChange={e=>update('bio',e.target.value)} placeholder="What do you make? What moves you? Who is this space for?" required/><p className="input-help">{draft.bio.length}/300 characters · At least 10 characters</p><fieldset><legend>Choose a demo image</legend><p className="input-help">Licensed stock examples. Uploads come in a future milestone.</p><div className="image-options">{['/images/artist.jpg','/images/sienna.jpg','/images/atlas.jpg','/images/room.jpg'].map((src,i)=><label key={src}><input type="radio" name="image" value={src} checked={draft.image===src} onChange={()=>update('image',src)}/><Image src={src} width={100} height={90} alt={`Stock image option ${i+1}`}/>{draft.image===src&&<span><Check size={15}/></span>}</label>)}</div></fieldset><fieldset><legend>Pick your accent</legend><div className="color-options">{['mint','blue','pink','orange'].map(c=><label key={c} className={`swatch swatch-${c}`}><input type="radio" name="accent" value={c} checked={draft.accent===c} onChange={()=>update('accent',c)}/><span className="sr-only">{c} accent</span>{draft.accent===c&&<Check size={16}/>}</label>)}</div></fieldset></div>}{!complete&&step===2&&<div className="form-fields"><div className="link-intro"><Headphones size={29}/><p>Your first track. Your latest video.<br /><b>A good place to start listening.</b></p></div><label htmlFor="artist-link">Music, video or artist website <span>Optional</span></label><input type="url" id="artist-link" value={draft.link} onChange={e=>update('link',e.target.value)} placeholder="https://…" maxLength={500}/><p className="input-help">HTTPS only. Spotify, YouTube, SoundCloud, Bandcamp, Apple Music, or your website. Provider embeds need separate validation in a future milestone.</p><div className="wizard-callout">✳ <p>No link yet? No problem.<br /><span>You can preview your space without one.</span></p></div></div>}{(step===3||complete)&&<div className={`wizard-preview accent-${draft.accent}`}><div className="preview-banner"><Image src={draft.image} fill sizes="(max-width:800px) 85vw, 55vw" alt="Chosen licensed demo photograph"/><span>THIS IS YOUR CORNER. ↗</span></div><div className="preview-body"><p className="micro-label">{draft.genre} · DEMO ARTIST</p><h3>{draft.name}<span>✳</span></h3><p className="muted">@{draft.handle}</p><p>{draft.bio}</p><div className="preview-modules"><span><Headphones size={16}/> Your sound</span><span><MessageCircle size={16}/> Your army chat</span><span><Heart size={16}/> Your people</span></div>{draft.link&&<a href={draft.link} target="_blank" rel="noreferrer" className="preview-external">Your artist link <ArrowUpRight size={16}/></a>}<p className="input-help">Demo preview · 0 stans · Not published · No public page created</p></div></div>}{error&&<p id="wizard-error" role="alert" className="form-error">{error}</p>}{!complete?<div className="wizard-actions">{step>0?<button type="button" className="text-link" onClick={()=>move(step-1)}><ArrowLeft size={16}/> Back</button>:<Link className="text-link" href="/">Back to home</Link>}<button className="button button-blue" type="submit">{step===3?'Finish demo preview':'Keep going'} {step===3?<Check size={17}/>:<ArrowRight size={17}/>}</button></div>:<div className="wizard-finished"><p role="status"><Check size={16}/> Demo preview complete. Nothing is published.</p><div><button type="button" className="button" onClick={()=>{setComplete(false);move(0);}}>Edit your preview</button><button type="button" className="text-link" onClick={restart}>Start again</button><Link href="/artists/nova-reign" className="text-link">Explore a full demo army <ArrowUpRight size={16}/></Link></div></div>}</form></div></div></main>;
+"use client";
+import { useRef, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  ArrowRight,
+  ArrowLeft,
+  Check,
+  ArrowUpRight,
+  Heart,
+} from "lucide-react";
+import {
+  artists,
+  artistIdentityKey,
+  armyForArtist,
+  armyPath,
+  currentFan,
+  ArmyDraft,
+  initialArmyDraft,
+  suggestedAddress,
+  validateArmyDraft,
+} from "@/lib/data";
+import { defaultTheme, Theme } from "@/lib/theme";
+import { ThemePresetPicker } from "./theme-editor";
+import { ProfileTheme } from "./profile-theme";
+const steps = [
+  "Pick your artist",
+  "Your Army address",
+  "Make it yours",
+  "Rally the fans",
+];
+export function ArmyWizard({ prefill = "" }: { prefill?: string }) {
+  const [step, setStep] = useState(0),
+    [complete, setComplete] = useState(false),
+    [error, setError] = useState(""),
+    [copied, setCopied] = useState(false);
+  const [draft, setDraft] = useState<ArmyDraft>({
+    ...initialArmyDraft,
+    artistName: prefill,
+  });
+  const [theme, setTheme] = useState<Theme>(structuredClone(defaultTheme));
+  const heading = useRef<HTMLHeadingElement>(null);
+  const selected =
+    artists.find((a) => a.id === draft.artistId) ||
+    artists.find(
+      (a) => artistIdentityKey(a.name) === artistIdentityKey(draft.artistName),
+    );
+  const existing = selected && armyForArtist(selected.id);
+  const suggestions = artists.filter(
+    (a) =>
+      !draft.artistName.trim() ||
+      a.name.toLowerCase().includes(draft.artistName.trim().toLowerCase()),
+  );
+  function update(change: Partial<ArmyDraft>) {
+    setDraft((d) => ({ ...d, ...change }));
+    setError("");
+  }
+  function move(s: number) {
+    setStep(s);
+    setError("");
+    requestAnimationFrame(() => heading.current?.focus());
+  }
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    const problem = validateArmyDraft(
+      { ...draft, artistId: selected?.id || "" },
+      step,
+    );
+    if (problem) {
+      setError(problem);
+      return;
+    }
+    if (step === 0 && !draft.address)
+      update({ address: suggestedAddress(draft.artistName) });
+    if (step < 3) move(step + 1);
+    else {
+      for (let s = 0; s < 3; s++) {
+        const issue = validateArmyDraft(
+          { ...draft, artistId: selected?.id || "" },
+          s,
+        );
+        if (issue) {
+          move(s);
+          setError(issue);
+          return;
+        }
+      }
+      setComplete(true);
+      requestAnimationFrame(() => heading.current?.focus());
+    }
+  }
+  async function copyInvite() {
+    try {
+      await navigator.clipboard.writeText(
+        `Preview only — ${draft.address}.stan.army is an intended address, not a live invite. ${currentFan.name} is starting a fan-run Army for ${draft.artistName}.`,
+      );
+      setCopied(true);
+    } catch {
+      setError(
+        "Clipboard unavailable. The intended address shown below is preview text, not a live invite.",
+      );
+    }
+  }
+  return (
+    <main id="main" className="container wizard-page">
+      <div className="wizard-heading">
+        <p className="eyebrow">ONE FAN CAN START SOMETHING.</p>
+        <h1>
+          Every Army starts
+          <br />
+          with <span>one stan.</span>
+        </h1>
+        <p>
+          You bring the love. The artist doesn’t need to sign up, approve or
+          pay.
+        </p>
+      </div>
+      <div className="wizard-founder">
+        <Image
+          src={currentFan.image}
+          width={42}
+          height={42}
+          alt="Stock portrait for fictional founding fan Jess"
+        />
+        <p>
+          Starting as <b>@{currentFan.handle}</b>
+          <span>
+            Your fan identity stays yours. It never becomes the artist’s
+            identity.
+          </span>
+        </p>
+        <span className="demo-pill">FICTIONAL FAN ACCOUNT</span>
+      </div>
+      <div className="wizard-layout">
+        <aside className="wizard-sidebar">
+          <ol>
+            {steps.map((label, i) => (
+              <li
+                key={label}
+                className={step === i ? "current" : step > i ? "done" : ""}
+              >
+                <span>
+                  {step > i ? (
+                    <Check size={15} />
+                  ) : (
+                    String(i + 1).padStart(2, "0")
+                  )}
+                </span>
+                <div>
+                  <small>STEP {i + 1}</small>
+                  <b>{label}</b>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <div className="wizard-sidebar-note">
+            <span>✳</span>
+            <h3>
+              The fans build it.
+              <br />
+              The artist inspires it.
+            </h3>
+            <p>
+              One canonical Army per artist. A local preview never reserves a
+              public address or publishes a community.
+            </p>
+            <Link className="text-link" href="/official-access">
+              Are you the artist? Request official access ↗
+            </Link>
+          </div>
+        </aside>
+        <form className="panel wizard-form" onSubmit={submit} noValidate>
+          <div className="wizard-step-meta">
+            <span className="micro-label">
+              {complete ? "LOCAL PREVIEW READY" : `STEP 0${step + 1} OF 04`}
+            </span>
+            <span className="demo-pill">FAN-LED · DEMO ONLY</span>
+          </div>
+          <h2 ref={heading} tabIndex={-1}>
+            {complete
+              ? "Your rallying point is ready."
+              : step === 0
+                ? "Who are we rallying around?"
+                : step === 1
+                  ? "Give your Army an address."
+                  : step === 2
+                    ? "Make a home for your people."
+                    : "Let’s rally the first fans."}
+          </h2>
+          <p className="wizard-description">
+            {step === 0
+              ? "Find an artist first. If their Army already exists, join it. If it doesn’t, you could be the founding stan."
+              : step === 1
+                ? "An Army address identifies the community. It is separate from your fan handle and the artist’s official identity."
+                : step === 2
+                  ? "Pick an initial theme, choose imagery and write a welcome in your own voice. The shared visual editor can take your full demo Army further."
+                  : "Fan-run, fan-built, and clearly labelled. This local preview does not create a public Army or a working invite."}
+          </p>
+          {!complete && step === 0 && (
+            <div className="form-fields">
+              <label htmlFor="army-artist">
+                Artist name <span>Required</span>
+              </label>
+              <input
+                id="army-artist"
+                maxLength={80}
+                value={draft.artistName}
+                onChange={(e) =>
+                  update({ artistName: e.target.value, artistId: "" })
+                }
+                placeholder="Search or add an artist…"
+              />
+              <div
+                className="artist-search-options"
+                aria-label="Seeded artist matches"
+              >
+                {suggestions.map((a) => (
+                  <button
+                    type="button"
+                    key={a.id}
+                    aria-pressed={selected?.id === a.id}
+                    onClick={() =>
+                      update({ artistId: a.id, artistName: a.name })
+                    }
+                  >
+                    <span>
+                      <b>{a.name}</b>
+                      <small>
+                        {a.genre} · {a.city}
+                      </small>
+                    </span>
+                    <span>
+                      {armyForArtist(a.id)
+                        ? "Army exists ↗"
+                        : "Start their Army +"}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              {existing ? (
+                <div className="existing-army-callout">
+                  <h3>This artist already has an Army.</h3>
+                  <p>One artist, one canonical community. Come help it grow.</p>
+                  <Link
+                    className="button button-blue"
+                    href={armyPath(existing)}
+                  >
+                    Visit & enlist <ArrowUpRight size={16} />
+                  </Link>
+                </div>
+              ) : (
+                !selected && (
+                  <>
+                    <label htmlFor="artist-context">
+                      Help us distinguish this artist{" "}
+                      <span>Required for unlisted artists</span>
+                    </label>
+                    <textarea
+                      id="artist-context"
+                      maxLength={500}
+                      rows={3}
+                      value={draft.artistContext}
+                      onChange={(e) =>
+                        update({ artistContext: e.target.value })
+                      }
+                      placeholder="Genre, city, an official catalogue link, or another distinguishing detail."
+                    />
+                    <p className="input-help">
+                      Unlisted identities would need conflict review before a
+                      public canonical Army is established. This demo checks
+                      seeded matches only.
+                    </p>
+                  </>
+                )
+              )}
+            </div>
+          )}
+          {!complete && step === 1 && (
+            <div className="form-fields">
+              <label htmlFor="army-address">
+                Army subdomain <span>Required</span>
+              </label>
+              <div className="handle-input army-subdomain-input">
+                <input
+                  id="army-address"
+                  value={draft.address}
+                  maxLength={63}
+                  onChange={(e) =>
+                    update({ address: e.target.value.toLowerCase() })
+                  }
+                />
+                <span>.stan.army</span>
+              </div>
+              <p className="input-help">
+                1–63 lowercase letters, numbers and internal hyphens. Reserved
+                and seeded conflicts are checked locally. No public availability
+                check or reservation.
+              </p>
+              <div className="identity-separation">
+                <p>
+                  <b>Artist:</b> {draft.artistName}
+                </p>
+                <p>
+                  <b>Founding fan:</b> @{currentFan.handle}
+                </p>
+                <p>
+                  <b>Intended Army address:</b> {draft.address || "your-army"}
+                  .stan.army
+                </p>
+              </div>
+            </div>
+          )}
+          {!complete && step === 2 && (
+            <div className="form-fields">
+              <label htmlFor="army-welcome">
+                Welcome your fellow stans <span>Required</span>
+              </label>
+              <textarea
+                id="army-welcome"
+                rows={4}
+                maxLength={500}
+                value={draft.welcome}
+                onChange={(e) => update({ welcome: e.target.value })}
+                placeholder="I started this Army because…"
+              />
+              <p className="input-help">
+                {draft.welcome.length}/500 · Write as yourself, not as the
+                artist.
+              </p>
+              <label htmlFor="army-music-link">
+                A public music link <span>Optional</span>
+              </label>
+              <input
+                type="url"
+                id="army-music-link"
+                value={draft.musicLink}
+                onChange={(e) => update({ musicLink: e.target.value })}
+                maxLength={500}
+                placeholder="https://…"
+              />
+              <p className="input-help">
+                A permitted public music/video or catalogue link. It stays a
+                link in this preview; nothing is scraped or hosted.
+              </p>
+              <fieldset>
+                <legend>Pick a starting image</legend>
+                <div className="image-options">
+                  {[
+                    "/images/room.jpg",
+                    "/images/crowd.jpg",
+                    "/images/artist.jpg",
+                    "/images/sienna.jpg",
+                  ].map((src, i) => (
+                    <label key={src}>
+                      <input
+                        type="radio"
+                        name="army-image"
+                        checked={draft.image === src}
+                        onChange={() => update({ image: src })}
+                      />
+                      <Image
+                        src={src}
+                        width={100}
+                        height={90}
+                        alt={`Licensed stock starting image ${i + 1}`}
+                      />
+                      {draft.image === src && (
+                        <span>
+                          <Check size={15} />
+                        </span>
+                      )}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              <div className="wizard-theme-picker">
+                <h3>Your Army’s first mood</h3>
+                <ThemePresetPicker theme={theme} onChange={setTheme} />
+                <p className="input-help">
+                  The same six-preset theme engine used by Army and fan
+                  customisation. Preview below; full local file/GIF and colour
+                  controls remain in the demo Army editor.
+                </p>
+              </div>
+            </div>
+          )}
+          {(step >= 2 || complete) && (
+            <ProfileTheme
+              profileId="preview:army-wizard"
+              kind="army"
+              name={draft.artistName}
+              previewTheme={theme}
+            >
+              <section className="panel wizard-pivot-preview">
+                <div className="preview-banner">
+                  <Image
+                    src={draft.image}
+                    fill
+                    sizes="(max-width:800px) 80vw, 55vw"
+                    alt="Licensed stock image for this local Army preview"
+                  />
+                  <span>BUILT BY FANS. FOR THE PEOPLE WHO GET IT.</span>
+                </div>
+                <div className="preview-body">
+                  <p className="micro-label">FAN-RUN ARMY · LOCAL PREVIEW</p>
+                  <h3>
+                    {draft.artistName}’s Army <span>✳</span>
+                  </h3>
+                  <p>
+                    {draft.address}.stan.army{" "}
+                    <small>· Intended address only</small>
+                  </p>
+                  <p>
+                    Founded by <b>@{currentFan.handle}</b>
+                  </p>
+                  <p>
+                    {draft.welcome ||
+                      "Your welcome will appear here as you type."}
+                  </p>
+                  {draft.musicLink && !validateArmyDraft(draft, 2) && (
+                    <a
+                      className="preview-external"
+                      href={draft.musicLink}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Start listening ↗
+                    </a>
+                  )}
+                  <p className="input-help">
+                    Community stewardship is not ownership of the artist’s name,
+                    music or IP.
+                  </p>
+                </div>
+              </section>
+            </ProfileTheme>
+          )}
+          {error && (
+            <p role="alert" className="form-error">
+              {error}
+            </p>
+          )}
+          {!complete ? (
+            <div className="wizard-actions">
+              {step > 0 ? (
+                <button
+                  type="button"
+                  className="text-link"
+                  onClick={() => move(step - 1)}
+                >
+                  <ArrowLeft size={16} /> Back
+                </button>
+              ) : (
+                <Link href="/discover" className="text-link">
+                  Back to discovery
+                </Link>
+              )}
+              <button
+                type="submit"
+                className="button button-blue"
+                disabled={step === 0 && !!existing}
+              >
+                {step === 3 ? "Create demo preview" : "Keep going"}{" "}
+                {step === 3 ? <Check size={16} /> : <ArrowRight size={16} />}
+              </button>
+            </div>
+          ) : (
+            <div className="wizard-finished">
+              <p role="status">
+                <Check size={16} /> Local preview complete. No Army, account,
+                public address or live invite has been created.
+              </p>
+              <div>
+                <button type="button" className="button" onClick={copyInvite}>
+                  {copied
+                    ? "Preview invite text copied"
+                    : "Copy preview invite text"}
+                </button>
+                <button
+                  type="button"
+                  className="text-link"
+                  onClick={() => {
+                    setComplete(false);
+                    move(0);
+                  }}
+                >
+                  Edit preview
+                </button>
+                <button
+                  type="button"
+                  className="text-link"
+                  onClick={() => {
+                    setComplete(false);
+                    setCopied(false);
+                    setDraft({ ...initialArmyDraft });
+                    setTheme(structuredClone(defaultTheme));
+                    move(0);
+                  }}
+                >
+                  Start again
+                </button>
+                <Link className="text-link" href="/armies/nova">
+                  Explore Nova’s full fan-run demo <Heart size={15} />
+                </Link>
+              </div>
+            </div>
+          )}
+        </form>
+      </div>
+    </main>
+  );
 }

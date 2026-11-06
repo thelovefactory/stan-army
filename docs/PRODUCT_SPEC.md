@@ -1,48 +1,62 @@
-# Stan Army — Product specification
+# Stan Army — fan-led product specification
 
-## Authority and review gate
-Confirmed requirements come from the unchanged root `STAN_ARMY_CODEX_BUILD_BRIEF.md` and the current Milestone 1 request. The current request narrows the master brief: local prototype only; stop for visual review before backend development. No backend resources, migrations, API endpoints, account system, persistent community storage, payment flow or deployment are part of this deliverable. Addendum 01 explicitly authorises browser-local persistence for visual themes only.
+## Authority
+`STAN_ARMY_PRODUCT_PIVOT.md` and the user's approved follow-up supersede conflicting ownership, identity and monetization assumptions in the original master brief and Addendum 01. Those source documents remain intact. Existing visual identity and working functionality are retained, with purposeful hierarchy changes; no wholesale reskin.
 
-## Confirmed product direction
-Every artist needs an army. The heartbeat of every artist is their community. Music and conversation should have equal visual weight. Balance personal MySpace-style expression with modern navigation, readable text, responsive layouts, visible keyboard focus and reduced-motion support. Preserve the user’s hand-drawn logo as an image; no generated artist imagery.
+## The proposition
+Stan Army is fan-led, fan-owned, fan-funded and fan-promoted. Every artist needs an army. Fans establish and steward the community; the artist is who they rally around. The artist need not sign up, approve or pay before an Army exists. "Fan-owned" means administrative stewardship within platform rules, not ownership of an artist's name, music, trademarks or other IP.
 
-## Milestone 1 routes and acceptance
-| Route | Intended experience | Local interaction |
+One canonical Army per artist is the initial model. Artist identity, founding fan identity, Army address, verification and payment are separate concepts. Official artist/representative participation never automatically grants community ownership, theme editing or moderation.
+
+## Implemented local prototype
+| Route | Purpose | Working local behaviour |
 | --- | --- | --- |
-| `/` | Brand introduction, artist discovery, community proposition | Working navigation and artist cards |
-| `/discover` | New artists, Most stanned, Our favourites | Search by artist/handle/genre/city, combined genre/location filters, reset and empty state |
-| `/artists/[slug]` | Banner, identity, count, media, Army Chat, pinned message, posts, fan faces, events, external links | Reversible enlistment, local message composition, copy army link, post reaction |
-| `/artists/[slug]/room` | Wider media-and-chat view | Same session-local chat, click-to-load media |
-| `/create` | Four-step artist setup | Identity validation; bio, stock image and accent selection; optional HTTPS link; editable preview, completion and restart |
+| `/` | Fan-led proposition with existing Stan Army visual identity | Navigation, demo Army cards, creation CTA |
+| `/discover` | Seeded fan-run communities | Combined search/genre/city filters, organic ranking, favourites, reset, no-match creation CTA with artist-name prefill |
+| `/armies/nova` | Main exceptional demo Army for fictional artist Nova Reign | Celebrated founder Jess.wav, distinct address/artist/fan identities, enlistment, media, chat, two announcement areas, posts/reactions, fan event and links |
+| `/armies/nova/room` | Wider fan listening room | Shared session chat/enlistment and saved Army theme |
+| `/create` | Fan-led four-step onboarding | Find/select/add an artist; prevent seeded duplicates; validate Army address; choose image/preset, write welcome and optionally add a safe public music link; complete editable local preview and copy explicitly non-live invite text |
+| `/official-access?army=nova` | Artist/representative request explanation | Local validation and request preview; no submission, verification or permission change |
+| `/fans/jess-wav` | Founding fan's own expressive profile | Independent theme, artist favourites and session-local enlisted Armies |
+| `/artists/[legacySlug]` and `/room` | Compatibility | Permanent redirects to corresponding Army routes |
 
-Every identity, conversation, event, post and count is fictional. Photography represents illustrative people and performances, not the fictional artists. Demo content is labeled across landing, discovery, artist and room views. No verified badges. No real online-user count, streaming statistics or synchronized-playback claims.
+Five other original Army fixtures remain for discovery/filtering and old-link compatibility; no new generic community pages were added. Echo Valentine is a catalogue identity without an Army, useful for exercising onboarding.
 
-## State and expected behaviour
-Enlistment, submitted chat messages and reactions change the interface only. Enlistment and submitted chat messages survive client navigation through the shared provider and reset on refresh. Likes reset when their page unmounts. Composer drafts reset on navigation. Wizard state remains while the wizard is mounted and resets on refresh or leaving the route. Community content does not use localStorage, cookies or a server database. Addendum 01 visual themes and their selected image data are saved to namespaced localStorage keys. Text is rendered through React escaping.
+## The three visible identities
+- Artist: Nova Reign, artist reference `@novareign` (fictional demo).
+- Founding stan: Jess.wav, separate fan handle `@jess.wav`.
+- Army: stable `army-nova`, intended address `nova.stan.army`, actual local route `/armies/nova`.
 
-Messages must contain non-whitespace text and are limited to 280 characters. A blank composer disables Send. A new message is visibly attributed to `@you.demo` and acknowledged as local only. Messages do not reach any other person.
+Public subdomains are illustrative and not provisioned. Copying the main Army link copies a working local route. No verified badge/status about a real person is claimed; the official participation fixture is conspicuously fictional.
 
-Wizard rules: artist name 2–60 trimmed characters; handle 3–30 lowercase ASCII letters, numbers and hyphens, starting with an alphanumeric character; biography 10–300 characters; optional HTTPS link without credentials. Handle uniqueness is not checked. Completion displays a local preview, never a publish button or a fabricated public URL. Stock selection stands in for uploads.
+## Two distinct announcement areas
+**From the Army:** fan-administrator-controlled community welcome and announcements. Founder/admin simulation exposes its local composer; verified identity alone does not.
 
-## Media and external links
-One fixed public YouTube example is loaded using the privacy-enhanced iframe after an explicit click. It is labeled third-party sample content, not the fictional artist’s catalogue. Loading contacts YouTube; browser privacy, geography, provider restrictions and owner embed settings can prevent playback. No autoplay or playback synchronization. A persistent watch-on-YouTube link is the fallback. No music is hosted. Bandcamp and NPR links are platform examples, not claimed artist profiles.
+**From the Artist:** labelled official artist/authorised representative announcements. Only the corresponding fictional verified-role simulation exposes its local composer. Founder/admin status alone does not. Nova includes a clearly labelled sample artist message; other retained fixtures need no official participant.
 
-## Assumptions awaiting review
-- Nova Reign and five other fictional artists establish the first content set.
-- Blue is the primary action colour; mint anchors music and community; pink and orange provide personal sticker details.
-- Generic UK/EU locations, illustrative events and free enlistment demonstrate the intended shape.
-- The creation wizard uses stock image choices; Addendum 01 profile editors additionally support browser-local raster selection. Typography uses local system fonts to avoid network dependencies.
-- This prototype’s desktop content hierarchy puts media on the left and chat in the wider right column; mobile stacks media, chat, fans and posts.
+New announcement text is React-escaped, limited to 500 characters, and page-local. Role attribution is captured when posted. Changing demo roles cannot turn an existing community post into an official post. No server authorization or moderation system is claimed.
 
-## Out of scope until later milestones
-Auth, real roles and manager rosters, image uploads, persistent artist pages, real enlistment, realtime chat, moderation, access-controlled posts, notifications, subscriptions, Battleground voting, analytics and production privacy/legal workflows. Future pricing remains provisional ($19 Pro / $59 Elite in the master brief), with no pricing or billing UI in this milestone.
+## Customisation preserved
+One versioned JSON theme schema and shared editor serve fan profiles and fan-run Armies. All six presets, raster/GIF selection, backgrounds, colours, retro font stacks, panel treatments, decorations and banner/avatar customisation remain. Only founder/admin simulation opens the Army editor. Moderator, official artist, official representative and visitor modes do not inherit editing rights. Clean/custom viewing and motion controls remain available to everyone.
 
-## Visual review questions
-Does the artist page feel personal enough without losing usability? Is Army Chat prominent enough? Does the nostalgia/modern balance fit? Review desktop and mobile before approving accounts and persistence.
+Old `artist:<slug>` theme keys remain readable for their corresponding Army; a new Army-key save takes priority without deleting the old value. Fan keys are unchanged. Community content is separate from themes. No arbitrary HTML/JS/CSS or remote asset URL executes. See `THEME_ENGINE.md`.
 
-## Addendum 01 — confirmed in this milestone
-The root `STAN_ARMY_ADDENDUM_01.md` is part of the specification. A shared live visual editor customises existing artist pages, their listening rooms, and `/fans/jess-wav`. Six presets: Glitter Bomb, Scene Queen, Burning Desire, Digital Dream, Cyber Trash, Blank Canvas. Settings include raster/GIF backgrounds, cover/contain/tile/natural sizing, positioning and fixed/scroll attachment; six colour roles; six system font stacks; panel colour/opacity/border/corners; original animated CSS decorations; custom banner/avatar imagery.
+## Creation and identity integrity
+The creator acts as a fictional fan, never as the artist. Existing canonical matches lead to Visit & Enlist rather than a second Army. Adding an unlisted artist requires distinguishing details and carries a future conflict-review explanation. Address checks cover DNS syntax, reserved platform names, seeded conflicts and misleading official/verified claims. They are local demonstrations, not public uniqueness guarantees or reservations.
 
-Save persists versioned JSON per profile in localStorage. Cancel and Escape discard drafts. Reset previews defaults, with an explicit Save required to persist. Visitor clean/custom and pause controls preserve all content. The editor is available only in simulated owner/manager views; real role authorisation remains Milestone 2. Reduced motion hides animated uploads and stops CSS animations. Text contrast and opaque core surfaces are protected. Advanced CSS is disabled, with a token preview only.
+Official-access requests require a separate fan handle, public HTTPS evidence link and explanatory details. A real workflow will need identity/authority verification, reserved sensitive handles, disputes, expiry/revocation and auditable scoped grants. The prototype neither sends evidence nor grants status.
 
-Fan space includes a fictional biography, licensed imagery, favourites, and the actual session-local enlistment list. It uses the same schema/editor as artist pages. See `THEME_ENGINE.md` for asset limits, migration and acceptance evidence.
+## Stewardship policy — approved boundaries
+Inactivity is not automatically abandonment. Assessment must consider active moderators, continuing community care and reasonable absences. Notice, platform review, community continuity and an appeal route precede any involuntary stewardship change. The suggested 90-day/30-day periods remain provisional policy examples, not timers or implemented thresholds. No automatic ownership transfer is implemented.
+
+Voluntary transfer requires explicit owner consent, recipient acceptance and a supported audited process. Founder attribution remains historical even if administration changes later. Verification, upgrades and promotional spend never transfer control.
+
+## Funding and music
+Army creation and enlistment are free. PRO $19/month and ELITE $59/month remain provisional Army upgrade concepts, optionally fan-funded; exact entitlements and collective funding rules are undecided. Professional tools may be paid separately, without buying ownership or identity.
+
+FAN. THE FLAMES. is a future voluntary, transparent promotional-campaign concept. Paid inventory must be clearly labelled and separate from organic discovery. Moderation/approval, budgets, reporting, responsible payment handling and refunds are future requirements. No fake engagement, ranking manipulation or guaranteed streams. The prototype displays the concept only, with no payment UI or fabricated performance figures.
+
+Music uses consented, permitted third-party playback with a fallback. The NPR sample is not Nova's catalogue. No copyrighted media is hosted, no synchronized playback is claimed, and verification does not establish media licensing rights.
+
+## Remaining simulated / out of scope
+All people, identities, counts, posts, conversations and events are fictional. Roles are an explicit UI simulation. Community activity and creation/request previews are in memory; only successful visual-theme saves persist locally. No accounts, database, global duplicate detection, DNS, real official access, moderation enforcement, transfers, payments, campaigns, ad delivery, exclusive-media hosting or deployment. Desktop/mobile browser journeys and screenshots remain unverified because managed browser tooling is unavailable.

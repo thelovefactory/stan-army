@@ -9,7 +9,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const links = [
     { href: "/discover", label: "Discover" },
-    { href: "/artists/nova-reign", label: "The demo army" },
+    { href: "/armies/nova", label: "The demo army" },
     { href: "/fans/jess-wav", label: "Fan space" },
   ];
   return (
@@ -44,7 +44,7 @@ export function Header() {
               <span /> VISUAL PROTOTYPE
             </span>
             <Link href="/create" className="button button-small">
-              Create your army <ArrowUpRight size={15} />
+              Start an Army <ArrowUpRight size={15} />
             </Link>
             <button
               className="menu-button"
@@ -58,7 +58,7 @@ export function Header() {
         </div>
         {open && (
           <nav aria-label="Mobile navigation" className="mobile-nav">
-            {[...links, { href: "/create", label: "Create your army" }].map(
+            {[...links, { href: "/create", label: "Start an Army" }].map(
               (l) => (
                 <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>
                   {l.label} <ArrowUpRight size={16} />

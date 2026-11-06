@@ -1,6 +1,6 @@
 # Fan-led product pivot — audit and implementation proposal
 
-Status: audit complete; structural implementation has not begun. The user's `STAN_ARMY_PRODUCT_PIVOT.md` supersedes conflicting product assumptions in the original brief and Addendum 01. Later clarification: the current design is a useful starting point, not a constraint; purposeful changes are welcome, with a broader reskin possible later.
+Status: the user approved this plan and both recommendations. The fan-led prototype is now implemented; see PRODUCT_SPEC.md and VALIDATION.md. The audit and proposed sequence below are retained as the planning record. The user's `STAN_ARMY_PRODUCT_PIVOT.md` supersedes conflicting product assumptions in the original brief and Addendum 01. Later clarification: the current design is a useful starting point, not a constraint; purposeful changes are welcome, with a broader reskin possible later.
 
 ## Product invariant
 Fans establish and steward an Army around an artist. The artist need not register, approve or pay. Community authority, verified artist identity and financial support are independent. "Fan-owned" means stewardship within platform rules, never ownership of artist IP. No money or verification event automatically transfers community control.
@@ -108,5 +108,8 @@ Keep provider-approved music embeds and fallback links. Licensed exclusive media
 
 Neither requires a backend in this prototype. The core fan-led ownership, one-artist/one-canonical-Army rule, separate identities and no automatic artist takeover are already explicit requirements, not open questions.
 
-## Gate
+## Original plan-first gate (subsequently approved)
 The pivot's section 11 explicitly says: "Before making major structural changes, report your proposed implementation plan and any decisions that need clarification." This commit supplies that report. It does not restart, redesign, restructure or deploy the application. The user's later design clarification permits purposeful UI changes; it does not remove the requested plan-first step.
+
+## Approved policy clarification
+The user approved two distinct announcement surfaces: From the Army for fan administrators and From the Artist for verified artists/authorised representatives. Verification never automatically grants ownership, theme editing or moderation. Founder inactivity is not automatically abandonment, especially when moderators continue to maintain the community. Notice, platform review, continuity and appeal remain required. The proposed 90-day/30-day thresholds are provisional; no automatic ownership transfer is implemented. Implementation proceeds under that approval.
