@@ -1,5 +1,7 @@
 # Stan Army — Milestone 1
 
+**Product update:** [Fan-led pivot](STAN_ARMY_PRODUCT_PIVOT.md) supersedes conflicting ownership/business assumptions in earlier briefs. [Read the codebase audit and proposed implementation plan](docs/PIVOT_AUDIT_PLAN.md). The running prototype has not yet been restructured for this pivot.
+
 Local visual prototype built from `STAN_ARMY_CODEX_BUILD_BRIEF.md`. The original master brief is unchanged. `STAN_ARMY_ADDENDUM_01.md` extends Milestone 1 with artist and fan visual customisation. Stop for visual review before accounts, persistence, realtime or billing.
 
 ## Run locally
