@@ -29,6 +29,7 @@ import {
 } from "@/lib/theme";
 
 type ThemeContext = {
+  openPlayerEditor: () => void;
   clean: boolean;
   animationsEnabled: boolean;
   role: string;
@@ -38,6 +39,7 @@ type ThemeContext = {
   visibleAsset: (asset: Theme["background"]["image"]) => string | null;
 };
 const Context = createContext<ThemeContext>({
+  openPlayerEditor: () => {},
   clean: false,
   animationsEnabled: false,
   role: "visitor",
@@ -82,12 +84,14 @@ export function ProfileTheme({
   legacyProfileId,
   officialParticipation = false,
   previewTheme,
+  compactControls = false,
 }: {
   profileId: string;
   kind: "army" | "fan";
   legacyProfileId?: string;
   officialParticipation?: boolean;
   previewTheme?: Theme;
+  compactControls?: boolean;
   name: string;
   children: React.ReactNode;
 }) {
@@ -204,6 +208,14 @@ export function ProfileTheme({
   return (
     <Context.Provider
       value={{
+        openPlayerEditor: () => {
+          if (canEdit) {
+            if (!editing) open();
+            requestAnimationFrame(() =>
+              document.getElementById("army-player-skin")?.focus(),
+            );
+          }
+        },
         clean,
         animationsEnabled: playing,
         role,
@@ -214,7 +226,7 @@ export function ProfileTheme({
       }}
     >
       <div
-        className={`profile-workbench ${editing ? "is-editing" : ""}`}
+        className={`profile-workbench ${editing ? "is-editing" : ""} ${compactControls ? "profile-compact-controls" : ""}`}
         onKeyDown={(e) => {
           if (editing && e.key === "Escape") {
             e.preventDefault();
@@ -315,7 +327,9 @@ export function ProfileTheme({
             <div className="theme-status-row">
               <p role="status">
                 {status ||
-                  "Local role simulation, not authentication. Community roles and official identity are separate. Visual settings save on this device only."}
+                  (compactControls
+                    ? "Local demo controls · Theme saves stay on this device."
+                    : "Local role simulation, not authentication. Community roles and official identity are separate. Visual settings save on this device only.")}
               </p>
               {playing ? (
                 <span>Animation on</span>

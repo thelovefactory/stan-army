@@ -20,6 +20,7 @@ import { FanMediaPreviews } from "./fan-media";
 import { ArmyAnnouncements } from "./army-announcements";
 import { DemoNote } from "./shell";
 import { MusicPanel } from "./music-panel";
+import { ArmyPlayer } from "./army-player";
 import { ArmyChat } from "./army-chat";
 import { useDemo } from "./demo-provider";
 import { ProfileTheme, useProfileTheme } from "./profile-theme";
@@ -34,6 +35,7 @@ export function ArmySpace({
     <ProfileTheme
       profileId={`army:${view.army.id}`}
       legacyProfileId={`artist:${view.artist.slug}`}
+      compactControls={view.army.id === "army-nova" && !room}
       kind="army"
       name={`${view.artist.name}’s Army`}
       officialParticipation={view.artist.id === "artist-nova"}
@@ -107,7 +109,7 @@ function ArmySpaceContent({
   return (
     <main
       id="main"
-      className={`artist-page accent-${army.accent} ${isNova ? "living-army" : ""}`}
+      className={`artist-page accent-${army.accent} ${isNova ? "living-army turn-up-army" : ""}`}
     >
       <div className="container">
         <div className="artist-breadcrumb">
@@ -116,37 +118,57 @@ function ArmySpaceContent({
           </Link>
           <DemoNote compact />
         </div>
-        <section className="artist-banner" aria-label={`${artist.name} banner`}>
-          <Image
-            src={customBanner || (isNova ? artist.image : "/images/crowd.jpg")}
-            unoptimized={!!customBanner}
-            fill
-            priority
-            sizes="95vw"
-            alt={
-              customBanner
-                ? "Locally selected custom artist banner"
-                : "Licensed stock photograph representing this fictional artist"
-            }
-          />
-          <div className="banner-overlay" />
-          <span className="banner-tag">
-            THIS IS OUR LITTLE CORNER OF THE INTERNET.
-          </span>
-          <div className="banner-lettering">
-            FEEL IT.
-            <br />
-            <i>TOGETHER.</i>
-            <span>✳</span>
-          </div>
-          <span className="banner-sticker">
-            STAY FOR
-            <br />
-            THE PEOPLE ↘
-          </span>
-          <span className="banner-caption">{artist.city.toUpperCase()} ↗</span>
-        </section>
-        <section className="artist-identity">
+        {!isNova && (
+          <>
+            <section
+              className="artist-banner"
+              aria-label={`${artist.name} banner`}
+            >
+              <Image
+                src={
+                  customBanner || (isNova ? artist.image : "/images/crowd.jpg")
+                }
+                unoptimized={!!customBanner}
+                fill
+                priority
+                sizes="95vw"
+                alt={
+                  customBanner
+                    ? "Locally selected custom artist banner"
+                    : "Licensed stock photograph representing this fictional artist"
+                }
+              />
+              <div className="banner-overlay" />
+              <span className="banner-tag">
+                THIS IS OUR LITTLE CORNER OF THE INTERNET.
+              </span>
+              <div className="banner-lettering">
+                FEEL IT.
+                <br />
+                <i>TOGETHER.</i>
+                <span>✳</span>
+              </div>
+              <span className="banner-sticker">
+                STAY FOR
+                <br />
+                THE PEOPLE ↘
+              </span>
+              <span className="banner-caption">
+                {artist.city.toUpperCase()} ↗
+              </span>
+            </section>
+          </>
+        )}
+        <section
+          className={`artist-identity ${isNova ? "nova-identity-compact" : ""}`}
+          style={
+            isNova && customBanner
+              ? {
+                  backgroundImage: `linear-gradient(90deg,${theme.background.color}f2,${theme.background.color}ed),url("${customBanner}")`,
+                }
+              : undefined
+          }
+        >
           <div className="identity-left">
             <div className="artist-avatar">
               <Image
@@ -163,7 +185,7 @@ function ArmySpaceContent({
             </div>
             <div>
               <p className="eyebrow">
-                FANS RALLYING AROUND{" "}
+                {isNova ? "NOVA’S ARMY · FAN-RUN" : "FANS RALLYING AROUND"}{" "}
                 <span className="mint-text">{artist.genre.toUpperCase()}</span>
               </p>
               <h1>
@@ -203,20 +225,35 @@ function ArmySpaceContent({
             </button>
           </div>
         </section>
-        <div className="army-address-strip">
-          <span>FAN-RUN · FAN-MADE</span>
-          <b>{armyAddress(army)}</b>
-          <small>Intended address · local prototype</small>
-        </div>
-        <div className="artist-about-row">
-          <p>{artist.bio}</p>
-          <span role="status" className="share-status">
-            {share ||
-              (isEnlisted
-                ? "You’re in! This enlistment is local to your demo session."
-                : "Independent sounds. A space for everyone.")}
-          </span>
-        </div>
+        {!isNova && (
+          <div className="army-address-strip">
+            <span>FAN-RUN · FAN-MADE</span>
+            <b>{armyAddress(army)}</b>
+            <small>Intended address · local prototype</small>
+          </div>
+        )}
+        {!isNova && (
+          <div className="artist-about-row">
+            <p>{artist.bio}</p>
+            <span role="status" className="share-status">
+              {share ||
+                (isEnlisted
+                  ? "You’re in! This enlistment is local to your demo session."
+                  : "Independent sounds. A space for everyone.")}
+            </span>
+          </div>
+        )}
+        {isNova && (
+          <>
+            <p className="compact-army-status" role="status">
+              {share ||
+                (isEnlisted
+                  ? "You’re enlisted in this local demo."
+                  : `${armyAddress(army)} · Intended public address · Listening is individual.`)}
+            </p>
+            <ArmyPlayer />
+          </>
+        )}
         <div className="artist-section-nav">
           <a href={isNova ? "#fan-space" : "#army-room"} className="active">
             The army <span>✳</span>
@@ -250,9 +287,6 @@ function ArmySpaceContent({
             <div className="living-sidebar">
               <div id="army-room">
                 <ArmyChat view={view} />
-              </div>
-              <div className="living-music">
-                <MusicPanel />
               </div>
               <OrbitFans />{" "}
               <aside id="events" className="panel events-panel">

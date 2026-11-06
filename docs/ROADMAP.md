@@ -30,3 +30,6 @@ The fan-led implementation is ready for product/visual review with available aut
 
 ## Current visual review: the living fan space
 Prioritise authored community experience over a generic feature catalogue. This revision adds Nova's varied local fan feed, a first-stan feed mode, replies/hearts, a focused gallery/keepsake shelf and original playable video studies, grounded in 2006–2007 historical evidence. The artist remains the hero; founder credit moves down. It does not start a social-network backend or introduce real uploads/hosting. Judge whether a single person's contribution changes the emotional character of the place before adding more product surface.
+
+## Current visual review: Turn up the music
+Nova's arrival now uses compact identity and one shared skinnable Music/Video player immediately before participation. The same component replaces older music/video widgets in the room and video shelf. Original demo audio supports the one-stan test; existing fan content, themes and permissions remain. Review real browser playback, responsive height, skin contrast and keyboard control before extending the catalogue. Artist releases/official videos need permitted provider links or rights, not claims inferred from prototype media. Community-curated selection remains a possible later scope; no voting/recommendation or streaming backend is added.

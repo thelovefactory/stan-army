@@ -8,7 +8,7 @@ Checkout `/workspace/stan-army`; review branch `codex/milestone-1-visual-prototy
 | --- | --- |
 | `npm run lint` | Passed, exit 0, no errors/warnings |
 | `npm run typecheck` | Passed, exit 0; runs `next typegen && tsc --noEmit` |
-| `npm test` | Passed, exit 0; 19 named tests, 19 passed, 0 failed |
+| `npm test` | Passed, exit 0; 23 named tests, 23 passed, 0 failed |
 | `npm run build` | Passed, exit 0; optimized webpack build, TypeScript and 33 generated route outputs including legacy redirects; create/official-access render on demand |
 | `git diff --check` | Passed |
 | `git diff --numstat -- STAN_ARMY_CODEX_BUILD_BRIEF.md STAN_ARMY_ADDENDUM_01.md STAN_ARMY_PRODUCT_PIVOT.md public` | Empty; source briefs and supplied/licensed/original public assets preserved |
@@ -44,7 +44,7 @@ Python assertions against `.next/server/app` verified:
 - The founder-default generated HTML does not contain an official-announcement textarea.
 - Landing, discovery and fan-profile HTML is generated.
 
-These checks read build artifacts; they do not start a server or substitute for browser QA. The 31 generated outputs include compatibility routes, not 31 new product pages or additional generic Armies.
+These checks read build artifacts; they do not start a server or substitute for browser QA. The 33 generated outputs include compatibility routes, not 33 new product pages or additional generic Armies.
 
 ## Working implementation / source-reviewed state boundaries
 - Original six communities retained; Nova is the developed primary demo. Echo Valentine is only a catalogue identity for the no-Army onboarding case.
@@ -57,7 +57,7 @@ These checks read build artifacts; they do not start a server or substitute for 
 - All content remains React-escaped. No arbitrary CSS/HTML/JS is executed. Global nav and role/editor controls remain outside theme scope.
 
 ## Browser QA and screenshots remain unavailable
-This session exposes no `cua_repl.js` or supported managed browser-control tool. No browser was installed, alternate browser-control path improvised, preview server started or screenshot fabricated.
+This session exposes no `cua_repl.js` or supported managed browser-control tool. No browser was installed, alternate browser-control path improvised or screenshot fabricated. The user-requested local development server is used for HTTP checks; it is not a substitute for browser QA.
 
 The [Sites skill](skill://plugin_connector_1p_689987207de08191979cf68eca2941c6/sites/SKILL.md) says: “If `cua_repl.js` is unavailable, skip browser QA: do not start a preview server, install a browser, or improvise another browser-control path.” This leaves actual desktop/mobile rendering, keyboard focus, software keyboard, image/GIF decoding/playback, clipboard behaviour, localStorage refresh, reduced-motion presentation and third-party playback unverified. There are no screenshots in this deliverable.
 
@@ -83,8 +83,34 @@ The already-authorised workspace development server remains running. HTTP checks
 1. Write a note using each of the four treatments; confirm it appears first. Leave a heart, expand replies and answer; navigate to the gallery and back. Confirm session state survives and refresh clears content but retains saved themes.
 2. Disable sample conversations. The feed should retain only the founding note, with no sample hearts/replies, plus anything you wrote. Does one personal note feel like a beginning rather than an empty dashboard?
 3. Open gallery previews, filter Photos/Fan art/Keepsakes, navigate details with native dialog controls/Escape, and keep/unkeep a memory. Inspect stock/original provenance captions and return-focus behaviour.
-4. Play the two original silent clips manually. Confirm no autoplay/loop, local file delivery, download links and pause when motion controls switch off. These are original typography studies, not artist performance uploads.
+4. Play the two original silent clips manually. Confirm no autoplay or looping without explicit Repeat, local file delivery, download links and pause when motion controls switch off. These are original typography studies, not artist performance uploads.
 5. Check artist-first hierarchy, varied contribution compositions and bottom founder credit at 1440/390/320px and 200% zoom. Ensure the chat/music/sidebar stack remains useful. Open From the Army / From the Artist and verify existing role-gated composers.
 6. Test custom/clean view on main/gallery/video pages, including existing saved themes and a bright/clashing theme. Contribution treatments should neutralise without erasing their content. Check focus, contrasts and reduced-motion behaviour.
 
 The actual historical research screenshot is in `docs/research/`; product browser screenshots remain unavailable. No browser visual/keyboard/dialog/playback pass is claimed because the required managed tool is still absent. The existing user-requested server was used for HTTP checks; no alternative browser was installed or controlled. No production backend, real upload service, payments or deployment was added.
+
+## Turn up the music — current validation
+`npm run lint`, `npm run typecheck`, `npm test` and `npm run build` passed. The latest suite has **23 tests / 23 passed / 0 failed**; build generates 33 outputs, with no additional route count from the player. Four new tests cover safe known catalogue sources/mode queues, previous/next wrapping and seek/time edge cases, old v1 preference preservation with the new default, and enum-only player-skin persistence/injection rejection.
+
+HTTP checks on the already-authorised workspace preview returned 200 for `/armies/nova`, `/armies/nova/room` and `/armies/nova/videos`. Parsed markup has exactly one Army Player per page, no unsolicited iframe, and no autoplay attribute. Nova has no promotional banner and follows compact identity → Army Player → Leave your mark → founder credit. Both new MP3 files return 206 `audio/mpeg` to range requests. `ffprobe` reports valid 24.06-second MP3 audio; FFmpeg successfully decodes the original source with non-silent output and no clipping (sample measured mean -24.2 dB, peak -9.0 dB).
+
+The old long-running Turbopack development process stopped responding during HTTP checks, despite successful production compilation. It required a targeted process restart; the attempted cache move failed without changing the files, and no cache/data directory was deleted. Webpack development then served all pages successfully. `npm run dev` now explicitly uses webpack, matching the production build, so local reviewers use the verified bundler. No dependency version changed and no browser-saved preference was cleared. The generated `next-env.d.ts` dev-path change and untracked pre-existing AGENTS.md are not included as product edits.
+
+### Genuinely wired vs. decorative/provider-owned
+- Local play/pause/stop/seek/volume/mute/repeat use native audio/video methods/properties; time/duration/loading/ended/error status comes from active-element events. No timer pretends to play a track. Selecting a new item pauses/unloads old playback; the next selection waits for explicit Play.
+- Music/video mode, selection queue and compact/expanded layout are real React interactions around one component. The same player is reused in the wider room and video shelf.
+- Pixel bars are explicitly decorative CSS motion tied to local playback and motion settings, **not** audio analysis or a working EQ. Reduced motion/animation pause freezes them; no hidden DSP is claimed.
+- YouTube is created only on consent. The outer button loads/unloads it; play/pause/seek/volume remain the provider's own controls. Source fallback remains available. Stan Army does not read provider time/state or synchronize it across users.
+- Skins are stored through the existing live editor/Save/Cancel contract. Old v1 records missing `playerSkin` receive a safe default while keeping their previous fields; storage keys and legacy fallback are unchanged. Official identity does not gain edit permission.
+
+These implementation statements and model/HTTP/media checks do not claim successful browser audio, gesture/codec handling, keyboard/range interaction, skin layout or screenshot verification.
+
+### Focused review checklist
+1. Open `/armies/nova`. Confirm the large FEEL IT TOGETHER banner is absent and music is immediately visible after compact identity. At 1440/390/320px and 200% zoom, inspect wrapping, first-screen height, readable controls and access to the note composer/chat.
+2. Play each original audio sketch. Test pause, stop/rewind, seeking, mute, volume, repeat and previous/next. Confirm selection change stops the earlier source, never starts unsolicited playback, and displayed time matches actual playback.
+3. Switch to Video without leaving the page. Play/pause/seek an original silent study, expand/compact, and show/hide the queue. Load the NPR example only by clicking; test provider controls, unload, source fallback and blocked-embed behaviour.
+4. From the player skin button or CUSTOMISE, try all four skins, Save/refresh, Cancel and Reset. Continue audio while changing skins and verify it is not restarted. Reopen an old theme with colours/background/GIF/avatar settings and confirm those remain. Verify custom banner art is a compact readable treatment, not a resurrected hero.
+5. Test clean view, reduced motion and pixel visualization off. Audio should not be muted by visual-motion preferences; deliberate native media interaction remains possible. Test explicit video pause when animation preference switches off.
+6. Check keyboard focus and range controls, media-error source fallback, official/visitor role restrictions, local note/hearts/replies, gallery/shelf state, distinct community/artist notes and founder credit. No community backend has changed.
+
+Browser tooling remains unavailable, so product screenshots and actual desktop/mobile/playback/keyboard results remain outstanding. Research contains an inspected preservation-reference image separately from product evidence. No production streaming, licensing infrastructure, payments, auth, real uploads or deployment was implemented.

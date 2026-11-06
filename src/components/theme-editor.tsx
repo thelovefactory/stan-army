@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import type { CSSProperties } from "react";
 import {
+  playerSkins,
+  PlayerSkin,
   fontLabels,
   fonts,
   MAX_ASSET_BYTES,
@@ -149,6 +151,29 @@ export function ThemeEditor({
         <p className="editor-hint">
           Presets replace the current preview, including uploads. Cancel
           restores your saved theme.
+        </p>
+      </section>
+      <section className="editor-section">
+        <h3>♫ The Army Player</h3>
+        <label>
+          Player skin
+          <select
+            id="army-player-skin"
+            value={theme.playerSkin}
+            onChange={(e) =>
+              update({ playerSkin: e.target.value as PlayerSkin })
+            }
+          >
+            {Object.entries(playerSkins).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <p className="editor-hint">
+          Try it live on the Army Player. Save keeps this skin with the Army’s
+          theme. Clean view uses a restrained player.
         </p>
       </section>
       <section className="editor-section">

@@ -33,8 +33,16 @@ export type ThemeAsset = {
   height: number;
   animated: boolean;
 };
+export const playerSkins = {
+  desktop: "Classic desktop",
+  y2k: "Bubblegum Y2K",
+  minimal: "Quiet hours",
+  toxic: "Toxic chrome",
+} as const;
+export type PlayerSkin = keyof typeof playerSkins;
 export type Theme = {
   schemaVersion: 1;
+  playerSkin: PlayerSkin;
   preset: PresetId;
   background: {
     color: string;
@@ -66,6 +74,7 @@ export type Theme = {
 };
 export const defaultTheme: Theme = {
   schemaVersion: 1,
+  playerSkin: "desktop",
   preset: "blank-canvas",
   background: {
     color: "#0b0b0d",
@@ -116,6 +125,7 @@ export const presets: {
     theme: {
       ...defaultTheme,
       preset: "glitter-bomb",
+      playerSkin: "y2k",
       background: { ...defaultTheme.background, color: "#2c092a" },
       colors: {
         text: "#fff1fa",
@@ -197,6 +207,7 @@ export const presets: {
     theme: {
       ...defaultTheme,
       preset: "digital-dream",
+      playerSkin: "minimal",
       background: { ...defaultTheme.background, color: "#201c3c" },
       colors: {
         text: "#f9f4ff",
@@ -224,6 +235,7 @@ export const presets: {
     theme: {
       ...defaultTheme,
       preset: "cyber-trash",
+      playerSkin: "toxic",
       background: { ...defaultTheme.background, color: "#11170c" },
       colors: {
         text: "#ebffda",
@@ -357,6 +369,11 @@ export function validateTheme(value: unknown): Theme {
   }
   return {
     schemaVersion: 1,
+    playerSkin: choice(
+      t.playerSkin,
+      Object.keys(playerSkins) as PlayerSkin[],
+      d.playerSkin,
+    ),
     preset: choice(
       t.preset,
       presets.map((p) => p.id),

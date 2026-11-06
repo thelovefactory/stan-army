@@ -10,9 +10,10 @@ import {
   X,
 } from "lucide-react";
 import { ArmyView, armyPath } from "@/lib/data";
-import { fanVideoStudies, memories } from "@/lib/fan-space";
+import { memories } from "@/lib/fan-space";
 import { useDemo } from "./demo-provider";
-import { ProfileTheme, useProfileTheme } from "./profile-theme";
+import { ProfileTheme } from "./profile-theme";
+import { ArmyPlayer } from "./army-player";
 import { MemoryVisual } from "./memory-visual";
 export function FanMediaPreviews() {
   return (
@@ -243,44 +244,13 @@ function MemoryGallery({ initialMemory }: { initialMemory?: string }) {
   );
 }
 function FanVideos() {
-  const { animationsEnabled } = useProfileTheme();
-  const videos = useRef<(HTMLVideoElement | null)[]>([]);
-  useEffect(() => {
-    if (!animationsEnabled) videos.current.forEach((v) => v?.pause());
-  }, [animationsEnabled]);
   return (
     <>
       <p className="living-demo-label">
         Original silent local demo films, not Nova performances or real fan
         uploads. Press play yourself; nothing autoplays.
       </p>
-      <div className="fan-video-grid">
-        {fanVideoStudies.map((v, i) => (
-          <article className="fan-video-card" key={v.id}>
-            <div className={`local-film film-${v.id}`}>
-              <span aria-hidden="true">{v.id === "mark" ? "♡" : "✳"}</span>
-              <video
-                ref={(node) => {
-                  videos.current[i] = node;
-                }}
-                src={v.src}
-                controls
-                preload="none"
-                playsInline
-                aria-label={v.title + " — silent original demo video"}
-              />
-            </div>
-            <p className="eyebrow">{v.category}</p>
-            <h2>{v.title}</h2>
-            <p>
-              By @{v.by} · {v.caption}
-            </p>
-            <a href={v.src} download>
-              Keep the demo clip <ArrowUpRight size={15} />
-            </a>
-          </article>
-        ))}
-      </div>
+      <ArmyPlayer initialMode="video" wide />
       <div className="video-letter">
         <span>To the first person who makes something here:</span>
         <h2>

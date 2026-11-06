@@ -10,6 +10,7 @@ Fan community administrators control Army appearance. A verified artist/represen
 - Panels: hex colour, 0–100 opacity, solid/dashed/dotted/double, original/square/round/wonky corners.
 - Decorations: none/hearts/stars/flames/butterflies/pixels, glitter, animation setting.
 - Images: banner and avatar using the same asset contract as background.
+- Player skin: Classic desktop / Bubblegum Y2K / Quiet hours / Toxic chrome, mapped from a fixed enum with a safe missing-field default.
 
 Six presets remain: Blank Canvas, Glitter Bomb, Scene Queen, Burning Desire, Digital Dream and Cyber Trash. Defaults are cloned; unknown fields, unsafe CSS/HTML, unapproved enums and unsupported schema versions never enter the style pipeline. Content and authority are not stored in themes.
 
@@ -42,4 +43,11 @@ Unit tests cover all six presets, unsafe inputs, asset budgets, contrast, indepe
 ## Living fan contributions
 The saved presentation schema and all localStorage keys are unchanged. `ProfileTheme` exposes clean-view/motion state so note treatments and gallery framing can respond without remounting content or overwriting the Army theme. Clean view neutralises contribution backgrounds/fonts/rotations and decorative ornaments while retaining text, replies, photographs and original artwork. Original art content is not a background theme to discard. Notes choose only fixed local style tokens; no author HTML/CSS/JS runs.
 
-Local video studies never autoplay or loop. The pause/reduced-motion state pauses currently playing local videos when it switches off; a deliberate native Play action remains available for user-controlled media. Existing GIF hiding and CSS animation controls remain. Native dialog and note/reply controls use fixed readable interaction styling. Authored note data is separate from theme configuration and resets on refresh.
+Local video studies never autoplay; looping requires explicit Repeat in the Army Player. The pause/reduced-motion state pauses currently playing local videos when it switches off; a deliberate native Play action remains available for user-controlled media. Existing GIF hiding and CSS animation controls remain. Native dialog and note/reply controls use fixed readable interaction styling. Authored note data is separate from theme configuration and resets on refresh.
+
+## Additive Army Player setting
+`Theme.playerSkin` accepts only `desktop`, `y2k`, `minimal` or `toxic`. It remains schema v1 because this is an additive setting with a safe missing-field fallback; legacy fields/keys and raster limits are unchanged. Existing v1 JSON without a player field preserves colours, backgrounds, typography, panels, decorations and imagery. Validation supplies `desktop` in memory; visiting does not rewrite old storage. Saving writes the usual target key and retains legacy data.
+
+The shared editor's player select previews live. The player skin button opens/focuses the same editor and does not replace an already-open unsaved draft. Founder/admin simulation may edit; official-only/visitor modes cannot. Clean view temporarily selects `minimal` without saving. Existing full-profile presets can suggest corresponding player skins, but old saved records do not silently adopt a different preset skin.
+
+All player palettes/structures are original fixed CSS, not imported .wsz archives or arbitrary CSS/HTML. Buttons/displays keep explicit contrast independent of user-selected page colours. Optional decorative pixels stop with local pause/buffering, disabled visualization or reduced-motion settings. Audio may continue under motion pause; video pauses when the motion preference switches off. There is no actual audio EQ/analyzer, autoplay or cross-user playback feature.

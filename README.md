@@ -15,6 +15,8 @@ npm ci
 npm run dev
 ```
 
+The dev script uses webpack, matching the production build, to avoid a hang observed in the previous long-running Turbopack preview. No browser storage reset is needed.
+
 For a new checkout, first run `git clone https://github.com/thelovefactory/stan-army.git` and `cd stan-army`. In this workspace the checkout is `/workspace/stan-army`. Open http://localhost:3000.
 
 ```sh
@@ -45,6 +47,17 @@ Artist, founding fan and Army are separate records and visible identities. Enlis
 
 Creation is unmistakably fan-led: search/select/add an artist; route existing canonical matches to their Army; validate a separate reserved-aware Army address; choose starting imagery and a shared theme preset; write a fan welcome; finish an editable preview. Completion creates no public Army or reserved address. Invite text is marked non-live. Official-request validation likewise submits nothing and changes no permissions.
 
+## Turn up the music — latest revision
+Nova's large promotional banner is removed. Arrival is compact identity → **THE ARMY PLAYER** → the existing community, with no marketing introduction. Old custom banners remain saved and can appear as a small readable identity background; avatar/background settings and fan content are preserved.
+
+The same Army Player powers the main Army, focused listening room and video shelf. Switch **MUSIC / VIDEO** on-page; choose selections with Previous/Next or the queue; use Play/Pause, Stop, seek, volume, mute, repeat and compact/expanded controls. Local controls operate HTML media elements. No playback starts automatically, and selecting a different item requires pressing Play. A browser playback failure has a visible status and source-file fallback. YouTube is explicitly load/unload consent with provider-native play/pause/seek/volume; Stan Army never pretends to read or synchronize that iframe's state.
+
+Choose **Classic desktop**, **Bubblegum Y2K**, **Quiet hours** or **Toxic chrome** in CUSTOMISE → The Army Player. The player skin button opens that existing editor for fan administrators, with live preview and Save/Cancel. Skins are a safe additive v1 theme field, not a second storage system. Old themes without the field keep their earlier preferences and receive the classic player default. Clean view uses Quiet hours. Existing saved Army/fan keys and legacy fallback are unchanged.
+
+The pixel pulse is **decorative, not audio analysis or an equalizer**. It runs only while the local media reports playback and motion is permitted, and can be switched off. Visual motion controls do not mute user-started audio; they pause currently playing local video when switched off. Native deliberate media play remains possible. No streaming infrastructure, DSP, voting, licensing service or backend is introduced.
+
+[Player research and inspected visual reference](docs/research/ARMY_PLAYER_REFERENCES.md) · [Supplied music brief](STAN_ARMY_TURN_UP_THE_MUSIC.md)
+
 ## The living fan space — leave your mark
 Nova now leads into a fan-authored feed rather than a promotional noticeboard. Write a note, choose Simple note / Notebook heart / After hours / Demo photo, and **Leave my mark**. It appears first in the feed. Hearts and threaded replies work locally; notes/replies/hearts and kept gallery memories survive client navigation in the root provider, then clear on refresh. Unlike themes, none of this content is persisted or published.
 
@@ -69,7 +82,7 @@ No real auth, server authorization, database, realtime delivery, global availabi
 FAN. THE FLAMES. is a future promotional concept only. No payment CTA or guaranteed streams. Creation/joining are free; optional Army upgrades and professional tools remain separate from ownership and identity.
 
 ## Music and verification limits
-The player uses a public NPR Music sample through a click-to-load YouTube privacy-enhanced iframe. It is not the fictional artist's catalogue. Loading contacts YouTube and playback depends on provider/browser policies. The watch-on-YouTube fallback remains available. No hosted music, synchronization or playback analytics.
+The Army Player starts with two original 24-second synthesized instrumental sketches, clearly labelled as prototype audio rather than Nova recordings. Video mode offers the existing two original silent films and the public NPR Music performance through a click-to-load YouTube privacy-enhanced iframe. Loading the iframe contacts YouTube; provider/browser restrictions may prevent playback, so the YouTube link remains. Commercial recordings are not hosted; original local demo files are. No synchronization or playback analytics.
 
 Automated checks and generated-output checks are recorded in [VALIDATION.md](docs/VALIDATION.md). Desktop/mobile browser interaction, keyboard/file-picker/playback journeys and screenshots remain unavailable because this session lacks the required managed browser tool. Do not treat implementation or unit-test coverage as a completed browser accessibility audit.
 
