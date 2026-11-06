@@ -1,0 +1,9 @@
+'use client';
+import Image from 'next/image';
+import { useState } from 'react';
+import { Play, ArrowUpRight, Headphones, X } from 'lucide-react';
+import { embed } from '@/lib/data';
+export function MusicPanel({ wide = false }: { wide?: boolean }) {
+  const [loaded,setLoaded] = useState(false);
+  return <section className={`panel music-panel ${wide ? 'wide-music' : ''}`} aria-labelledby="music-heading"><div className="panel-title"><h2 id="music-heading"><Headphones size={17} /> On repeat</h2><span className="micro-label">SAMPLE LISTEN</span></div>{loaded ? <div className="loaded-player"><iframe src={embed.src} title={embed.title} allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen /><button onClick={()=>setLoaded(false)} className="unload-button"><X size={13} /> Unload video</button></div> : <div className="player-art"><Image src="/images/room.jpg" fill sizes="(max-width: 800px) 90vw, 40vw" alt="Concert stage lighting" /><div className="player-art-overlay" /><span className="player-art-word">SOUND<br />IS A<br /><i>FEELING.</i></span><button onClick={()=>setLoaded(true)} className="load-player"><Play fill="currentColor" size={20} /><span>Load sample video</span></button></div>}<div className="track-row"><div className="vinyl-icon">♫</div><div><strong>NPR Music · Tiny Desk</strong><span>Third-party playback example</span></div><a href={embed.url} target="_blank" rel="noreferrer" aria-label="Open sample concert on YouTube (new tab)"><ArrowUpRight size={21} /></a></div><p className="embed-note">Loads YouTube only after your click. This sample isn’t this fictional artist’s music. Playback is individual, never synchronized.</p><a className="small-link" href={embed.url} target="_blank" rel="noreferrer">Player unavailable? Watch on YouTube ↗</a></section>;
+}
