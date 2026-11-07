@@ -57,7 +57,7 @@ export function ObsessionStrip() {
         <h2 id="obsession-heading">MAKE SOME NOISE.</h2>
         <Link href="/create" className="button button-blue">
           <span>
-            Build your army <ArrowRight size={19} />
+            Rally the troops <ArrowRight size={19} />
           </span>
         </Link>
       </div>
