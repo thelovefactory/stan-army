@@ -100,7 +100,6 @@ export default function Home() {
           </span>
         </div>
         <div className="belonging-copy">
-          <p className="eyebrow">LESS ABOUT ME. MORE ABOUT US.</p>
           <h2>
             It&apos;s not my space.
             <br />
