@@ -1,14 +1,14 @@
+import { ObsessionStrip } from "@/components/obsession-strip";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, ArrowRight, ChevronRight } from "lucide-react";
+import { ArrowUpRight, ArrowRight } from "lucide-react";
 import { StanStarIcon } from "@/components/stan-icons";
 import { ArmyCard } from "@/components/artist-card";
-import { DemoNote } from "@/components/shell";
 import { armies, armyView } from "@/lib/data";
 export const metadata = {
-  title: "Stan for the things you love.",
+  title: "Stan for something.",
   description:
-    "The culture brings us together. The stans keep us fed. Create your Army or find your Army.",
+    "Unapologetically human. Slightly obsessive. Utterly yours. Build your Army around anything you love.",
 };
 export default function Home() {
   return (
@@ -16,20 +16,16 @@ export default function Home() {
       <section className="container landing-hero">
         <div className="hero-copy">
           <h1>
-            Stan for the
+            Stan for
             <br />
-            things you <span className="love-word">love.</span>
+            <span className="love-word">something.</span>
           </h1>
           <div className="hero-description">
-            <h2>The culture brings us together.</h2>
-            <h2>The stans keep us fed.</h2>
+            <p>Unapologetically human. Slightly obsessive. Utterly yours.</p>
           </div>
           <div className="hero-actions">
             <Link href="/create" className="button button-blue">
-              Create your Army <ArrowUpRight size={19} />
-            </Link>
-            <Link href="/discover" className="text-link">
-              Find your Army <ArrowRight size={18} />
+              Build your Army today <ArrowRight size={19} />
             </Link>
           </div>
           <div className="hero-community">
@@ -71,26 +67,23 @@ export default function Home() {
       <section className="container explore-section">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">DIFFERENT OBSESSIONS. STAN ENERGY.</p>
-            <h2>There&apos;s an Army for that.</h2>
+            <p className="eyebrow">02 / TRENDING</p>
+            <h2>The troops are gathering.</h2>
           </div>
           <Link href="/discover" className="text-link">
-            Explore the armies <ArrowUpRight size={19} />
+            Enlist in your next obsession <ArrowRight size={19} />
           </Link>
         </div>
-        <DemoNote />{" "}
+        <p className="demo-note">
+          <span className="demo-dot" /> DEMO SPACE · Sample communities and
+          counts, not live trends.
+        </p>
         <div className="artist-grid">
-          <ArmyCard view={armyView(armies.find((a) => a.slug === "nova")!)} />
+          <ArmyCard
+            view={armyView(armies.find((a) => a.slug === "nova")!)}
+            boardLabel="s/nova"
+          />
           {[
-            {
-              slug: "celebrity-pets",
-              name: "Celebrity Pets",
-              category: "Famous little divas",
-              description: "The real stars have paws.",
-              image: "/images/celebrity-pets.jpg",
-              alt: "A black-and-white cat looking regally over a wooden ledge",
-              accent: "pink",
-            },
             {
               slug: "brie",
               name: "Brie",
@@ -99,6 +92,15 @@ export default function Home() {
               image: "/images/brie.jpg",
               alt: "Slices of Brie cheese on a dark slate board",
               accent: "orange",
+            },
+            {
+              slug: "sneaks",
+              name: "Sneakers",
+              category: "Sole mates",
+              description: "For the pairs you can't stop thinking about.",
+              image: "/images/sneakers.jpg",
+              alt: "A red sneaker against a bright red background",
+              accent: "pink",
             },
           ].map((example, i) => (
             <div key={example.slug}>
@@ -124,6 +126,7 @@ export default function Home() {
                 </div>
                 <div className="card-details">
                   <div>
+                    <p className="featured-board-label">s/{example.slug}</p>
                     <h3>{example.name}</h3>
                     <p>{example.description}</p>
                     <p>Concept Army · Start one like this ↗</p>
@@ -187,30 +190,21 @@ export default function Home() {
           <div className="feature-row">
             <StanStarIcon size={22} />
             <span>
-              <strong>Keep the internet weird.</strong> From princesses to
-              parmesan. If you love it, there&apos;s an army for it.
+              <strong>Keep the internet weird.</strong> From pop-stars to
+              pop-tarts. If you love it, there&apos;s an Army for it.
             </span>
           </div>
-          <Link href="/create" className="button">
-            Create your army <ChevronRight size={18} />
-          </Link>
+          <div className="belonging-actions">
+            <Link href="/create" className="button">
+              Build your Army <ArrowRight size={18} />
+            </Link>
+            <Link href="/discover" className="text-link">
+              Find your Army <ArrowRight size={18} />
+            </Link>
+          </div>
         </div>
       </section>
-      <section className="container final-cta">
-        <span className="big-asterisk">✳</span>
-        <div>
-          <p className="eyebrow">ONE STAN CAN START AN ARMY.</p>
-          <h2>What&apos;s your obsession?</h2>
-        </div>
-        <div className="final-cta-actions">
-          <Link href="/create" className="button button-blue">
-            Create your army <ArrowUpRight size={20} />
-          </Link>
-          <Link href="/discover" className="text-link">
-            Find your army <ChevronRight size={18} />
-          </Link>
-        </div>
-      </section>
+      <ObsessionStrip />
     </main>
   );
 }

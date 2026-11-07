@@ -5,9 +5,11 @@ import { ArmyView, armyPath, armyAddress } from "@/lib/data";
 export function ArmyCard({
   view,
   index = 0,
+  boardLabel,
 }: {
   view: ArmyView;
   index?: number;
+  boardLabel?: string;
 }) {
   const { army, artist, founder } = view;
   return (
@@ -27,7 +29,11 @@ export function ArmyCard({
       </div>
       <div className="card-details">
         <div>
-          <h3>{artist.name}’s Army</h3>
+          {boardLabel && <p className="featured-board-label">{boardLabel}</p>}
+          <h3>
+            {artist.name}
+            {!boardLabel && "’s Army"}
+          </h3>
           <p>
             {armyAddress(army)}
             <span> · Founded by @{founder.handle}</span>

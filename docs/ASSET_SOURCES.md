@@ -60,3 +60,19 @@ The user explicitly restored the `s/` visual labels and then changed the footwea
 - `public/images/celebrity-pets.jpg`: https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=900&q=85 under the Unsplash License. Illustrative stock cat, not represented as a real celebrity's pet.
 - `public/images/brie.jpg`: original https://upload.wikimedia.org/wikipedia/commons/8/88/Brie_01.jpg by Coyau, [source](https://commons.wikimedia.org/wiki/File:Brie_01.jpg), [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). Preserved original; responsive display crops via existing card styling. Visible source/author/license attribution appears beneath the card. This photograph retains its CC BY-SA licence.
 - These are explicitly marked concept Armies linking to the creation wizard, without fabricated members or live community claims. Nova remains the working demo; shared discovery fixtures and saved themes are unchanged.
+
+## Homepage campaign montage — original photo-style imagery
+The user requested original imagery using their supplied style preview as inspiration, then refined the direction to realistic flash-lit photography, one widescreen image per frame. Midjourney IDs/profile codes were not resolved or used as a model interface. The preview itself is not used as a product asset. The earlier pastel 3D concept was not shipped.
+
+Four original imagegen marketing illustrations are displayed as a 1.4-second-per-frame CSS sequence, not represented as documentary photographs, artist imagery, real fans or licensed stock photography:
+
+| Public image | Retained original generation |
+| --- | --- |
+| `public/brand/obsessions/sneakers.png` | `/workspace/generated_images/exec-81e997e2-80c7-4667-8579-8e1b6cddc0be.png` |
+| `public/brand/obsessions/cheese.png` | `/workspace/generated_images/exec-a10b062a-30a8-4574-8b0b-c6bd72258233.png` |
+| `public/brand/obsessions/tv.png` | `/workspace/generated_images/exec-6b054aeb-c5f5-4c63-9476-e9b90439bd34.png` |
+| `public/brand/obsessions/music.png` | `/workspace/generated_images/exec-ca82078e-2dc2-4926-bc8d-941bede42fb1.png` |
+
+Sneakers, Brie/pets, TV/books and pop-music objects/cameras cover the requested obsessions in original scenes. No real celebrity likeness, existing artist artwork, TV footage or fan work is used. The original hero collage and community photograph remain unchanged. Next Image supplies lazy loading and responsive optimisation; originals remain preserved. Reduced motion shows the first still frame; pause freezes every frame without moving the CTA.
+
+`public/images/sneakers.jpg`: https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=85, downloaded 2026-11-07 under the Unsplash License. Used for the Sneakers concept card; no brand endorsement is implied. Brie retains its visible CC BY-SA attribution. Celebrity Pets' earlier asset remains in the repository for preservation, but is no longer featured.

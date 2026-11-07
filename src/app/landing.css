@@ -198,24 +198,127 @@
     display: none;
   }
 }
-.final-cta-actions {
-  margin-left: auto;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px 24px;
-  flex-shrink: 0;
+.obsession-cta {
+  padding: 40px 0 28px;
+  margin-bottom: 72px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: #19191e;
+  overflow: hidden;
 }
-
-@media (max-width: 800px) {
-  .final-cta-actions {
-    flex-shrink: 1;
+.obsession-cta h2 {
+  font-size: clamp(30px, 4.3vw, 58px);
+  text-align: center;
+  padding: 0 20px 30px;
+  letter-spacing: -0.045em;
+}
+.obsession-film {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #1c202b;
+  overflow: hidden;
+  isolation: isolate;
+}
+.obsession-shot {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: obsession-cut 5.6s steps(1, end) infinite;
+}
+.obsession-shot img {
+  object-fit: cover;
+}
+.obsession-film[data-paused="true"] .obsession-shot {
+  animation-play-state: paused;
+}
+.obsession-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: 22px 24px 0;
+  min-height: 48px;
+}
+.obsession-pause {
+  position: absolute;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  min-height: 44px;
+  background: none;
+  border: none;
+  color: #d1d1d8;
+  font-size: 11px;
+}
+.obsession-pause:hover {
+  color: var(--mint);
+}
+@keyframes obsession-cut {
+  0% {
+    opacity: 1;
+  }
+  25%,
+  100% {
+    opacity: 0;
   }
 }
-
 @media (max-width: 600px) {
-  .final-cta-actions {
-    grid-column: 2;
-    margin-left: 0;
+  .obsession-cta {
+    padding-top: 28px;
+    border-radius: 18px;
+    margin-bottom: 44px;
+  }
+  .obsession-cta h2 {
+    padding-bottom: 24px;
+  }
+  .obsession-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .obsession-pause {
+    position: static;
+    order: 2;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .obsession-shot {
+    animation: none;
+    opacity: 0;
+  }
+  .obsession-shot:first-child {
+    opacity: 1;
+  }
+  .obsession-pause {
+    display: none;
+  }
+}
+.landing-hero .hero-description p {
+  font-size: 20px;
+  line-height: 1.6;
+  max-width: 380px;
+}
+.belonging-actions {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 26px;
+}
+.card-details .featured-board-label {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+@media (max-width: 400px) {
+  .landing-hero .hero-copy h1 {
+    font-size: clamp(44px, 12vw, 52px);
+  }
+  .landing-hero .hero-description p {
+    font-size: 18px;
   }
 }

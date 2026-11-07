@@ -215,3 +215,14 @@ Review images: [desktop](screenshots/landing-culture-desktop.png), [mobile](scre
 
 ### Mixed landing obsessions
 Landing features Nova plus Celebrity Pets and Brie concept cards; Nova links to the existing demo, both concepts link to creation and are labelled as concepts. Licensed local photography and visible Brie attribution are recorded in ASSET_SOURCES.md. `npm run lint` and `npm run typecheck` passed. Focused Chromium checks passed for three cards, correct destinations and no horizontal overflow at 1440/800/390/320px. Screenshot: screenshots/landing-featured-obsessions.png. No shared demo fixtures or theme storage changed.
+
+### Homepage final polish and widescreen campaign
+- `npm run lint`: passed, no warnings/errors.
+- `npm run typecheck`: passed, route types and TypeScript.
+- `npm test`: 30 passed, 0 failed.
+- `npm run build`: passed, all 45 static outputs generated.
+- Focused Chromium campaign check passed: four images loaded; animation advances; pause freezes animation time; resume works; reduced motion disables animation and shows first still; keyboard focus visible; Rally the troops navigates to `/create`; no browser exceptions; no horizontal overflow at 320/390/800/1440px.
+- Focused Chromium copy check passed: latest hero/supporting copy, one hero CTA, Nova/Brie/Sneakers labels, preserved hero collage, community and discovery destinations, exact final campaign copy, no overflow at the same four widths.
+- Screenshots: `screenshots/homepage-polish-desktop.png`, `homepage-polish-mobile.png`, `homepage-campaign-desktop.png`, `homepage-campaign-mobile.png`.
+- Local dev server restarted after build and ready at http://localhost:3000/. No backend, theme storage or Nova interaction logic changed. Concept cards remain demonstrations; generated campaign frames are illustrative, with provenance in ASSET_SOURCES.md. No claims to exact Midjourney reference fidelity.
+- Replacement logo remains unavailable: repeated inline image previews reference Mac-local files that are not present in workspace attachments. Existing original header logo remains unchanged; no imitation was made.

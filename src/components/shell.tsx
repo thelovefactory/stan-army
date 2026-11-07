@@ -79,14 +79,14 @@ export function Footer() {
         <Link href="/" className="footer-wordmark">
           stan.army<span>✳</span>
         </Link>
-        <p>The heartbeat of every artist is their community.</p>
+        <p>Whatever you stan for. Stan for it here.</p>
       </div>
       <div className="footer-meta">
         <span>
-          <Headphones size={14} /> Made for the music. Built around the people.
+          <Headphones size={14} /> Built by the stans. For the stans.
         </span>
         <p>
-          Milestone 01 · Fictional artists & demo content · Nothing is
+          Milestone 01 · Sample communities & demo content · Nothing is
           published.
         </p>
         <Link href="/discover">Find your people ↗</Link>
