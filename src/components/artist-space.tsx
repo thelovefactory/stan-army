@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowUpRight,
   ArrowLeft,
@@ -20,7 +20,8 @@ import { FanMediaPreviews } from "./fan-media";
 import { ArmyAnnouncements } from "./army-announcements";
 import { DemoNote } from "./shell";
 import { MusicPanel } from "./music-panel";
-import { ArmyPlayer } from "./army-player";
+import { SidebarPlaylist } from "./sidebar-playlist";
+import { DiscussionBoard } from "./discussion-board";
 import { ArmyChat } from "./army-chat";
 import { useDemo } from "./demo-provider";
 import { ProfileTheme, useProfileTheme } from "./profile-theme";
@@ -58,6 +59,28 @@ function ArmySpaceContent({
   const customAvatar = visibleAsset(theme.images.avatar);
   const { enlisted, toggle } = useDemo();
   const isEnlisted = enlisted.includes(army.id);
+  const members = useRef<HTMLDetailsElement>(null);
+  useEffect(() => {
+    function close(event: PointerEvent) {
+      if (
+        members.current?.open &&
+        !members.current.contains(event.target as Node)
+      )
+        members.current.open = false;
+    }
+    function escape(event: KeyboardEvent) {
+      if (event.key === "Escape" && members.current?.open) {
+        members.current.open = false;
+        members.current.querySelector("summary")?.focus();
+      }
+    }
+    document.addEventListener("pointerdown", close);
+    document.addEventListener("keydown", escape);
+    return () => {
+      document.removeEventListener("pointerdown", close);
+      document.removeEventListener("keydown", escape);
+    };
+  }, []);
   const [share, setShare] = useState("");
   const [liked, setLiked] = useState(false);
   async function copyLink() {
@@ -199,14 +222,36 @@ function ArmySpaceContent({
             </div>
           </div>
           <div className="identity-actions">
-            <div className="enlist-count" aria-live="polite">
-              <strong>
-                {(army.count + (isEnlisted ? 1 : 0)).toLocaleString("en-GB")}
-              </strong>
-              <span>
-                <Users size={12} /> demo stans & counting
-              </span>
-            </div>
+            {isNova ? (
+              <details className="member-dropdown" ref={members}>
+                <summary
+                  className="enlist-count"
+                  aria-label="View Army members"
+                >
+                  <strong>
+                    {(army.count + (isEnlisted ? 1 : 0)).toLocaleString(
+                      "en-GB",
+                    )}
+                  </strong>
+                  <span>
+                    <Users size={12} /> demo stans · view members
+                  </span>
+                </summary>
+                <div className="member-popover">
+                  <OrbitFans />
+                </div>
+              </details>
+            ) : (
+              <div className="enlist-count" aria-live="polite">
+                <strong>
+                  {(army.count + (isEnlisted ? 1 : 0)).toLocaleString("en-GB")}
+                </strong>
+                <span>
+                  <Users size={12} /> demo stans & counting
+                </span>
+              </div>
+            )}
+
             <button
               className={`button ${isEnlisted ? "button-mint" : "button-blue"}`}
               aria-pressed={isEnlisted}
@@ -251,7 +296,6 @@ function ArmySpaceContent({
                   ? "You’re enlisted in this local demo."
                   : `${armyAddress(army)} · Intended public address · Listening is individual.`)}
             </p>
-            <ArmyPlayer />
           </>
         )}
         <div className="artist-section-nav">
@@ -259,6 +303,7 @@ function ArmySpaceContent({
             The army <span>✳</span>
           </a>
           {isNova && <a href="#army-room">Army chat</a>}
+          {isNova && <a href="#discussions">s/Nova</a>}
           <a href="#artist-posts">Army & artist notes</a>
           {isNova && <Link href="/armies/nova/gallery">Our gallery</Link>}
           <a href="#events">Events & links</a>
@@ -285,10 +330,12 @@ function ArmySpaceContent({
               </details>
             </div>
             <div className="living-sidebar">
+              <div className="sidebar-player">
+                <SidebarPlaylist />
+              </div>
               <div id="army-room">
                 <ArmyChat view={view} />
               </div>
-              <OrbitFans />{" "}
               <aside id="events" className="panel events-panel">
                 <div className="panel-title">
                   <h2>
@@ -522,6 +569,7 @@ function ArmySpaceContent({
             Make a space of your own <ArrowUpRight size={18} />
           </Link>
         </div>
+        {isNova && <DiscussionBoard />}
       </div>
     </main>
   );

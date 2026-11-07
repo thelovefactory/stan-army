@@ -1,3 +1,4 @@
+import type { ThemeAsset } from "./theme";
 export type NoteStyle = "note" | "scrapbook" | "afterhours" | "photo";
 export type FanReply = { id: string; handle: string; text: string };
 export type FanNote = {
@@ -9,6 +10,7 @@ export type FanNote = {
   label: string;
   text: string;
   image?: string;
+  attachment?: ThemeAsset;
   likes: number;
   replies: FanReply[];
   local?: boolean;
@@ -158,6 +160,7 @@ export type Memory = {
   kind: "Photos" | "Fan art" | "Keepsakes";
   visual: "photo" | "print" | "ticket" | "cassette";
   image?: string;
+  attachment?: ThemeAsset;
   caption: string;
 };
 export const memories: Memory[] = [

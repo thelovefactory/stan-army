@@ -114,3 +114,30 @@ These implementation statements and model/HTTP/media checks do not claim success
 6. Check keyboard focus and range controls, media-error source fallback, official/visitor role restrictions, local note/hearts/replies, gallery/shelf state, distinct community/artist notes and founder credit. No community backend has changed.
 
 Browser tooling remains unavailable, so product screenshots and actual desktop/mobile/playback/keyboard results remain outstanding. Research contains an inspected preservation-reference image separately from product evidence. No production streaming, licensing infrastructure, payments, auth, real uploads or deployment was implemented.
+
+## Feed, stereo, members and s/Nova — November 7, 2026
+This section supersedes the earlier music-first layout and browser-tooling limitation for the current iteration.
+
+Commands and results:
+- `npm run lint` — passed, zero warnings/errors.
+- `npm run typecheck` — passed.
+- `npm test` — 23 passed, zero failed (run with subprocess/network capability; the default sandbox otherwise reports only the four test-file wrappers).
+- `npm run build` — passed, 33 generated outputs. One initial sandboxed attempt could not parse TypeScript `--showConfig`; repeating with the environment's subprocess/network capability passed.
+- `PLAYWRIGHT_MODULE=/tmp/stan-army-browser/node_modules/playwright-core/index.mjs node scripts/check-army-community.mjs` — passed using installed `/usr/bin/chromium`. Browser tooling is now available under the updated environment runtime guidance.
+
+Browser checks cover desktop 1440px and mobile 390px layout, page overflow, player/chat column placement, members selection, Escape dismissal, text posts, decoded local-image attachments and image-only posts, creating a discussion, vote toggles, adding replies, Top sorting, click-to-load Spotify and unloading its iframe, refresh resetting posts, and absence of uncaught page errors. An initial mobile dropdown overflow was corrected and retested. A separate browser scenario verified saving Glitter Bomb, restoring it on refresh, clean/custom preserving stored JSON and authored content, Enter/Escape with focus restoration, and no overflow at 320px. Both scenarios used reduced-motion preference. The screenshot tool's first pre-hydration caret hiding produced a development warning; final captures use `caret: "initial"` after interactive checks.
+
+Screenshots: [desktop feed](screenshots/nova-feed-desktop.png), [mobile feed](screenshots/nova-feed-mobile.png), [discussion board](screenshots/nova-discussion-board.png). These show the prototype in actual headless Chromium, not a design mockup.
+
+For a repeatable optional browser check, install Playwright Core outside the app dependency tree and start the existing dev server in another terminal:
+```sh
+npm install --prefix /tmp/stan-army-browser playwright-core
+npm run dev -- --port 3000
+# In another terminal, from the repository:
+PLAYWRIGHT_MODULE=/tmp/stan-army-browser/node_modules/playwright-core/index.mjs node scripts/check-army-community.mjs
+```
+Set `CHROMIUM_PATH` for your installed browser, `BASE_URL` for another preview origin, or `SCREENSHOT_DIR` for another capture directory. No browser dependency was added to the app. In the managed environment these commands need the supported network/subprocess capability.
+
+Review URL: http://localhost:3000/armies/nova ; jump directly to the board with `#discussions`. The local webpack server was restarted after the production build. Existing saved theme keys and the legacy fallback are untouched; no user localStorage was cleared. Tests use an isolated browser context.
+
+Still simulated: sample fans/counts/posts/chat/threads, identity/roles and all contributions/votes. Uploads are browser-memory attachments, not server storage; posts and discussions reset on refresh. Only presentation settings persist. Spotify iframe creation and fallback link were verified; audio playback, account/region restrictions and full-track availability are provider-controlled and not validated here. The existing full native player and video shelf remain accessible in their previous routes.

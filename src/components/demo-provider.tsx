@@ -6,6 +6,7 @@ import {
   safeNoteStyle,
   validateMark,
 } from "@/lib/fan-space";
+import { ThemeAsset, validAsset } from "@/lib/theme";
 type Message = { text: string; time: string };
 type DemoState = {
   enlisted: string[];
@@ -13,7 +14,12 @@ type DemoState = {
   messages: Record<string, Message[]>;
   send: (id: string, text: string) => void;
   notes: Record<string, FanNote[]>;
-  leaveMark: (armyId: string, text: string, style: string) => void;
+  leaveMark: (
+    armyId: string,
+    text: string,
+    style: string,
+    attachment?: ThemeAsset,
+  ) => void;
   replies: Record<string, FanReply[]>;
   reply: (key: string, text: string) => void;
   hearts: string[];
@@ -49,8 +55,14 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       ],
     }));
   }
-  function leaveMark(armyId: string, text: string, style: string) {
-    if (validateMark(text)) return;
+  function leaveMark(
+    armyId: string,
+    text: string,
+    style: string,
+    attachment?: ThemeAsset,
+  ) {
+    const image = validAsset(attachment);
+    if (text.length > 500 || (!image && validateMark(text))) return;
     const note: FanNote = {
       id: crypto.randomUUID(),
       handle: "jess.wav",
@@ -59,6 +71,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       style: safeNoteStyle(style),
       label: "YOUR MARK · LOCAL DEMO",
       text: text.trim(),
+      attachment: image || undefined,
       likes: 0,
       replies: [],
       local: true,

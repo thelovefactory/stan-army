@@ -2,13 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
-import {
-  ArrowUpRight,
-  Heart,
-  MessageCircle,
-  Send,
-  Sparkles,
-} from "lucide-react";
+import { ArrowUpRight, Heart, MessageCircle, ImagePlus, X } from "lucide-react";
 import {
   FanNote,
   fanNotes,
@@ -18,35 +12,35 @@ import {
 } from "@/lib/fan-space";
 import { useDemo } from "./demo-provider";
 import { useProfileTheme } from "./profile-theme";
+import { readImage } from "@/lib/image-upload";
+import type { ThemeAsset } from "@/lib/theme";
 import { MemoryVisual } from "./memory-visual";
 export function LivingFanSpace({ armyId }: { armyId: string }) {
   const { notes, leaveMark } = useDemo();
-  const { clean } = useProfileTheme();
+  const { clean, animationsEnabled } = useProfileTheme();
   const [draft, setDraft] = useState(""),
     [style, setStyle] = useState<NoteStyle>("note"),
     [notice, setNotice] = useState(""),
     [examples, setExamples] = useState(true);
-  const composer = useRef<HTMLTextAreaElement>(null);
+  const [attachment, setAttachment] = useState<ThemeAsset>();
+  const [uploading, setUploading] = useState(false);
+  const fileInput = useRef<HTMLInputElement>(null);
   const local = notes[armyId] || [];
   const seeded = examples
     ? fanNotes
     : [{ ...fanNotes[0], likes: 0, replies: [] }];
-  function prompt(text: string) {
-    setDraft(text);
-    composer.current?.focus();
-  }
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    const issue = validateMark(draft);
+    const issue =
+      attachment && draft.length <= 500 ? null : validateMark(draft);
     if (issue) {
       setNotice(issue);
       return;
     }
-    leaveMark(armyId, draft, style);
+    leaveMark(armyId, draft, style, attachment);
+    setAttachment(undefined);
     setDraft("");
-    setNotice(
-      "You left your mark. Your note is now first in this local feed; only this browser session can see it.",
-    );
+    setNotice("Posted locally · stays until refresh.");
   }
   return (
     <section
@@ -54,112 +48,120 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
       id="fan-space"
       aria-labelledby="fan-space-heading"
     >
-      <div className="fan-space-heading">
-        <div>
-          <p className="eyebrow">THE MUSIC BROUGHT YOU. THIS BIT IS OURS.</p>
-          <h2 id="fan-space-heading">
-            Look what we’re
-            <br />
-            <span>making of this place.</span>
-          </h2>
-        </div>
-        <span className="fan-space-star" aria-hidden="true">
-          ✳
-        </span>
-      </div>
-      <p className="living-demo-label">
-        Fictional fans & sample memories. Your contributions are local demos,
-        not live posts.
-      </p>
-      <form className="mark-composer" onSubmit={submit}>
-        <div className="composer-heading">
-          <span className="little-avatar">YOU</span>
-          <div>
-            <h3>Leave your mark.</h3>
-            <p>One song. One memory. One thing only you would say.</p>
-          </div>
-          <Sparkles size={20} />
-        </div>
-        <label htmlFor="fan-mark" className="sr-only">
-          Your note to the Army
-        </label>
-        <textarea
-          id="fan-mark"
-          ref={composer}
-          value={draft}
-          onChange={(e) => {
-            setDraft(e.target.value);
-            setNotice("");
-          }}
-          maxLength={500}
-          rows={3}
-          placeholder="I knew I’d found my people when…"
-        />
-        <div className="mark-prompts">
-          <button
-            type="button"
-            onClick={() => prompt("The first time this music found me… ")}
-          >
-            A first-listen memory
-          </button>
-          <button
-            type="button"
-            onClick={() => prompt("Made something for the B-side people: ")}
-          >
-            Something I made
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              prompt("Unreasonably invested in the bridge. Anyone else? ")
-            }
-          >
-            A very important question
-          </button>
-        </div>
-        <fieldset className="mark-style-picker">
-          <legend>Make it look like you</legend>
-          {(
-            [
-              { id: "note", label: "Simple note" },
-              { id: "scrapbook", label: "Notebook heart" },
-              { id: "afterhours", label: "After hours" },
-              { id: "photo", label: "Demo photo" },
-            ] as { id: NoteStyle; label: string }[]
-          ).map((s) => (
-            <label key={s.id}>
-              <input
-                type="radio"
-                name="note-style"
-                value={s.id}
-                checked={style === s.id}
-                onChange={() => setStyle(s.id)}
-              />
-              <span>{s.label}</span>
-            </label>
-          ))}
-        </fieldset>
-        <div className="composer-actions">
-          <span>
-            {draft.length}/500 ·{" "}
-            {style === "photo"
-              ? "Uses an existing licensed demo photo"
-              : "Your voice. Your little corner."}
+      <h2 id="fan-space-heading" className="sr-only">
+        Fan feed
+      </h2>
+      <form className="mark-composer simple-composer" onSubmit={submit}>
+        <div className="compose-row">
+          <span className="little-avatar" aria-hidden="true">
+            YOU
           </span>
-          <button type="submit" disabled={!draft.trim()}>
-            <Send size={15} /> Leave my mark
+          <label htmlFor="fan-mark" className="sr-only">
+            Your post to the Army
+          </label>
+          <textarea
+            id="fan-mark"
+            value={draft}
+            onChange={(e) => {
+              setDraft(e.target.value);
+              setNotice("");
+            }}
+            maxLength={500}
+            rows={3}
+            placeholder="What’s happening in the Army?"
+          />
+        </div>
+        {attachment && (
+          <div className="attachment-preview">
+            {!attachment.animated || animationsEnabled ? (
+              <Image
+                src={attachment.dataUrl}
+                unoptimized
+                width={attachment.width}
+                height={attachment.height}
+                alt="Your selected attachment"
+              />
+            ) : (
+              <p>Animated image attached · animation paused</p>
+            )}
+            <button
+              type="button"
+              className="icon-button"
+              aria-label="Remove attachment"
+              onClick={() => setAttachment(undefined)}
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
+        <div className="composer-actions">
+          <div className="composer-tools">
+            <button
+              type="button"
+              className="icon-button"
+              aria-label="Attach an image or GIF"
+              disabled={uploading}
+              onClick={() => fileInput.current?.click()}
+            >
+              <ImagePlus size={20} />
+            </button>
+            <input
+              ref={fileInput}
+              type="file"
+              className="sr-only"
+              tabIndex={-1}
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                e.target.value = "";
+                if (!file) return;
+                setUploading(true);
+                setNotice("");
+                try {
+                  setAttachment(await readImage(file));
+                } catch (error) {
+                  setNotice(
+                    error instanceof Error
+                      ? error.message
+                      : "Could not read image.",
+                  );
+                } finally {
+                  setUploading(false);
+                }
+              }}
+            />
+            <label className="sr-only" htmlFor="post-style">
+              Post style
+            </label>
+            <select
+              id="post-style"
+              value={style}
+              onChange={(e) => setStyle(e.target.value as NoteStyle)}
+            >
+              <option value="note">Plain</option>
+              <option value="scrapbook">Notebook</option>
+              <option value="afterhours">After hours</option>
+            </select>
+          </div>
+          <span>{draft.length}/500</span>
+          <button
+            type="submit"
+            disabled={uploading || (!draft.trim() && !attachment)}
+          >
+            {uploading ? "Reading…" : "Post"}
           </button>
         </div>
-        <p role="status" className="mark-status">
-          {notice ||
-            "You don’t need a crowd to start something. Notes stay until refresh."}
-        </p>
+        {notice && (
+          <p role="status" className="mark-status">
+            {notice}
+          </p>
+        )}
+        <small className="composer-local-note">
+          Local demo · images up to 512 KB · posts reset on refresh
+        </small>
       </form>
       <div className="feed-controls">
-        <p>
-          {local.length ? `${local.length} of your marks · ` : ""}A few notes
-          from this corner
-        </p>
+        <p>{local.length ? `${local.length} of your marks · ` : ""}Posts</p>
         <label>
           <input
             type="checkbox"
@@ -185,7 +187,7 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
 }
 function FanNoteCard({ note, armyId }: { note: FanNote; armyId: string }) {
   const { hearts, heart, replies, reply } = useDemo();
-  const { clean } = useProfileTheme();
+  const { clean, animationsEnabled } = useProfileTheme();
   const key = `${armyId}:${note.id}`;
   const [expanded, setExpanded] = useState(false),
     [draft, setDraft] = useState(""),
@@ -224,6 +226,21 @@ function FanNoteCard({ note, armyId }: { note: FanNote; armyId: string }) {
               : "✧"}
         </span>
       </header>
+      {note.attachment && (
+        <div className="post-attachment">
+          {!note.attachment.animated || animationsEnabled ? (
+            <Image
+              src={note.attachment.dataUrl}
+              unoptimized
+              width={note.attachment.width}
+              height={note.attachment.height}
+              alt="Image shared with this local post"
+            />
+          ) : (
+            <p>Animated attachment · animation paused</p>
+          )}
+        </div>
+      )}
       {(note.image || note.style === "photo") && (
         <div className="fan-note-photo">
           <Image
