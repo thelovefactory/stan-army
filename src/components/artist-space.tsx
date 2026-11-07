@@ -8,7 +8,6 @@ import {
   Heart,
   Users,
   MapPin,
-  Maximize2,
   CalendarDays,
   ExternalLink,
   Copy,
@@ -296,45 +295,10 @@ function ArmySpaceContent({
           </div>
         )}
         {isNova && (
-          <>
-            <p className="compact-army-status" role="status">
-              {share ||
-                (isEnlisted
-                  ? "You’re enlisted in this local demo."
-                  : `${armyAddress(army)} · Intended public address · Listening is individual.`)}
-            </p>
-          </>
+          <p className="sr-only" role="status">
+            {share}
+          </p>
         )}
-        <div className="artist-section-nav">
-          <a
-            href={
-              isNova && theme.modules.feed
-                ? "#fan-space"
-                : theme.modules.chat
-                  ? "#army-room"
-                  : "#main"
-            }
-            className="active"
-          >
-            The army <span>✳</span>
-          </a>
-          {isNova && theme.modules.chat && <a href="#army-room">Army chat</a>}
-          {isNova && theme.modules.discussions && (
-            <a href="#discussions">s/nova</a>
-          )}
-          {theme.modules.announcements && (
-            <a href="#artist-posts">Army & artist notes</a>
-          )}
-          {isNova && theme.modules.gallery && (
-            <Link href="/armies/nova/gallery">Our gallery</Link>
-          )}
-          {theme.modules.events && <a href="#events">Events & links</a>}
-          {(theme.modules.playlist || theme.modules.chat) && (
-            <Link className="room-link" href={`${armyPath(army)}/room`}>
-              <Maximize2 size={14} /> Open listening room
-            </Link>
-          )}
-        </div>
         {isNova ? (
           <div
             className={`living-layout ${theme.modules.playlist || theme.modules.chat || theme.modules.events ? "" : "modules-no-sidebar"}`}
