@@ -82,3 +82,8 @@ Sneakers, Brie/pets, TV/books and pop-music objects/cameras cover the requested 
 
 ### Denser leopard button refinement
 `public/decorations/stan-leopard-dense.png` replaces the simple SVG in landing actions. It is an original imagegen pattern created using the user's attached pattern as reference, with denser irregular purple rosettes on hot pink. It is not the inaccessible Mac-local JPG. Retained generated original: `/workspace/generated_images/exec-80578d01-1d2f-4ff0-b2ae-085a88d1193d.png`. The older SVG remains preserved. White button labels now have a dark stroke/shadow for separation from both pattern colours, without a solid label panel.
+
+## ZIP-supplied transparent header logo and chunky action type
+`public/brand/stanarmy-header.png` is the exact 16,888-byte `stanarmy.png` extracted from the user's `stanarmy.png.zip`, received 2026-11-07. It is a 502×224 RGBA image with white artwork and variable alpha, preserved byte-for-byte. It replaces the old header image without inversion, cropping or regeneration. The old supplied asset remains preserved.
+
+`public/fonts/Anton-Regular.ttf` is Anton by Vernon Adams, locally hosted from https://raw.githubusercontent.com/google/fonts/main/ofl/anton/Anton-Regular.ttf under SIL Open Font License 1.1, preserved in `public/fonts/Anton-OFL.txt` from the same directory. It supplies consistent chunky Impact-like landing action lettering without requiring external font requests or a locally installed commercial font. White text has no outline or shadow.

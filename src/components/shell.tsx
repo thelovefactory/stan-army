@@ -22,9 +22,9 @@ export function Header() {
         <div className="container header-inner">
           <Link href="/" aria-label="Stan Army home" className="logo">
             <Image
-              src="/brand/stan-army-logo.png"
-              width={160}
-              height={132}
+              src="/brand/stanarmy-header.png"
+              width={502}
+              height={224}
               alt="Stan Army"
               priority
             />

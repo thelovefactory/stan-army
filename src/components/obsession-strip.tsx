@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 const frames = ["sneakers", "cheese", "tv", "music"];
 
@@ -57,7 +57,7 @@ export function ObsessionStrip() {
         <h2 id="obsession-heading">MAKE SOME NOISE.</h2>
         <Link href="/create" className="button button-blue">
           <span>
-            Rally the troops <ArrowUpRight size={19} />
+            Build your army <ChevronRight size={19} />
           </span>
         </Link>
       </div>

@@ -1,7 +1,7 @@
 import { ObsessionStrip } from "@/components/obsession-strip";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, ArrowRight } from "lucide-react";
+import { ArrowUpRight, ArrowRight, ChevronRight } from "lucide-react";
 import { StanStarIcon } from "@/components/stan-icons";
 import { ArmyCard } from "@/components/artist-card";
 import { armies, armyView } from "@/lib/data";
@@ -26,7 +26,7 @@ export default function Home() {
           <div className="hero-actions">
             <Link href="/create" className="button button-blue">
               <span>
-                Build your Army today <ArrowRight size={19} />
+                Build your army <ChevronRight size={19} />
               </span>
             </Link>
           </div>
@@ -199,7 +199,7 @@ export default function Home() {
           <div className="belonging-actions">
             <Link href="/create" className="button">
               <span>
-                Build your Army <ArrowRight size={18} />
+                Build your army <ChevronRight size={18} />
               </span>
             </Link>
             <Link href="/discover" className="text-link">

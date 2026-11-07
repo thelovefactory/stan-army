@@ -236,3 +236,7 @@ Landing CTAs use an original local fuchsia/purple leopard SVG with solid light-p
 
 ### Denser leopard and readable white labels
 Replaced sparse rosette pattern with a denser reference-inspired generated texture and strengthened white label weight/stroke/shadow. Hover scale and motion preferences remain unchanged. `npm run lint` passed. Focused Chromium checks passed at 320/390/600/800/1024/1440px with no overflow; desktop screenshot visually inspected for label readability and pattern rendering.
+
+### Transparent logo / chunky creation CTAs
+The ZIP supplied a valid white-on-transparent logo. Header renders its exact pixels with correct aspect ratio and no old inversion/blend/clipping rules. All three landing creation CTAs read “Build your army” with a chevron and use local Anton, no text stroke or shadow. Pattern, hover enlargement, mint heading and reduced-motion behaviour remain.
+`npm run lint` and `npm run typecheck` passed. Focused Chromium confirmed the supplied asset path and no inversion, font availability, all three CTA labels, absent text stroke and no overflow at 320/390/800/1024/1440px. Desktop screenshot visually inspected: `screenshots/homepage-logo-anton.png`.
