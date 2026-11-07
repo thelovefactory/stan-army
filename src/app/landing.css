@@ -319,27 +319,29 @@
 .landing-page .button {
   background: #ff20bb url("/decorations/stan-leopard.svg") repeat;
   background-size: 84px 60px;
-  color: #210817;
+  color: #fff;
   border: 1px solid #ff54c7;
   padding: 8px;
   box-shadow: 0 2px 0 #6411ef;
+  transition: transform 180ms ease, border-color 180ms ease;
 }
 .landing-page .button > span {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 14px;
-  background: #ff8dda;
-  color: #210817;
-  border-radius: 3px;
+  background: transparent;
+  color: #fff;
   padding: 7px 12px;
+  text-shadow: 0 1px 3px #210817, 0 0 5px #210817;
 }
 .landing-page .button:hover {
-  background-size: 94px 67px;
+  transform: scale(1.05);
   border-color: #ffb1e6;
 }
-.landing-page .button:hover > span {
-  background: #ffb1e6;
+@media (prefers-reduced-motion: reduce) {
+  .landing-page .button { transition: none; }
+  .landing-page .button:hover { transform: none; }
 }
 .belonging-copy h2 > span {
   color: var(--mint);
