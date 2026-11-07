@@ -8,7 +8,7 @@ import { ArrowRight } from "lucide-react";
 
 const frames = [
   { id: "sneakers", focus: "50% 46%", mobileFocus: "54% 50%" },
-  { id: "cheese", focus: "50% 58%", mobileFocus: "44% 50%" },
+  { id: "cheese", focus: "50% 32%", mobileFocus: "44% 50%" },
   { id: "tv", focus: "50% 40%", mobileFocus: "58% 50%" },
   { id: "music", focus: "50% 12%", mobileFocus: "76% 38%", mobileScale: 1.6 },
   { id: "community", focus: "50% 45%", mobileFocus: "66% 50%" },
