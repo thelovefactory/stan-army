@@ -1,4 +1,13 @@
 /* A culture-first welcome, keeping the rest of the prototype intact. */
+.featured-photo-credit {
+  margin-top: 10px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.featured-photo-credit a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .landing-hero {
   grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.12fr);
   gap: 32px;

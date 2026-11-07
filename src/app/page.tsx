@@ -80,8 +80,69 @@ export default function Home() {
         </div>
         <DemoNote />{" "}
         <div className="artist-grid">
-          {armies.slice(0, 3).map((a, i) => (
-            <ArmyCard view={armyView(a)} index={i} key={a.id} />
+          <ArmyCard view={armyView(armies.find((a) => a.slug === "nova")!)} />
+          {[
+            {
+              slug: "celebrity-pets",
+              name: "Celebrity Pets",
+              category: "Famous little divas",
+              description: "The real stars have paws.",
+              image: "/images/celebrity-pets.jpg",
+              alt: "A black-and-white cat looking regally over a wooden ledge",
+              accent: "pink",
+            },
+            {
+              slug: "brie",
+              name: "Brie",
+              category: "Cultured behaviour",
+              description: "Soft centre. Strong following.",
+              image: "/images/brie.jpg",
+              alt: "Slices of Brie cheese on a dark slate board",
+              accent: "orange",
+            },
+          ].map((example, i) => (
+            <div key={example.slug}>
+              <Link
+                href="/create"
+                className={`artist-card accent-${example.accent}`}
+                aria-label={`Start an Army like ${example.name}`}
+              >
+                <div className="card-photo">
+                  <Image
+                    src={example.image}
+                    fill
+                    sizes="(max-width: 600px) 92vw, (max-width: 900px) 45vw, 30vw"
+                    alt={example.alt}
+                  />
+                  <span className="card-category">
+                    {example.category} · Fan-run
+                  </span>
+                  <span className="card-number">0{i + 2}</span>
+                  <span className="card-arrow">
+                    <ArrowUpRight size={21} />
+                  </span>
+                </div>
+                <div className="card-details">
+                  <div>
+                    <h3>{example.name}</h3>
+                    <p>{example.description}</p>
+                    <p>Concept Army · Start one like this ↗</p>
+                  </div>
+                </div>
+              </Link>
+              {example.slug === "brie" && (
+                <p className="featured-photo-credit">
+                  Photo:{" "}
+                  <a href="https://commons.wikimedia.org/wiki/File:Brie_01.jpg">
+                    Coyau / Wikimedia Commons
+                  </a>{" "}
+                  ·{" "}
+                  <a href="https://creativecommons.org/licenses/by-sa/3.0/">
+                    CC BY-SA 3.0
+                  </a>
+                </p>
+              )}
+            </div>
           ))}
         </div>
       </section>

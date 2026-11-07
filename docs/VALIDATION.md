@@ -212,3 +212,6 @@ Review images: [desktop](screenshots/landing-culture-desktop.png), [mobile](scre
 
 ### Landing community copy follow-up
 `npm run lint` and `npm run typecheck` passed. A focused Chromium check verified exact ticker/discovery/belonging copy, all three feature leads and descriptions, the creation CTA destination and actual navigation, and no overflow at 320/390/800/1440px. Mobile ticker layout now displays all three phrases rather than clipping the older wide strip. [Belonging-section screenshot](screenshots/landing-ours-section.png). No application-model logic or dependencies changed; no additional unit tests were added for static copy.
+
+### Mixed landing obsessions
+Landing features Nova plus Celebrity Pets and Brie concept cards; Nova links to the existing demo, both concepts link to creation and are labelled as concepts. Licensed local photography and visible Brie attribution are recorded in ASSET_SOURCES.md. `npm run lint` and `npm run typecheck` passed. Focused Chromium checks passed for three cards, correct destinations and no horizontal overflow at 1440/800/390/320px. Screenshot: screenshots/landing-featured-obsessions.png. No shared demo fixtures or theme storage changed.
