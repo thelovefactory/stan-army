@@ -317,3 +317,272 @@
   align-items: center;
   vertical-align: middle;
 }
+
+
+/* Army participation hierarchy: themes own the atmosphere, controls keep their shape.
+   No theme values are written or replaced here. */
+.profile-canvas .profile-content .artist-page :is(
+  .identity-actions > .button,
+  .composer-actions > button[type="submit"],
+  .chat-compose > button,
+  .playlist-placeholder .button,
+  .note-replies form > button,
+  .board-compose button[type="submit"],
+  .thread-expanded form button[type="submit"],
+  .voice-panel form > button
+) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 11px 16px;
+  border: 1px solid currentColor;
+  border-radius: 10px;
+  background: var(--theme-button, #305bff);
+  color: var(--theme-button-text, #fff);
+  font: 700 13px/1.4 Arial, Helvetica, sans-serif;
+  letter-spacing: normal;
+  text-align: center;
+}
+.profile-canvas .profile-content .artist-page :is(
+  .identity-actions > .button,
+  .composer-actions > button[type="submit"],
+  .chat-compose > button,
+  .playlist-placeholder .button
+) > svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.profile-canvas .profile-content .artist-page .identity-actions > .button[aria-pressed="true"] {
+  box-shadow: inset 0 0 0 1px currentColor;
+}
+.profile-canvas .profile-content .artist-page .chat-compose > button {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  padding: 0;
+  flex-shrink: 0;
+}
+.profile-canvas .profile-content .artist-page .share-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: auto;
+  min-height: 44px;
+  padding: 11px 16px;
+  border: 1px solid currentColor;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  font: 600 13px/1.4 Arial, Helvetica, sans-serif;
+}
+.profile-canvas .profile-content .artist-page .share-button > svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.profile-canvas .profile-content .artist-page :is(
+  .composer-attach, .attachment-preview .icon-button, .poll-close,
+  .fan-note > footer > button
+) {
+  min-height: 44px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.profile-canvas .profile-content .artist-page :is(
+  .attachment-preview .icon-button, .poll-close
+) {
+  min-width: 44px;
+}
+.profile-canvas .profile-content .artist-page .composer-attach {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 8px;
+  border-radius: 10px;
+}
+.profile-canvas .profile-content .artist-page :is(
+  .composer-attach, .share-button
+):not(:disabled):hover {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+.profile-canvas .profile-content .artist-page :is(
+  .playlist-unload, .sidebar-playlist footer a, .artist-links > a
+) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  font: 400 12px/1.6 Arial, Helvetica, sans-serif;
+  text-underline-offset: 4px;
+}
+.profile-canvas .profile-content .artist-page :is(
+  .playlist-unload, .sidebar-playlist footer a, .artist-links > a
+):hover {
+  text-decoration: underline;
+}
+.profile-canvas .profile-content .artist-page .playlist-unload {
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+.profile-canvas .profile-content .living-army :is(
+  .sidebar-playlist > header, .army-chat > .panel-title,
+  .events-panel > .panel-title, .voice-panel > .panel-title
+) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin: 0;
+  background: transparent;
+}
+.profile-canvas .profile-content .living-army :is(
+  .sidebar-playlist > header h2, .army-chat > .panel-title h2,
+  .events-panel > .panel-title h2, .voice-panel > .panel-title h2
+) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font: 700 18px/1.35 Arial, Helvetica, sans-serif;
+  letter-spacing: -.02em;
+}
+.profile-canvas .profile-content .living-army :is(
+  .sidebar-playlist > header h2, .army-chat > .panel-title h2,
+  .events-panel > .panel-title h2, .voice-panel > .panel-title h2
+) > svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.profile-canvas .profile-content .living-army .chat-intro {
+  margin: 8px 0 20px;
+  font: 400 13px/1.6 Arial, Helvetica, sans-serif;
+}
+.profile-canvas .profile-content .living-army .playlist-placeholder {
+  align-items: flex-start;
+  padding-block: 20px;
+}
+.profile-canvas .profile-content .living-army .playlist-placeholder > div {
+  min-width: 0;
+}
+.profile-canvas .profile-content .living-army .playlist-placeholder b {
+  font: 700 14px/1.5 Arial, Helvetica, sans-serif;
+}
+.profile-canvas .profile-content .living-army .playlist-placeholder p {
+  margin: 6px 0 16px;
+  font: 400 13px/1.6 Arial, Helvetica, sans-serif;
+}
+.profile-canvas .profile-content .living-army .sidebar-playlist > footer {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+}
+.profile-canvas .profile-content .living-army :is(
+  .sidebar-playlist > small, .composer-local-note, .chat-status,
+  .chat-compose-meta, .announcement-status
+) {
+  display: block;
+  margin-top: 12px;
+  font: 400 11px/1.65 Arial, Helvetica, sans-serif;
+  letter-spacing: normal;
+}
+.profile-canvas .profile-content .living-army .chat-compose-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  justify-content: space-between;
+}
+.profile-canvas .profile-content .living-army .chat-message > div {
+  flex: 1;
+  min-width: 0;
+}
+.profile-canvas .profile-content .living-army .message-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  font: 400 11px/1.6 Arial, Helvetica, sans-serif;
+}
+.profile-canvas .profile-content .living-army .message-meta > time {
+  margin-left: auto;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.profile-canvas .profile-content .living-army .message-meta > b {
+  font-size: 12px;
+}
+.profile-canvas .profile-content .living-army .chat-compose {
+  align-items: center;
+  border-radius: 10px;
+}
+.profile-canvas .profile-content .living-army .chat-compose > input {
+  min-width: 0;
+  min-height: 44px;
+  font: 400 13px/1.6 Arial, Helvetica, sans-serif;
+}
+.profile-canvas .profile-content .living-army .compose-row > textarea {
+  font: 400 14px/1.7 Arial, Helvetica, sans-serif;
+}
+.profile-canvas .profile-content .living-army :is(
+  .fan-note > header, .fan-note > footer
+) {
+  font-family: Arial, Helvetica, sans-serif;
+  letter-spacing: normal;
+}
+.profile-canvas .profile-content .living-army .fan-note > footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+}
+.profile-canvas .profile-content .living-army .fan-note > header strong {
+  font-size: 13px;
+}
+.profile-canvas .profile-content .living-army .board-header {
+  padding: var(--army-inset);
+}
+.profile-canvas .profile-content .living-army .board-thread {
+  padding: var(--army-inset);
+}
+.profile-canvas .profile-content .living-army :is(
+  .feed-more-links, .army-voices-fold
+) {
+  padding-inline: var(--army-inset);
+}
+.profile-canvas .profile-content .living-army :is(
+  .army-voices-fold, .voice-panel, .sidebar-playlist, .army-chat,
+  .events-panel, .discussion-board
+) {
+  border-radius: var(--theme-radius, 15px);
+}
+@media (max-width: 600px) {
+  .profile-canvas .profile-content .living-army .nova-identity-compact .identity-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+  .profile-canvas .profile-content .living-army .identity-actions .member-dropdown {
+    flex-basis: 100%;
+  }
+  .profile-canvas .profile-content .living-army .member-dropdown .enlist-count {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+  .profile-canvas .profile-content .living-army .board-header-actions {
+    column-gap: 16px;
+    row-gap: 4px;
+  }
+}
