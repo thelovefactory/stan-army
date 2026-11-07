@@ -397,12 +397,39 @@
   font-weight: 400;
   font-display: swap;
 }
+.ticker > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 26px minmax(0, 1fr) 26px minmax(
+      0,
+      1fr
+    ) 26px;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  min-width: 0;
+  height: 72px;
+}
 .ticker span {
+  display: block;
+  min-width: 0;
+  text-align: center;
   font-family: "Stan Anton", Impact, sans-serif;
-  font-size: 20px;
+  font-size: clamp(11px, 1.35vw, 20px);
   font-weight: 400;
   letter-spacing: -0.025em;
-  animation: ticker-type 12s steps(1, end) infinite;
+  line-height: 1.5;
+  animation: ticker-type 2.4s steps(1, end) infinite;
+}
+.ticker span:nth-of-type(2) {
+  font-family: "Stan Bungee", Impact, sans-serif;
+  animation-delay: -0.8s;
+}
+.ticker span:nth-of-type(3) {
+  font-family: "Stan Rubik Mono", monospace;
+  animation-delay: -1.6s;
+}
+.ticker > div > svg {
+  justify-self: center;
 }
 @keyframes ticker-type {
   0%,
@@ -417,41 +444,25 @@
   }
 }
 @media (max-width: 800px) {
+  .landing-header .header-end > .button {
+    display: none;
+  }
+  .ticker > div {
+    grid-template-columns: minmax(0, 1fr) 18px minmax(0, 1fr) 18px minmax(
+        0,
+        1fr
+      );
+    gap: 8px;
+    padding-inline: 12px;
+    height: 96px;
+  }
   .ticker span {
-    font-size: 12px;
+    font-size: clamp(9px, 2.5vw, 12px);
+    letter-spacing: -0.04em;
   }
 }
 @media (prefers-reduced-motion: reduce) {
   .ticker span {
     animation: none;
-  }
-}
-.ticker > div {
-  min-height: 72px;
-}
-.ticker span {
-  font-size: clamp(14px, 1.35vw, 20px);
-}
-@media (max-width: 800px) {
-  .ticker > div {
-    height: 96px;
-  }
-  .ticker span {
-    font-size: 12px;
-  }
-}
-@media (max-width: 800px) {
-  .landing-header .header-end > .button {
-    display: none;
-  }
-}
-@media (max-width: 800px) {
-  .ticker > div {
-    gap: 8px;
-    padding-inline: 12px;
-  }
-  .ticker span {
-    font-size: clamp(9px, 2.5vw, 12px);
-    letter-spacing: -0.04em;
   }
 }
