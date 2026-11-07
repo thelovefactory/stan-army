@@ -26,8 +26,9 @@ export function WelcomeCommunity() {
         </span>
       </div>
       <p>
-        For the stans. Built by the stans.
-        <small>A first look at a new kind of community.</small>
+        Create and join communities
+        <br />
+        around the things you love.
       </p>
     </div>
   );
