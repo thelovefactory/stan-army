@@ -50,3 +50,8 @@ The user supplied https://open.spotify.com/playlist/0EO3CxjNLb1gFi9QuPT6YE for t
 
 ## Consistent interface markers
 StanStarIcon and StanCommunityIcon in src/components/stan-icons.tsx are original inline SVG interface drawings. They replace colour-font glyphs in identity/chat/board headings so the theme’s accent/contrast controls affect their strokes reliably. They do not redraw or replace the supplied hand-drawn Stan Army logo, which remains the original image asset.
+
+## Culture-first landing hero — user-authorised original illustration
+`public/brand/stan-army-welcome-sneaks.png` is a 1448×1086 original generated marketing collage made with imagegen, using the user’s attached welcome-image preview as visual reference under their express “feel free to make your own” instruction. Their `/Users/armi/.../stanarmy-welcomeimage.png` path was not available as a downloadable workspace file; this is an original matching illustration, not a byte-for-byte copy or licensed stock photograph. The central figure is an anonymous fictional fan, not a claimed artist identity or Nova artwork. Existing artist/fan stock photographs and the original supplied hand-drawn logo are unchanged.
+
+The user explicitly restored the `s/` visual labels and then changed the footwear label to `s/sneaks`: the final image reads `s/brie`, `s/popmusic`, `s/sneaks`. These are conceptual visual nods, not links, reserved boards or routing changes. No artist endorsement, brand affiliation, photography licence or actual membership is claimed. Original generated outputs are retained under `/workspace/generated_images/`; the final source output is `exec-ebab6886-688d-4116-a273-8971a46d4b7a.png`. The public filename is distinct to avoid stale image-optimizer caches after label revisions.

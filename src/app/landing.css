@@ -1,0 +1,136 @@
+/* A culture-first welcome, keeping the rest of the prototype intact. */
+.landing-hero {
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.12fr);
+  gap: 32px;
+  padding-top: 64px;
+  padding-bottom: 72px;
+}
+.landing-hero .hero-copy {
+  min-width: 0;
+}
+.landing-hero .hero-copy h1 {
+  font-size: clamp(64px, 5.6vw, 82px);
+  line-height: 1.02;
+  letter-spacing: -0.06em;
+  font-weight: 800;
+}
+.landing-hero .love-word {
+  color: #a0f4cc;
+}
+.landing-hero .hero-description {
+  margin-top: 28px;
+}
+.landing-hero .hero-description h2 {
+  font-size: 22px;
+  line-height: 1.45;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+.landing-hero .hero-actions {
+  gap: 24px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+.landing-hero .hero-actions .button {
+  min-height: 48px;
+  padding: 14px 20px;
+  font-size: 13px;
+}
+.landing-hero .hero-actions .text-link {
+  font-size: 13px;
+  min-height: 44px;
+}
+.landing-hero .hero-community {
+  margin-top: 32px;
+  gap: 14px;
+}
+.landing-hero .hero-community p {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.landing-hero .hero-community small {
+  display: block;
+  font-size: 11px;
+  margin-top: 3px;
+  max-width: none;
+}
+.landing-hero .welcome-collage {
+  height: auto;
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  margin: 0;
+}
+.landing-hero .welcome-collage > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  mix-blend-mode: lighten;
+}
+@media (min-width: 1600px) {
+  .landing-hero {
+    gap: 48px;
+  }
+}
+@media (max-width: 1100px) and (min-width: 801px) {
+  .landing-hero {
+    gap: 24px;
+    padding-top: 48px;
+    padding-bottom: 56px;
+  }
+  .landing-hero .hero-copy h1 {
+    font-size: 62px;
+  }
+  .landing-hero .hero-description h2 {
+    font-size: 18px;
+  }
+  .landing-hero .hero-actions {
+    gap: 12px 20px;
+  }
+}
+@media (max-width: 800px) {
+  .landing-hero {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding-top: 40px;
+    padding-bottom: 48px;
+  }
+  .landing-hero .hero-copy {
+    max-width: 620px;
+  }
+  .landing-hero .hero-copy h1 {
+    font-size: clamp(52px, 10vw, 76px);
+  }
+  .landing-hero .hero-description h2 {
+    font-size: 20px;
+  }
+  .landing-hero .welcome-collage {
+    max-width: 680px;
+    margin-inline: auto;
+  }
+}
+@media (max-width: 400px) {
+  .landing-hero .hero-copy h1 {
+    font-size: 52px;
+  }
+  .landing-hero .hero-description h2 {
+    font-size: 18px;
+  }
+  .landing-hero .hero-actions {
+    gap: 12px 20px;
+  }
+  .landing-hero .hero-actions .button {
+    padding-inline: 16px;
+  }
+  .landing-hero .hero-community {
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .landing-hero .hero-community p {
+    font-size: 11px;
+  }
+  .landing-hero .hero-community small {
+    font-size: 10px;
+  }
+}

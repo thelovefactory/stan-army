@@ -10,102 +10,54 @@ import {
 import { ArmyCard } from "@/components/artist-card";
 import { DemoNote } from "@/components/shell";
 import { armies, armyView } from "@/lib/data";
+export const metadata = {
+  title: "Stan for the things you love.",
+  description:
+    "The culture brings us together. The stans keep us fed. Create your Army or find your Army.",
+};
 export default function Home() {
   return (
     <main id="main">
       <section className="container landing-hero">
         <div className="hero-copy">
-          <p className="eyebrow">
-            <span className="mint-dot" /> FOR THE MUSIC. FOR THE PEOPLE.
-          </p>
           <h1>
-            Every artist
+            Stan for the
             <br />
-            needs an
-            <br />
-            <span className="army-word">
-              army
-              <svg viewBox="0 0 390 18" aria-hidden="true">
-                <path d="M4 13 Q180 -3 380 8 M30 17 Q220 3 360 14" />
-              </svg>
-            </span>
-            <span className="period">.</span>
+            things you <span className="love-word">love.</span>
           </h1>
-          <p className="hero-description">
-            The songs bring us together.
-            <br />
-            The fans bring it to life.
-          </p>
-          <p className="hero-support">
-            Fans start the Army. Fans run it. The artist is who we rally around.
-          </p>
+          <div className="hero-description">
+            <h2>The culture brings us together.</h2>
+            <h2>The stans keep us fed.</h2>
+          </div>
           <div className="hero-actions">
             <Link href="/create" className="button button-blue">
-              Create your army <ArrowUpRight size={19} />
+              Create your Army <ArrowUpRight size={19} />
             </Link>
             <Link href="/discover" className="text-link">
-              Find your artist <ArrowRight size={18} />
+              Find your Army <ArrowRight size={18} />
             </Link>
           </div>
           <div className="hero-community">
             <div className="avatar-stack">
               <Image src="/images/sienna.jpg" width={34} height={34} alt="" />
               <Image src="/images/atlas.jpg" width={34} height={34} alt="" />
-              <span>✳</span>
+              <Image src="/images/artist.jpg" width={34} height={34} alt="" />
             </div>
             <p>
-              Less scrolling. More belonging.
-              <small>A first look at a new kind of music community.</small>
+              For the stans. Built by the stans.
+              <small>A first look at a new kind of community.</small>
             </p>
           </div>
         </div>
-        <div className="hero-collage">
-          <div className="collage-back" />
-          <div className="hero-image">
-            <Image
-              src="/images/artist.jpg"
-              fill
-              priority
-              sizes="(max-width: 900px) 90vw, 48vw"
-              alt="Licensed stock portrait representing fictional demo artist Nova Reign"
-            />
-            <div className="photo-shade" />
-            <span className="image-caption">
-              FIND YOUR NEXT
-              <br />
-              <b>“I was here first.”</b>
-            </span>
-            <Link href="/armies/nova" className="photo-artist">
-              <span>
-                <small>MEET NOVA’S FAN-RUN ARMY</small>
-                <strong>Nova Reign</strong>
-                <span>Alternative R&B · Bristol</span>
-              </span>
-              <span className="round-arrow">
-                <ArrowUpRight />
-              </span>
-            </Link>
-          </div>
-          <span className="sticker sticker-orange">
-            GOOD MUSIC.
-            <br />
-            GREAT PEOPLE.
-          </span>
-          <div className="floating-chat">
-            <span className="chat-icon">
-              <MessageCircle size={19} />
-            </span>
-            <div>
-              <b>More than a comment section.</b>
-              <span>A whole army in your corner.</span>
-            </div>
-            <span className="spark">✳</span>
-          </div>
-          <div className="little-sticker">
-            YOUR PEOPLE
-            <br />
-            <b>ARE HERE ↗</b>
-          </div>
+        <div className="hero-collage welcome-collage">
+          <Image
+            src="/brand/stan-army-welcome-sneaks.png"
+            width={1448}
+            height={1086}
+            priority
+            sizes="(max-width: 800px) 94vw, 58vw"
+            alt="Cut-out collage labelled s/brie, s/popmusic and s/sneaks: Brie cheese, a fictional music fan and purple sneakers, with a blue frame and mint doodles."
+          />
         </div>
       </section>
       <div className="ticker" aria-label="Listen. Connect. Belong.">
@@ -196,7 +148,7 @@ export default function Home() {
           </h2>
         </div>
         <Link href="/create" className="button button-blue">
-          Create your army <ArrowUpRight size={20} />
+          Create your Army <ArrowUpRight size={20} />
         </Link>
       </section>
     </main>

@@ -203,3 +203,9 @@ Three worlds (monochrome, pink/glitter and fluorescent yellow with an original t
 The full control inventory, fixes and deliberate provider/font/motion/context limits are in [CUSTOMISATION_AUDIT.md](CUSTOMISATION_AUDIT.md). No auth/backend/migration/service was created. The normal webpack development preview is restored on port 3000 after temporary production verification.
 
 Screenshots: [monochrome](screenshots/participation-monochrome.png), [pink](screenshots/participation-pink.png), [neon](screenshots/participation-neon.png), [neon mobile](screenshots/participation-neon-mobile.png), [minimal board actions](screenshots/board-text-actions.png). These are actual browser renders in isolated test contexts; the user's personal wallpaper and stored themes are not replaced.
+
+## Culture-first landing page
+`npm run lint` and `npm run typecheck` passed. A focused Chromium check verified the exact supplied headline/subheads/avatar copy; Create your Army → `/create`, Find your Army → `/discover`; successful image decode of the final s/sneaks asset; actual CTA navigation; and no horizontal overflow at 320, 390, 768, 800, 1024 or 1440px. No uncaught page errors occurred. The hero was visually inspected at desktop size. The new copy has normal semantic headings, labelled links and a descriptive collage alt text.
+
+Review images: [desktop](screenshots/landing-culture-desktop.png), [mobile](screenshots/landing-culture-mobile.png). The asset is an original generated illustration made under the user’s express permission, not their unavailable local PNG or a stock photo; provenance is recorded in ASSET_SOURCES.md. The original logo and existing Army functionality/themes are untouched. Review the homepage at http://localhost:3000/ .
+`npm run build` also passed with 45 outputs. This landing-only change used focused browser verification rather than adding unit tests for static copy/CSS. The local webpack preview was restarted after the build.
