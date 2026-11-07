@@ -11,6 +11,7 @@ export type FanNote = {
   text: string;
   image?: string;
   attachment?: ThemeAsset;
+  poll?: FanPoll;
   likes: number;
   replies: FanReply[];
   local?: boolean;
@@ -161,6 +162,7 @@ export type Memory = {
   visual: "photo" | "print" | "ticket" | "cassette";
   image?: string;
   attachment?: ThemeAsset;
+  poll?: FanPoll;
   caption: string;
 };
 export const memories: Memory[] = [
@@ -244,3 +246,15 @@ export const fanVideoStudies = [
       "Original six-second silent graphic edit. No copyrighted recording or artist likeness.",
   },
 ];
+
+export type FanPoll = { options: string[] };
+export function validatePoll(options: string[]): string | null {
+  if (options.length < 2 || options.length > 4) return "Add 2–4 poll choices.";
+  if (options.some((o) => !o.trim() || o.length > 80))
+    return "Fill in every choice (80 characters maximum).";
+  if (
+    new Set(options.map((o) => o.trim().toLowerCase())).size !== options.length
+  )
+    return "Use different choices for your poll.";
+  return null;
+}

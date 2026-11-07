@@ -2957,3 +2957,116 @@
     animation: none;
   }
 }
+
+/* Editing controls use the same opaque panel/text pair as contrast validation. */
+.profile-canvas .simple-composer {
+  background: var(--theme-panel, #1b1921);
+  color: var(--theme-text, #f4f0f8);
+  border-color: var(--theme-control-border, #756b7a);
+  font-family: var(--theme-font, Arial, sans-serif);
+}
+.profile-canvas .simple-composer :is(textarea, input) {
+  background: var(--theme-panel, #1b1921);
+  color: var(--theme-text, #f4f0f8);
+  caret-color: var(--theme-text, #f4f0f8);
+  font-family: inherit;
+}
+.profile-canvas .simple-composer textarea::placeholder {
+  color: var(--theme-text, #f4f0f8);
+  opacity: 1;
+}
+.profile-canvas
+  .simple-composer
+  :is(
+    .composer-local-note,
+    .mark-status,
+    .composer-actions > span,
+    .poll-editor small,
+    .poll-editor label
+  ) {
+  color: var(--theme-text, #f4f0f8);
+  opacity: 1;
+}
+.profile-canvas .simple-composer .composer-attach {
+  color: var(--theme-accent, #a0f4cc);
+}
+.profile-canvas .simple-composer .composer-actions > button {
+  background: var(--theme-button, #a0f4cc);
+  color: var(--theme-button-text, #16241c);
+}
+.simple-composer .composer-actions {
+  flex-wrap: wrap;
+}
+.simple-composer .composer-tools {
+  gap: 2px;
+  flex-wrap: wrap;
+}
+.simple-composer .composer-attach {
+  padding-inline: 6px;
+  gap: 4px;
+}
+.poll-editor {
+  margin: 16px 0;
+  border: 1px solid currentColor;
+  border-radius: 10px;
+  padding: 14px;
+}
+.poll-editor legend {
+  padding: 0 6px;
+  font-size: 13px;
+}
+.poll-editor label {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+.poll-editor input {
+  display: block;
+  width: 100%;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 5px;
+}
+.poll-editor > div {
+  display: flex;
+  gap: 18px;
+  margin: 12px 0;
+}
+.poll-editor button {
+  font-size: 12px;
+  text-decoration: underline;
+}
+.poll-editor small {
+  font-size: 11px;
+}
+.fan-poll {
+  background: var(--theme-panel, #1b1921);
+  color: var(--theme-text, #f4f0f8);
+  border-radius: 10px;
+  padding: 14px;
+  margin: 14px 0;
+}
+.fan-poll > button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  width: 100%;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+  overflow-wrap: anywhere;
+}
+.fan-poll > button[aria-pressed="true"] {
+  border-width: 3px;
+  padding: 10px;
+  font-weight: bold;
+}
+.fan-poll small {
+  display: block;
+  font-size: 11px;
+  line-height: 1.6;
+}

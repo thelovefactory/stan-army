@@ -84,3 +84,8 @@ Nova’s main page now places fan posts in the left column and the supplied Spot
 
 ### Composer clarification
 The fan composer now follows familiar contemporary posting conventions: “What’s happening?”, separate labelled Photo and GIF upload buttons, an attachment preview/removal control, character count and Post. Presentation choices (Plain/Notebook/After hours) are removed from composing; new posts use the default note style. Existing seeded post designs and saved profile themes remain intact. No nonfunctional poll, scheduling or audience controls are displayed.
+
+### Polls and theme-aware composing
+The composer additionally offers Poll with 2–4 distinct choices (up to 80 characters each); the main text becomes the question. Polls and image attachments are alternatives. Posted polls accept one local choice, allow changing it, and show percentages for that local vote only. No fabricated aggregate results or live closing times are shown. All poll content and voting are demonstrations that reset on refresh; votes also reset if the poll component is remounted.
+
+Composer background, entered text, caret, placeholder, labels, attachment controls and Post use the profile’s validated colour pairs. The editing panel stays opaque so readable contrast is maintained over patterned/GIF backgrounds even when other decorative panels are translucent. Saved customisations are unchanged.

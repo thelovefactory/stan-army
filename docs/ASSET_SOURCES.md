@@ -43,3 +43,4 @@ The user supplied https://open.spotify.com/playlist/0EO3CxjNLb1gFi9QuPT6YE for t
 
 ## Stan Army composer icons
 `src/components/stan-icons.tsx` contains original inline SVG UI drawings for Photo and GIF, created for Stan Army. The Photo silhouette incorporates a small star detail; GIF uses an explicit letterform inside a frame. They use currentColor and decorative SVG semantics inside labelled buttons. No external artwork, icon font or generated image asset is used for these two icons; other existing interface icons remain unchanged.
+- `StanPollIcon` extends the original SVG set with a familiar chart silhouette. It is drawn locally in the same component file; no borrowed artwork.

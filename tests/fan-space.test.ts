@@ -46,3 +46,17 @@ test("local video studies are real MP4 files with no third-party URL or missing 
     assert.ok(bytes.length < 1024 * 1024);
   }
 });
+
+test("polls require 2–4 distinct, nonempty bounded choices", async () => {
+  const { validatePoll } = await import("../src/lib/fan-space");
+  assert.equal(validatePoll(["Live version", "Studio version"]), null);
+  for (const choices of [
+    [],
+    ["One"],
+    ["One", ""],
+    ["One", " one "],
+    ["One", "x".repeat(81)],
+    ["1", "2", "3", "4", "5"],
+  ])
+    assert.ok(validatePoll(choices));
+});

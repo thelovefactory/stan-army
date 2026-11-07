@@ -40,3 +40,11 @@ export function StanGifIcon(props: IconProps) {
     </Frame>
   );
 }
+
+export function StanPollIcon(props: IconProps) {
+  return (
+    <Frame {...props}>
+      <path d="M4 3v18h17M8 16v-5h3v5m3 0V6h3v10m3 0v-3" />
+    </Frame>
+  );
+}

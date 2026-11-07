@@ -2,6 +2,8 @@
 import { createContext, useContext, useState } from "react";
 import {
   FanNote,
+  FanPoll,
+  validatePoll,
   FanReply,
   safeNoteStyle,
   validateMark,
@@ -19,6 +21,7 @@ type DemoState = {
     text: string,
     style: string,
     attachment?: ThemeAsset,
+    poll?: FanPoll,
   ) => void;
   replies: Record<string, FanReply[]>;
   reply: (key: string, text: string) => void;
@@ -60,7 +63,13 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     text: string,
     style: string,
     attachment?: ThemeAsset,
+    poll?: FanPoll,
   ) {
+    if (
+      poll &&
+      (validatePoll(poll.options) || validateMark(text) || attachment)
+    )
+      return;
     const image = validAsset(attachment);
     if (text.length > 500 || (!image && validateMark(text))) return;
     const note: FanNote = {
@@ -72,6 +81,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       label: "YOUR MARK · LOCAL DEMO",
       text: text.trim(),
       attachment: image || undefined,
+      poll: poll ? { options: poll.options.map((o) => o.trim()) } : undefined,
       likes: 0,
       replies: [],
       local: true,

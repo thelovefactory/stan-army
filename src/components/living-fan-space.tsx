@@ -3,12 +3,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { ArrowUpRight, Heart, MessageCircle, X } from "lucide-react";
-import { FanNote, fanNotes, orbitFans, validateMark } from "@/lib/fan-space";
+import {
+  FanNote,
+  fanNotes,
+  orbitFans,
+  validateMark,
+  validatePoll,
+} from "@/lib/fan-space";
 import { useDemo } from "./demo-provider";
 import { useProfileTheme } from "./profile-theme";
 import { readImage } from "@/lib/image-upload";
 import type { ThemeAsset } from "@/lib/theme";
-import { StanPhotoIcon, StanGifIcon } from "./stan-icons";
+import { StanPhotoIcon, StanGifIcon, StanPollIcon } from "./stan-icons";
 import { MemoryVisual } from "./memory-visual";
 export function LivingFanSpace({ armyId }: { armyId: string }) {
   const { notes, leaveMark } = useDemo();
@@ -17,6 +23,7 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
     [notice, setNotice] = useState(""),
     [examples, setExamples] = useState(true);
   const [attachment, setAttachment] = useState<ThemeAsset>();
+  const [pollOptions, setPollOptions] = useState<string[] | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const local = notes[armyId] || [];
@@ -25,13 +32,25 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
     : [{ ...fanNotes[0], likes: 0, replies: [] }];
   function submit(e: React.FormEvent) {
     e.preventDefault();
+    const pollIssue = pollOptions ? validatePoll(pollOptions) : null;
+    if (pollIssue) {
+      setNotice(pollIssue);
+      return;
+    }
     const issue =
       attachment && draft.length <= 500 ? null : validateMark(draft);
     if (issue) {
       setNotice(issue);
       return;
     }
-    leaveMark(armyId, draft, "note", attachment);
+    leaveMark(
+      armyId,
+      draft,
+      "note",
+      attachment,
+      pollOptions ? { options: pollOptions } : undefined,
+    );
+    setPollOptions(null);
     setAttachment(undefined);
     setDraft("");
     setNotice("Posted locally · stays until refresh.");
@@ -62,7 +81,9 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
             }}
             maxLength={500}
             rows={3}
-            placeholder="What’s happening?"
+            placeholder={
+              pollOptions ? "Ask the Army a question…" : "What’s happening?"
+            }
           />
         </div>
         {attachment && (
@@ -88,6 +109,42 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
             </button>
           </div>
         )}
+        {pollOptions && (
+          <fieldset className="poll-editor">
+            <legend>Poll choices</legend>
+            {pollOptions.map((option, index) => (
+              <label key={index}>
+                Choice {index + 1}
+                <input
+                  value={option}
+                  maxLength={80}
+                  required
+                  onChange={(e) =>
+                    setPollOptions((current) =>
+                      current!.map((value, i) =>
+                        i === index ? e.target.value : value,
+                      ),
+                    )
+                  }
+                />
+              </label>
+            ))}
+            <div>
+              {pollOptions.length < 4 && (
+                <button
+                  type="button"
+                  onClick={() => setPollOptions([...pollOptions, ""])}
+                >
+                  + Add choice
+                </button>
+              )}
+              <button type="button" onClick={() => setPollOptions(null)}>
+                Remove poll
+              </button>
+            </div>
+            <small>One choice per person · local demo</small>
+          </fieldset>
+        )}
         <div className="composer-actions">
           <div className="composer-tools">
             <button
@@ -95,7 +152,7 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
               className="composer-attach"
               aria-label="Attach a photo"
               title="Attach a photo"
-              disabled={uploading}
+              disabled={uploading || !!pollOptions}
               onClick={() => {
                 if (fileInput.current) {
                   fileInput.current.accept = "image/jpeg,image/png,image/webp";
@@ -111,7 +168,7 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
               className="composer-attach"
               aria-label="Attach a GIF"
               title="Attach a GIF"
-              disabled={uploading}
+              disabled={uploading || !!pollOptions}
               onClick={() => {
                 if (fileInput.current) {
                   fileInput.current.accept = "image/gif";
@@ -121,6 +178,21 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
             >
               <StanGifIcon />
               <span>GIF</span>
+            </button>
+            <button
+              type="button"
+              className="composer-attach"
+              aria-label="Add a poll"
+              title="Add a poll"
+              aria-pressed={!!pollOptions}
+              disabled={uploading || !!attachment}
+              onClick={() => {
+                setPollOptions(pollOptions ? null : ["", ""]);
+                setNotice("");
+              }}
+            >
+              <StanPollIcon />
+              <span>Poll</span>
             </button>
             <input
               ref={fileInput}
@@ -151,7 +223,11 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
           <span>{draft.length}/500</span>
           <button
             type="submit"
-            disabled={uploading || (!draft.trim() && !attachment)}
+            disabled={
+              uploading ||
+              (!draft.trim() && !attachment) ||
+              !!(pollOptions && validatePoll(pollOptions))
+            }
           >
             {uploading ? "Reading…" : "Post"}
           </button>
@@ -258,6 +334,7 @@ function FanNoteCard({ note, armyId }: { note: FanNote; armyId: string }) {
         </div>
       )}
       <p className="note-body">{note.text}</p>
+      {note.poll && <FanPollCard options={note.poll.options} />}
       {note.id === "lex-print" && (
         <div className="note-print">
           <MemoryVisual memoryId="bside-print" />
@@ -358,6 +435,32 @@ export function OrbitFans() {
       <p className="orbit-disclaimer">
         Eight fictional personalities. Not a ranking or an online count.
       </p>
+    </section>
+  );
+}
+
+function FanPollCard({ options }: { options: string[] }) {
+  const [choice, setChoice] = useState<number | null>(null);
+  return (
+    <section className="fan-poll" aria-label="Post poll">
+      {options.map((option, index) => (
+        <button
+          key={index}
+          aria-pressed={choice === index}
+          onClick={() => setChoice(index)}
+        >
+          <span>{option}</span>
+          {choice !== null && (
+            <strong>{choice === index ? "100%" : "0%"}</strong>
+          )}
+        </button>
+      ))}
+      <small>
+        {choice === null
+          ? "Choose an option"
+          : "1 local vote · click another option to change"}{" "}
+        · demo poll
+      </small>
     </section>
   );
 }
