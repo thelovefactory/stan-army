@@ -76,3 +76,6 @@ Four original imagegen marketing illustrations are displayed as a 1.4-second-per
 Sneakers, Brie/pets, TV/books and pop-music objects/cameras cover the requested obsessions in original scenes. No real celebrity likeness, existing artist artwork, TV footage or fan work is used. The original hero collage and community photograph remain unchanged. Next Image supplies lazy loading and responsive optimisation; originals remain preserved. Reduced motion shows the first still frame; pause freezes every frame without moving the CTA.
 
 `public/images/sneakers.jpg`: https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=85, downloaded 2026-11-07 under the Unsplash License. Used for the Sneakers concept card; no brand endorsement is implied. Brie retains its visible CC BY-SA attribution. Celebrity Pets' earlier asset remains in the repository for preservation, but is no longer featured.
+
+## Homepage leopard actions
+`public/decorations/stan-leopard.svg` is an original locally drawn rosette pattern in fuchsia and purple, inspired by the user's colour/pattern direction. The attached Mac-local leopard JPG was not accessible and is not copied or represented as licensed source artwork. The original SVG is used only on landing-page primary buttons, with solid light-pink label areas for readable dark text.

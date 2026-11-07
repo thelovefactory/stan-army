@@ -56,7 +56,9 @@ export function ObsessionStrip() {
       <div className="obsession-overlay">
         <h2 id="obsession-heading">MAKE SOME NOISE.</h2>
         <Link href="/create" className="button button-blue">
-          Rally the troops <ArrowUpRight size={19} />
+          <span>
+            Rally the troops <ArrowUpRight size={19} />
+          </span>
         </Link>
       </div>
     </section>

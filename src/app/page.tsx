@@ -25,7 +25,9 @@ export default function Home() {
           </div>
           <div className="hero-actions">
             <Link href="/create" className="button button-blue">
-              Build your Army today <ArrowRight size={19} />
+              <span>
+                Build your Army today <ArrowRight size={19} />
+              </span>
             </Link>
           </div>
           <div className="hero-community">
@@ -196,7 +198,9 @@ export default function Home() {
           </div>
           <div className="belonging-actions">
             <Link href="/create" className="button">
-              Build your Army <ArrowRight size={18} />
+              <span>
+                Build your Army <ArrowRight size={18} />
+              </span>
             </Link>
             <Link href="/discover" className="text-link">
               Find your Army <ArrowRight size={18} />
