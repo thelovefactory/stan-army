@@ -2,24 +2,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { ArrowUpRight, Heart, MessageCircle, ImagePlus, X } from "lucide-react";
-import {
-  FanNote,
-  fanNotes,
-  NoteStyle,
-  orbitFans,
-  validateMark,
-} from "@/lib/fan-space";
+import { ArrowUpRight, Heart, MessageCircle, X } from "lucide-react";
+import { FanNote, fanNotes, orbitFans, validateMark } from "@/lib/fan-space";
 import { useDemo } from "./demo-provider";
 import { useProfileTheme } from "./profile-theme";
 import { readImage } from "@/lib/image-upload";
 import type { ThemeAsset } from "@/lib/theme";
+import { StanPhotoIcon, StanGifIcon } from "./stan-icons";
 import { MemoryVisual } from "./memory-visual";
 export function LivingFanSpace({ armyId }: { armyId: string }) {
   const { notes, leaveMark } = useDemo();
   const { clean, animationsEnabled } = useProfileTheme();
   const [draft, setDraft] = useState(""),
-    [style, setStyle] = useState<NoteStyle>("note"),
     [notice, setNotice] = useState(""),
     [examples, setExamples] = useState(true);
   const [attachment, setAttachment] = useState<ThemeAsset>();
@@ -37,7 +31,7 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
       setNotice(issue);
       return;
     }
-    leaveMark(armyId, draft, style, attachment);
+    leaveMark(armyId, draft, "note", attachment);
     setAttachment(undefined);
     setDraft("");
     setNotice("Posted locally · stays until refresh.");
@@ -68,7 +62,7 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
             }}
             maxLength={500}
             rows={3}
-            placeholder="What’s happening in the Army?"
+            placeholder="What’s happening?"
           />
         </div>
         {attachment && (
@@ -98,12 +92,35 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
           <div className="composer-tools">
             <button
               type="button"
-              className="icon-button"
-              aria-label="Attach an image or GIF"
+              className="composer-attach"
+              aria-label="Attach a photo"
+              title="Attach a photo"
               disabled={uploading}
-              onClick={() => fileInput.current?.click()}
+              onClick={() => {
+                if (fileInput.current) {
+                  fileInput.current.accept = "image/jpeg,image/png,image/webp";
+                  fileInput.current.click();
+                }
+              }}
             >
-              <ImagePlus size={20} />
+              <StanPhotoIcon />
+              <span>Photo</span>
+            </button>
+            <button
+              type="button"
+              className="composer-attach"
+              aria-label="Attach a GIF"
+              title="Attach a GIF"
+              disabled={uploading}
+              onClick={() => {
+                if (fileInput.current) {
+                  fileInput.current.accept = "image/gif";
+                  fileInput.current.click();
+                }
+              }}
+            >
+              <StanGifIcon />
+              <span>GIF</span>
             </button>
             <input
               ref={fileInput}
@@ -130,18 +147,6 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
                 }
               }}
             />
-            <label className="sr-only" htmlFor="post-style">
-              Post style
-            </label>
-            <select
-              id="post-style"
-              value={style}
-              onChange={(e) => setStyle(e.target.value as NoteStyle)}
-            >
-              <option value="note">Plain</option>
-              <option value="scrapbook">Notebook</option>
-              <option value="afterhours">After hours</option>
-            </select>
           </div>
           <span>{draft.length}/500</span>
           <button
@@ -161,7 +166,7 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
         </small>
       </form>
       <div className="feed-controls">
-        <p>{local.length ? `${local.length} of your marks · ` : ""}Posts</p>
+        <p>{local.length ? `${local.length} of your posts · ` : ""}Posts</p>
         <label>
           <input
             type="checkbox"

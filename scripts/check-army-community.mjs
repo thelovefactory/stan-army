@@ -51,10 +51,19 @@ import assert from "node:assert/strict";
     await page.locator(".fan-note-list .fan-note").first().innerText(),
     /Browser check/,
   );
+  assert.equal(await page.locator(".simple-composer select").count(), 0);
+  const photoPicker = page.waitForEvent("filechooser");
   await page
-    .locator("input[type=file]")
-    .first()
-    .setInputFiles(path.join(process.cwd(), "public/images/room.jpg"));
+    .getByRole("button", { name: "Attach a photo", exact: true })
+    .click();
+  const photoChooser = await photoPicker;
+  assert.equal(
+    await photoChooser.element().getAttribute("accept"),
+    "image/jpeg,image/png,image/webp",
+  );
+  await photoChooser.setFiles(
+    path.join(process.cwd(), "public/images/room.jpg"),
+  );
   await page.locator(".attachment-preview img").waitFor();
   await page.getByRole("button", { name: "Post", exact: true }).click();
   assert.equal(
@@ -65,6 +74,11 @@ import assert from "node:assert/strict";
       .count(),
     1,
   );
+  const gifPicker = page.waitForEvent("filechooser");
+  await page.getByRole("button", { name: "Attach a GIF", exact: true }).click();
+  const gifChooser = await gifPicker;
+  assert.equal(await gifChooser.element().getAttribute("accept"), "image/gif");
+  await gifChooser.setFiles([]);
   await page.getByRole("button", { name: "Start a discussion" }).click();
   await page
     .getByLabel("Title", { exact: true })
@@ -140,6 +154,13 @@ import assert from "node:assert/strict";
     fullPage: true,
     caret: "initial",
   });
+  await page.setViewportSize({ width: 320, height: 740 });
+  assert.ok(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+    "320px overflow",
+  );
   assert.deepEqual(errors, []);
   console.log(
     "PASS: desktop/mobile layout, no overflow, members + Escape, text/image posts, new thread, voting, replies, sorting, Spotify consent/unload, refresh reset; no page errors.",

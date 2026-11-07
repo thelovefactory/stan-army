@@ -40,3 +40,6 @@ Lucide React icons: ISC license, installed package. System Arial/Helvetica/sans-
 
 ## Supplied Spotify playlist
 The user supplied https://open.spotify.com/playlist/0EO3CxjNLb1gFi9QuPT6YE for this iteration. The compact, fixed Spotify embed at https://open.spotify.com/embed/playlist/0EO3CxjNLb1gFi9QuPT6YE?theme=0 returned HTTP 200 during validation. Spotify supplies any cover artwork/audio through its own iframe after consent; no tracks or cover artwork have been downloaded into the repository and no ownership/licensing claim is made. It is not presented as fictional artist Nova Reign’s official catalogue. Sign-in, regional availability, previews and playback restrictions remain Spotify’s responsibility.
+
+## Stan Army composer icons
+`src/components/stan-icons.tsx` contains original inline SVG UI drawings for Photo and GIF, created for Stan Army. The Photo silhouette incorporates a small star detail; GIF uses an explicit letterform inside a frame. They use currentColor and decorative SVG semantics inside labelled buttons. No external artwork, icon font or generated image asset is used for these two icons; other existing interface icons remain unchanged.

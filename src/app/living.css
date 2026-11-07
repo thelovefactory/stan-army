@@ -2661,15 +2661,25 @@
   color: inherit;
   border: 0;
 }
-.composer-tools select {
-  background: #171b20;
-  color: #f5f5f5;
-  border: 1px solid #596067;
-  padding: 6px;
-  border-radius: 6px;
+.simple-composer .composer-actions .composer-attach {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 0;
+  background: transparent;
+  color: #a0f4cc;
   font-size: 12px;
-  max-width: 125px;
 }
+.simple-composer .composer-actions .composer-attach:hover {
+  background: #ffffff12;
+}
+.simple-composer .composer-actions .composer-attach:disabled {
+  opacity: 0.5;
+}
+
 .composer-local-note {
   display: block;
   font-size: 10px;
