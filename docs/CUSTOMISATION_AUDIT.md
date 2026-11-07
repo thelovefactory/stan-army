@@ -71,3 +71,11 @@ No enabled control is left silently ineffective on its documented target. Contro
 ## Evidence
 
 See VALIDATION.md for exact commands and results. `check-customisation-audit.mjs` verifies control effects, migration, no colour bleed, per-surface contrast, images/removal, border/corner/opacity behavior, fonts, stickers/motion, skins, Save/Cancel/refresh/reset, module preservation, board action baseline/style/functionality/focus, 320/390px worlds and theme isolation across Nova/Sienna/Atlas. Tests use isolated browser contexts and never touch the user’s personal saved wallpaper.
+
+
+## Army interaction consistency follow-up
+The Army participation stylesheet now gives primary Join, Post, Send, Load Spotify and in-Army reply/submission controls the same 44px minimum height, 13px Arial UI typography, 18px direct icons, 10px control corners, and paired existing `--theme-button` / contrast-guarded `--theme-button-text` colours. Enlisted status retains its checkmark, label, aria-pressed state and an inset selected treatment. The Enlist others action is transparent/outlined. Secondary tools retain lighter styling, with 44px composer/icon hit areas and 36px secondary links.
+
+Nova's sidebar heading rows now share an 18px UI title/icon alignment; the larger Army and discussion identities stay distinct. Panel padding follows the existing responsive `--army-inset`; corners follow saved `--theme-radius`. Chat times align right and wrap safely alongside founder badges. Metadata uses 11px UI text without fading contrast-protected content. Feed author/footer interfaces use Arial while post body fonts, artwork, images and expressive styles remain untouched. The mint participation surfaces remain independently controlled by Participation Colour; action colours do not recolour them.
+
+Scope is Army pages, with Nova-specific geometry and mobile rules. No theme schema, storage keys, saved values, module toggles, permissions, interactions, global navigation or homepage styles changed. The owner Customise control retains its separate platform-toolbar identity. Spotify's internal iframe controls remain provider-owned; only the local click-to-load action is unified.
