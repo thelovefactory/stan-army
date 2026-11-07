@@ -221,11 +221,11 @@
   opacity: 1;
 }
 .obsession-cta[data-started="true"] .obsession-shot {
-  animation: obsession-cut 4s steps(1, end) infinite;
+  animation: obsession-cut var(--obsession-cycle, 5s) steps(1, end) infinite;
 }
 .obsession-shot img {
   object-fit: cover;
-  object-position: center 48%;
+  object-position: var(--frame-focus, center);
 }
 .obsession-overlay {
   position: relative;
@@ -251,7 +251,7 @@
   0% {
     opacity: 1;
   }
-  25%,
+  20%,
   100% {
     opacity: 0;
   }
@@ -270,7 +270,7 @@
     padding: 26px 22px;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: center;
+    justify-content: space-between;
     gap: 22px;
   }
   .obsession-cta h2 {
@@ -396,10 +396,9 @@
 }
 .ticker > div {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 26px minmax(0, 1fr) 26px minmax(
-      0,
-      1fr
-    ) 26px;
+  grid-template-columns:
+    minmax(0, 1fr) 26px minmax(0, 1fr) 26px minmax(0, 1fr)
+    26px;
   align-items: center;
   gap: 14px;
   padding: 16px 20px;
@@ -461,5 +460,14 @@
 @media (prefers-reduced-motion: reduce) {
   .ticker span {
     animation: none;
+  }
+}
+
+/* Keep key subjects in shot at each aspect ratio, rather than one shared crop. */
+@media (max-width: 600px) {
+  .obsession-shot img {
+    object-position: var(--frame-mobile-focus, var(--frame-focus, center));
+    transform: scale(var(--frame-mobile-scale, 1));
+    transform-origin: 75% 0%;
   }
 }
