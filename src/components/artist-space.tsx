@@ -574,13 +574,9 @@ function ArmySpaceContent({
         </ArmyModule>
         <div className="artist-bottom-note">
           <span>✳</span>
-          <p>
-            The artist brings the music.
-            <br />
-            <b>The fans bring the Army.</b>
-          </p>
+          <h2>MAKE SOME NOISE.</h2>
           <Link href="/create" className="text-link">
-            Make a space of your own <ArrowUpRight size={18} />
+            Start your own Army <ArrowUpRight size={18} />
           </Link>
         </div>
       </div>
