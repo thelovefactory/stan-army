@@ -247,3 +247,11 @@ The mint strip cycles Anton / Bungee / Rubik Mono every four seconds using local
 
 ### Staggered fast ticker type
 The three mint-strip statements start in different faces (Anton / Bungee / Rubik Mono), each advancing every 0.8 seconds through the same cycle with staggered phases. Fixed CSS grid tracks keep stars independent of text metrics. Reduced motion preserves three different static fonts. `npm run lint` passed. Focused Chromium checks verified three distinct faces at four cycle times, exact unchanged star bounding boxes, no text clipping or page overflow at 320/390/800/801/1024/1440px, and disabled animation with three distinct fonts for reduced motion. Screenshot: `screenshots/ticker-staggered.png`.
+
+
+### Army interaction consistency pass — source review only
+The execution workspace is unavailable: shell execution fails with an exec-server process error. Changes were applied directly to PR #1's existing branch using the GitHub connector. No lint, TypeScript, unit tests, production build, browser tests or screenshots could be run for this pass; earlier successful results do not validate these changes.
+
+Source review checked actual Army/playlist/chat/feed markup, stylesheet order and existing theme variables; the new CSS has balanced blocks and uses existing contrast-guarded button/text tokens without storage/schema changes. It scopes primary action geometry and colours to Army pages and Nova-specific alignment/metadata to the living Army, preserving post bodies and artwork. Mobile rules allow wrapping and retain existing panel-gap/inset tokens. New styles are additive and preserve event handlers and element semantics.
+
+Pending when execution returns: run lint/typecheck/tests/build; verify clean/custom modes and saved monochrome, mint, pink and fluorescent themes; inspect 320/390/800/1440 layouts, Join/share, Post, Send, Spotify load/unload, poll/photo tools, reply/discussion actions, visible focus, disabled states, metadata contrast and timestamp/badge wrapping. Confirm no selector is overridden by theme/skin rules in computed styles. No rendered-layout verification is claimed yet.
