@@ -12,7 +12,7 @@ export const metadata = {
 };
 export default function Home() {
   return (
-    <main id="main">
+    <main id="main" className="landing-page">
       <section className="container landing-hero">
         <div className="hero-copy">
           <h1>

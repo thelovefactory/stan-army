@@ -1,31 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Pause, Play } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
 const frames = ["sneakers", "cheese", "tv", "music"];
 
 export function ObsessionStrip() {
-  const [paused, setPaused] = useState(false);
+  const banner = useRef<HTMLElement>(null);
+  const [started, setStarted] = useState(false);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setStarted(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.25 },
+    );
+    if (banner.current) observer.observe(banner.current);
+    return () => observer.disconnect();
+  }, []);
   return (
     <section
+      ref={banner}
       className="container obsession-cta"
       aria-labelledby="obsession-heading"
+      data-started={started}
     >
-      <h2 id="obsession-heading">MAKE SOME NOISE.</h2>
       <div
         className="obsession-film"
-        data-paused={paused}
         role="img"
-        aria-label="A fast photographic-style sequence of sneakers, pop music, Brie, TV, pets, books, headphones and cameras. Original illustrative scenes."
+        aria-label="Original photographic-style scenes of sneakers, Brie, TV, books, pets and pop-music obsessions."
       >
         {frames.map((frame, index) => (
           <div
             className="obsession-shot"
             key={frame}
-            style={{ animationDelay: `${-index * 1.4}s` }}
+            style={{
+              animationDelay: `${-index}s`,
+              zIndex: frames.length - index,
+            }}
           >
             <Image
               src={`/brand/obsessions/${frame}.png`}
@@ -36,17 +53,8 @@ export function ObsessionStrip() {
           </div>
         ))}
       </div>
-      <div className="obsession-controls">
-        <button
-          type="button"
-          className="obsession-pause"
-          onClick={() => setPaused(!paused)}
-          aria-pressed={paused}
-          aria-label={paused ? "Play photo animation" : "Pause photo animation"}
-        >
-          {paused ? <Play size={15} /> : <Pause size={15} />}
-          {paused ? "Play" : "Pause"}
-        </button>
+      <div className="obsession-overlay">
+        <h2 id="obsession-heading">MAKE SOME NOISE.</h2>
         <Link href="/create" className="button button-blue">
           Rally the troops <ArrowUpRight size={19} />
         </Link>
