@@ -303,7 +303,7 @@ function ArmySpaceContent({
             The army <span>✳</span>
           </a>
           {isNova && <a href="#army-room">Army chat</a>}
-          {isNova && <a href="#discussions">s/Nova</a>}
+          {isNova && <a href="#discussions">s/nova</a>}
           <a href="#artist-posts">Army & artist notes</a>
           {isNova && <Link href="/armies/nova/gallery">Our gallery</Link>}
           <a href="#events">Events & links</a>
@@ -569,7 +569,7 @@ function ArmySpaceContent({
             Make a space of your own <ArrowUpRight size={18} />
           </Link>
         </div>
-        {isNova && <DiscussionBoard />}
+        <DiscussionBoard key={army.id} boardId={`s/${army.slug}`} />
       </div>
     </main>
   );

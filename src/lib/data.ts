@@ -314,6 +314,9 @@ export const reservedAddresses = new Set([
   "static",
   "cdn",
   "stan",
+  "s",
+  "com",
+  "boards",
 ]);
 export function suggestedAddress(name: string): string {
   return name

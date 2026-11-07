@@ -74,11 +74,16 @@ import assert from "node:assert/strict";
       .count(),
     1,
   );
-  const gifPicker = page.waitForEvent("filechooser");
-  await page.getByRole("button", { name: "Attach a GIF", exact: true }).click();
-  const gifChooser = await gifPicker;
-  assert.equal(await gifChooser.element().getAttribute("accept"), "image/gif");
-  await gifChooser.setFiles([]);
+  await page
+    .getByRole("button", { name: "Open GIF picker", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Attach Leave your mark GIF", exact: true })
+    .click();
+  await page.locator(".attachment-preview").waitFor();
+  await page
+    .getByRole("button", { name: "Remove attachment", exact: true })
+    .click();
   await page.getByRole("button", { name: "Start a discussion" }).click();
   await page
     .getByLabel("Title", { exact: true })

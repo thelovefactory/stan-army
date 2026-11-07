@@ -5,6 +5,7 @@ import "./pivot.css";
 import "./living.css";
 import "./player.css";
 import { Header, Footer } from "@/components/shell";
+import { BoardsProvider } from "@/components/boards-provider";
 import { DemoProvider } from "@/components/demo-provider";
 export const metadata: Metadata = {
   title: {
@@ -22,9 +23,11 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <DemoProvider>
-          <Header />
-          {children}
-          <Footer />
+          <BoardsProvider>
+            <Header />
+            {children}
+            <Footer />
+          </BoardsProvider>
         </DemoProvider>
       </body>
     </html>

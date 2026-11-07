@@ -48,3 +48,12 @@ export function StanPollIcon(props: IconProps) {
     </Frame>
   );
 }
+
+export function StanEmojiIcon(props: IconProps) {
+  return (
+    <Frame {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M8 9h.01M16 9h.01M8 14c2 3 6 3 8 0" />
+    </Frame>
+  );
+}

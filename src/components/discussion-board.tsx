@@ -1,54 +1,32 @@
 "use client";
+import Link from "next/link";
+import { boardById, boardPath, Thread } from "@/lib/boards";
+import { useBoards } from "./boards-provider";
 import { useState } from "react";
 import { ArrowUp, ArrowDown, MessageSquare, Plus, X } from "lucide-react";
-type Thread = {
-  id: string;
-  author: string;
-  title: string;
-  body: string;
-  tag: string;
-  score: number;
-  replies: { author: string; text: string }[];
-  local?: boolean;
-};
-const initialThreads: Thread[] = [
-  {
-    id: "bridge",
-    author: "jess.wav",
-    title: "Which Nova bridge would you defend with your life?",
-    body: "The last eight bars. Headphones on. That’s my entire argument. What’s yours?",
-    tag: "Discussion",
-    score: 18,
-    replies: [
-      {
-        author: "lucid.lou",
-        text: "The one you immediately rewind before the song even finishes. You know the one.",
-      },
-    ],
-  },
-  {
-    id: "first-listen",
-    author: "milo.mp3",
-    title: "First listen vs. 100th listen: what changed for you?",
-    body: "I came for the chorus and stayed for the tiny things in the background. Tell me what I’m missing.",
-    tag: "Question",
-    score: 12,
-    replies: [],
-  },
-  {
-    id: "fan-project",
-    author: "lex.exe",
-    title: "A little fan-made zine. Who wants a page?",
-    body: "Lyrics in the margins, blurry photos, concert memories. If you’ve got one thing you want to make, that’s enough.",
-    tag: "Fan project",
-    score: 9,
-    replies: [],
-  },
-];
-export function DiscussionBoard() {
-  const [threads, setThreads] = useState(initialThreads);
+export function DiscussionBoard({
+  boardId = "s/nova",
+  standalone = false,
+}: {
+  boardId?: string;
+  standalone?: boolean;
+}) {
+  const board = boardById(boardId)!;
+  const {
+    threadsFor,
+    setThreadsFor,
+    votesFor,
+    vote,
+    favourites,
+    toggleFavourite,
+    bookmarkStatus,
+  } = useBoards();
+  const threads = threadsFor(board);
+  const votes = votesFor(board.id);
+  const setThreads = (update: (current: Thread[]) => Thread[]) =>
+    setThreadsFor(board, update);
+  const saved = favourites.includes(board.id);
   const [sort, setSort] = useState("top");
-  const [votes, setVotes] = useState<Record<string, number>>({});
   const [open, setOpen] = useState<string>();
   const [composing, setComposing] = useState(false);
   const [title, setTitle] = useState("");
@@ -62,30 +40,46 @@ export function DiscussionBoard() {
           (a, b) => b.score + (votes[b.id] || 0) - a.score - (votes[a.id] || 0),
         )
       : threads;
-  function vote(id: string, value: number) {
-    setVotes((c) => ({ ...c, [id]: c[id] === value ? 0 : value }));
-  }
   return (
     <section
-      className="discussion-board"
+      className={`discussion-board board-kind-${board.kind}`}
       id="discussions"
       aria-labelledby="discussion-heading"
     >
       <header className="board-header">
         <div>
-          <p className="eyebrow">THE CONVERSATION KEEPS GOING</p>
+          <p className="eyebrow">
+            {board.kind === "s"
+              ? "ARTIST DISCUSSION · PART OF THE ARMY"
+              : "COMMUNITY · ACROSS ARMIES"}
+          </p>
           <h2 id="discussion-heading">
-            s/Nova<span>✳</span>
+            {board.id}
+            <span>{board.kind === "s" ? "✳" : "✦"}</span>
           </h2>
-          <p>Deep dives, big feelings, very specific opinions.</p>
+          <p>{board.description}</p>
         </div>
-        <button
-          className="button button-mint"
-          aria-expanded={composing}
-          onClick={() => setComposing(!composing)}
-        >
-          <Plus size={16} /> Start a discussion
-        </button>
+        <div className="board-header-actions">
+          <button
+            className="button"
+            aria-pressed={saved}
+            onClick={() => toggleFavourite(board.id)}
+          >
+            {saved ? "Saved to My Boards" : "+ My Boards"}
+          </button>
+          {standalone ? (
+            <Link href="/boards">Explore boards ↗</Link>
+          ) : (
+            <Link href={boardPath(board)}>Open board ↗</Link>
+          )}
+          <button
+            className="button button-mint"
+            aria-expanded={composing}
+            onClick={() => setComposing(!composing)}
+          >
+            <Plus size={16} /> Start a discussion
+          </button>
+        </div>
       </header>
       <div className="board-toolbar">
         <div role="group" aria-label="Sort discussions">
@@ -159,7 +153,11 @@ export function DiscussionBoard() {
             <option>Fan project</option>
           </select>
           <div>
-            <button type="button" onClick={() => setComposing(false)}>
+            <button
+              type="button"
+              formNoValidate
+              onClick={() => setComposing(false)}
+            >
               Cancel
             </button>
             <button type="submit" className="button button-mint">
@@ -169,7 +167,7 @@ export function DiscussionBoard() {
         </form>
       )}
       <p role="status" className="board-status">
-        {status}
+        {status || bookmarkStatus}
       </p>
       <div className="board-threads">
         {ordered.map((t) => (
@@ -178,7 +176,7 @@ export function DiscussionBoard() {
               <button
                 aria-label={`Upvote: ${t.title}`}
                 aria-pressed={votes[t.id] === 1}
-                onClick={() => vote(t.id, 1)}
+                onClick={() => vote(board.id, t.id, 1)}
               >
                 <ArrowUp size={19} />
               </button>
@@ -186,7 +184,7 @@ export function DiscussionBoard() {
               <button
                 aria-label={`Downvote: ${t.title}`}
                 aria-pressed={votes[t.id] === -1}
-                onClick={() => vote(t.id, -1)}
+                onClick={() => vote(board.id, t.id, -1)}
               >
                 <ArrowDown size={19} />
               </button>

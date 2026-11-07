@@ -14,7 +14,13 @@ import { useDemo } from "./demo-provider";
 import { useProfileTheme } from "./profile-theme";
 import { readImage } from "@/lib/image-upload";
 import type { ThemeAsset } from "@/lib/theme";
-import { StanPhotoIcon, StanGifIcon, StanPollIcon } from "./stan-icons";
+import {
+  StanPhotoIcon,
+  StanGifIcon,
+  StanPollIcon,
+  StanEmojiIcon,
+} from "./stan-icons";
+import { ReactionPicker } from "./reaction-picker";
 import { MemoryVisual } from "./memory-visual";
 export function LivingFanSpace({ armyId }: { armyId: string }) {
   const { notes, leaveMark } = useDemo();
@@ -25,6 +31,18 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
   const [attachment, setAttachment] = useState<ThemeAsset>();
   const [pollOptions, setPollOptions] = useState<string[] | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [picker, setPicker] = useState<"gifs" | "emoji" | null>(null);
+  const pickerTrigger = useRef<HTMLButtonElement | null>(null);
+  const composerInput = useRef<HTMLTextAreaElement>(null);
+  function closePicker() {
+    setPicker(null);
+    requestAnimationFrame(() => pickerTrigger.current?.focus());
+  }
+  function cancelPoll() {
+    setPollOptions(null);
+    setNotice("");
+    requestAnimationFrame(() => composerInput.current?.focus());
+  }
   const fileInput = useRef<HTMLInputElement>(null);
   const local = notes[armyId] || [];
   const seeded = examples
@@ -74,6 +92,7 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
           </label>
           <textarea
             id="fan-mark"
+            ref={composerInput}
             value={draft}
             onChange={(e) => {
               setDraft(e.target.value);
@@ -110,8 +129,24 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
           </div>
         )}
         {pollOptions && (
-          <fieldset className="poll-editor">
+          <fieldset
+            className="poll-editor"
+            onKeyDown={(e) => {
+              if (e.key === "Escape") {
+                e.preventDefault();
+                cancelPoll();
+              }
+            }}
+          >
             <legend>Poll choices</legend>
+            <button
+              type="button"
+              className="poll-close"
+              aria-label="Close poll"
+              onClick={cancelPoll}
+            >
+              <X size={18} />
+            </button>
             {pollOptions.map((option, index) => (
               <label key={index}>
                 Choice {index + 1}
@@ -138,8 +173,8 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
                   + Add choice
                 </button>
               )}
-              <button type="button" onClick={() => setPollOptions(null)}>
-                Remove poll
+              <button type="button" onClick={cancelPoll}>
+                Cancel poll
               </button>
             </div>
             <small>One choice per person · local demo</small>
@@ -166,14 +201,12 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
             <button
               type="button"
               className="composer-attach"
-              aria-label="Attach a GIF"
-              title="Attach a GIF"
-              disabled={uploading || !!pollOptions}
-              onClick={() => {
-                if (fileInput.current) {
-                  fileInput.current.accept = "image/gif";
-                  fileInput.current.click();
-                }
+              aria-label="Open GIF picker"
+              title="Choose a GIF"
+              aria-expanded={picker === "gifs"}
+              onClick={(e) => {
+                pickerTrigger.current = e.currentTarget;
+                setPicker(picker === "gifs" ? null : "gifs");
               }}
             >
               <StanGifIcon />
@@ -193,6 +226,19 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
             >
               <StanPollIcon />
               <span>Poll</span>
+            </button>
+            <button
+              type="button"
+              className="composer-attach"
+              aria-label="Open emoji picker"
+              aria-expanded={picker === "emoji"}
+              onClick={(e) => {
+                pickerTrigger.current = e.currentTarget;
+                setPicker(picker === "emoji" ? null : "emoji");
+              }}
+            >
+              <StanEmojiIcon />
+              <span>Emoji</span>
             </button>
             <input
               ref={fileInput}
@@ -232,6 +278,40 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
             {uploading ? "Reading…" : "Post"}
           </button>
         </div>
+        {picker && (
+          <ReactionPicker
+            key={picker}
+            initialTab={picker}
+            canAttach={!pollOptions}
+            onBusy={setUploading}
+            onClose={closePicker}
+            onEmoji={(emoji) => {
+              const field = composerInput.current;
+              const start = field?.selectionStart ?? draft.length;
+              const end = field?.selectionEnd ?? draft.length;
+              const next = draft.slice(0, start) + emoji + draft.slice(end);
+              if (next.length > 500) {
+                setNotice("Keep your post to 500 characters.");
+                return;
+              }
+              setDraft(next);
+              setNotice("");
+              setPicker(null);
+              requestAnimationFrame(() => {
+                field?.focus();
+                field?.setSelectionRange(
+                  start + emoji.length,
+                  start + emoji.length,
+                );
+              });
+            }}
+            onGif={(asset) => {
+              setAttachment(asset);
+              setNotice("");
+              closePicker();
+            }}
+          />
+        )}
         {notice && (
           <p role="status" className="mark-status">
             {notice}

@@ -45,3 +45,8 @@ Define regions, retention, export/deletion, evidence protection, minimum age, pu
 
 ## Local theme migration implemented now
 The browser reads `stan-army:theme:v1:army:<stableArmyId>`, falling back to the explicitly mapped `stan-army:theme:v1:artist:<legacySlug>` only when the new key is absent. The schema remains v1 because presentation fields did not change; only the target identity changes. Old keys are retained. New-key saves are validated; storage failure never deletes an old theme. Fan keys stay unchanged. Future storage processing should replace inline image data with reviewed asset references while retaining explicit schema migration and rollback support.
+
+## Future board persistence boundary (design only)
+Artist boards and broader communities share a future `boards` entity with an explicit kind (`s` or `com`), slug and title. Artist boards require a canonical Army association (one per Army); community boards have none. Future database constraints must enforce that distinction, not a client-only UI condition. Shared thread/reply/vote records reference a board and authenticated author; favourite boards require a unique `(user_id, board_id)` pair. Thread votes must be unique per authenticated user/thread and validated against board access. These are design notes only: the prototype uses typed fixture IDs, in-memory content/votes and browser-local favourite IDs. There are no tables, migrations or endpoints for this update.
+
+Artist verification remains independent from community ownership, theme editing and moderation. Future community-board moderation/roles and cross-board access policies require explicit design before persistence; no existing artist verification is used to grant them here.

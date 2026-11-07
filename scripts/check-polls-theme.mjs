@@ -65,14 +65,12 @@ function lum(c) {
   await page
     .getByLabel("Your post to the Army")
     .fill("Readable with my custom theme.");
-  const styles = await page
-    .locator("#fan-mark")
-    .evaluate((e) => ({
-      color: getComputedStyle(e).color,
-      bg: getComputedStyle(e).backgroundColor,
-      placeholder: getComputedStyle(e, "::placeholder").color,
-      opacity: getComputedStyle(e, "::placeholder").opacity,
-    }));
+  const styles = await page.locator("#fan-mark").evaluate((e) => ({
+    color: getComputedStyle(e).color,
+    bg: getComputedStyle(e).backgroundColor,
+    placeholder: getComputedStyle(e, "::placeholder").color,
+    opacity: getComputedStyle(e, "::placeholder").opacity,
+  }));
   const ratio =
     (Math.max(lum(styles.color), lum(styles.bg)) + 0.05) /
     (Math.min(lum(styles.color), lum(styles.bg)) + 0.05);
@@ -95,7 +93,7 @@ function lum(c) {
     await page.getByRole("button", { name: "Post", exact: true }).isDisabled(),
     true,
   );
-  await page.getByRole("button", { name: "Remove poll", exact: true }).click();
+  await page.getByRole("button", { name: "Cancel poll", exact: true }).click();
   assert.deepEqual(errors, []);
   console.log(
     "PASS: poll creation/vote/change/duplicate rejection/removal, hostile custom theme contrast " +

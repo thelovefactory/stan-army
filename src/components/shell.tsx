@@ -11,6 +11,7 @@ export function Header() {
     { href: "/discover", label: "Discover" },
     { href: "/armies/nova", label: "The demo army" },
     { href: "/fans/jess-wav", label: "Fan space" },
+    { href: "/boards", label: "My Boards" },
   ];
   return (
     <>
