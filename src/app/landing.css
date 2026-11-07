@@ -317,13 +317,13 @@
   container-type: inline-size;
 }
 :is(.landing-page, .landing-header) .button {
-  background: #d60086;
+  background: #f36bd6;
   color: #fff;
-  border: 1px solid #ff54c7;
+  border: 1px solid #f36bd6;
   padding: 14px 22px;
   min-height: 54px;
   border-radius: 6px;
-  box-shadow: 0 2px 0 #850052;
+  box-shadow: 0 2px 0 #bc329f;
   transition:
     transform 180ms ease,
     border-color 180ms ease;
@@ -346,7 +346,7 @@
   -webkit-text-stroke: 0;
 }
 :is(.landing-page, .landing-header) .button:hover {
-  background: #c00078;
+  background: #e957c9;
   transform: scale(1.05);
   border-color: #ffb1e6;
 }
