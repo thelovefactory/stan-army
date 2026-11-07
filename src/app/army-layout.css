@@ -1,0 +1,273 @@
+/* Calm geometry around expressive profile themes. Keep surfaces and controls
+   on one spacing scale without forcing unrelated content to equal heights. */
+.profile-canvas .living-army {
+  --army-gap: 24px;
+  --army-inset: 24px;
+  --army-card-radius: var(--theme-radius, 20px);
+  --army-control-radius: 10px;
+}
+.profile-canvas .living-army .artist-breadcrumb {
+  margin: 0 0 16px;
+  padding: 14px 20px;
+  min-height: 44px;
+  border-radius: 12px;
+}
+.profile-canvas .living-army .nova-identity-compact {
+  margin: 0 0 var(--army-gap);
+  padding: var(--army-inset);
+  gap: 24px;
+  min-height: 112px;
+  border-radius: var(--army-card-radius);
+  border: 1px solid var(--theme-border, #35313e);
+}
+.profile-canvas .living-army .nova-identity-compact .identity-left {
+  gap: 16px;
+}
+.profile-canvas .living-army .nova-identity-compact .identity-actions {
+  gap: 12px;
+  align-items: center;
+}
+.profile-canvas
+  .living-army
+  .nova-identity-compact
+  .identity-left
+  > div:last-child,
+.profile-canvas .living-army .nova-identity-compact .identity-actions {
+  border-radius: 0;
+}
+.profile-canvas .living-army .living-layout {
+  gap: var(--army-gap);
+  align-items: start;
+}
+.profile-canvas .living-army .living-sidebar {
+  gap: var(--army-gap);
+}
+.profile-canvas
+  .living-army
+  :is(
+    .simple-composer,
+    .sidebar-playlist,
+    .army-chat,
+    .events-panel,
+    .fan-note
+  ) {
+  padding: var(--army-inset);
+  border-radius: var(--army-card-radius);
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+.profile-canvas .living-army .sidebar-playlist {
+  box-shadow: none;
+}
+.profile-canvas .living-army .playlist-placeholder {
+  gap: 16px;
+  padding-block: 16px;
+}
+.profile-canvas .living-army .compose-row {
+  align-items: flex-start;
+  gap: 16px;
+}
+.profile-canvas .living-army .compose-row textarea {
+  padding: 8px 0;
+  min-height: 112px;
+  border-radius: 0;
+  line-height: 1.6;
+}
+.profile-canvas .living-army .simple-composer .composer-actions {
+  margin-top: 16px;
+  padding-top: 16px;
+  gap: 12px;
+}
+.profile-canvas .living-army .composer-local-note {
+  margin-top: 12px;
+  line-height: 1.6;
+}
+.profile-canvas
+  .living-army
+  :is(
+    .composer-actions > button,
+    .composer-attach,
+    .chat-compose,
+    .chat-compose button,
+    .identity-actions > .button,
+    .share-button
+  ) {
+  border-radius: var(--army-control-radius);
+}
+.profile-canvas .living-army .composer-attach {
+  min-height: 40px;
+}
+.profile-canvas .living-army .feed-controls {
+  margin: var(--army-gap) 0 16px;
+  padding: 12px 16px;
+  min-height: 44px;
+  border-radius: 12px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.profile-canvas .living-army .fan-note-list {
+  gap: var(--army-gap);
+  padding: 0;
+}
+.profile-canvas .living-army .fan-note {
+  transform: none;
+  box-shadow: none;
+}
+.profile-canvas .living-army .fan-note > header {
+  margin-bottom: 20px;
+}
+.profile-canvas .living-army .fan-note > footer {
+  margin-top: 20px;
+  padding-top: 16px;
+}
+.profile-canvas .living-army .chat-compose {
+  margin-top: 16px;
+  padding: 8px;
+  gap: 8px;
+}
+.profile-canvas .living-army .chat-compose button {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+.profile-canvas .living-army .fan-media-previews {
+  margin-top: 40px;
+}
+.profile-canvas .living-army .memory-preview-heading {
+  padding: 20px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.profile-canvas .living-army .shoebox-preview {
+  gap: 16px;
+  align-items: start;
+}
+.profile-canvas .living-army .shoebox-preview > a {
+  transform: none;
+}
+.profile-canvas .living-army .shoebox-preview .memory-visual {
+  border-radius: 12px;
+  overflow: hidden;
+}
+.profile-canvas .living-army .video-shelf-preview {
+  margin-top: var(--army-gap);
+  padding: 20px;
+  border-radius: var(--army-card-radius);
+}
+.profile-canvas .living-army .army-voices-fold {
+  margin-top: 32px;
+  padding: 20px;
+  border-radius: var(--army-card-radius);
+}
+.profile-canvas .living-army .founder-love-credit {
+  margin-top: 40px;
+  padding: 24px;
+  border-radius: 12px;
+}
+.profile-canvas .living-army .discussion-board {
+  margin: 40px 0 0;
+  border-radius: var(--army-card-radius);
+}
+.profile-canvas .living-army .board-header {
+  padding: 24px;
+}
+.profile-canvas .living-army .board-thread {
+  padding: 24px;
+  border-radius: 0;
+}
+.profile-canvas .living-army .artist-bottom-note {
+  margin-top: 32px;
+  padding: 24px;
+  gap: 20px;
+  border-radius: 12px;
+}
+@media (max-width: 1000px) and (min-width: 801px) {
+  .profile-canvas .living-army {
+    --army-inset: 20px;
+  }
+  .profile-canvas .living-army .nova-identity-compact {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 800px) {
+  .profile-canvas .living-army {
+    --army-inset: 20px;
+  }
+  .profile-canvas .living-army .living-layout {
+    gap: var(--army-gap);
+  }
+  .profile-canvas .living-army .nova-identity-compact {
+    padding: 20px;
+    gap: 20px;
+  }
+  .profile-canvas .living-army .artist-breadcrumb {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+  }
+  .profile-canvas .living-army .board-header {
+    padding: 20px;
+  }
+}
+@media (max-width: 500px) {
+  .profile-canvas .living-army {
+    --army-gap: 20px;
+    --army-inset: 18px;
+  }
+  .profile-canvas .living-army .nova-identity-compact {
+    padding: 18px;
+  }
+  .profile-canvas .living-army .nova-identity-compact .identity-actions {
+    gap: 12px;
+  }
+  .profile-canvas .living-army .feed-controls {
+    align-items: flex-start;
+  }
+  .profile-canvas .living-army .compose-row {
+    gap: 12px;
+  }
+  .profile-canvas .living-army .compose-row textarea {
+    min-height: 104px;
+  }
+  .profile-canvas .living-army .memory-preview-heading {
+    padding: 16px;
+  }
+  .profile-canvas .living-army .memory-preview-heading h2 {
+    font-size: 25px;
+  }
+  .profile-canvas .living-army .board-thread {
+    padding: 20px 16px;
+    gap: 12px;
+  }
+  .profile-canvas .living-army .artist-bottom-note {
+    padding: 20px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .profile-canvas .living-army .artist-bottom-note > a {
+    margin-left: 0;
+  }
+}
+@media (max-width: 500px) {
+  .profile-canvas .living-army .nova-identity-compact .identity-actions {
+    position: relative;
+  }
+  .profile-canvas .living-army .member-dropdown {
+    position: static;
+  }
+  .profile-canvas .living-army .member-popover {
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: none;
+    padding: 14px;
+  }
+  .profile-canvas .living-army .member-popover .orbit-avatar {
+    width: 40px;
+    height: 40px;
+  }
+}
