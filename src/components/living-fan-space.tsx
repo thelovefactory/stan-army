@@ -22,7 +22,13 @@ import {
 } from "./stan-icons";
 import { ReactionPicker } from "./reaction-picker";
 import { MemoryVisual } from "./memory-visual";
-export function LivingFanSpace({ armyId }: { armyId: string }) {
+export function LivingFanSpace({
+  armyId,
+  allPosts = false,
+}: {
+  armyId: string;
+  allPosts?: boolean;
+}) {
   const { notes, leaveMark } = useDemo();
   const { clean, animationsEnabled } = useProfileTheme();
   const [draft, setDraft] = useState(""),
@@ -48,6 +54,8 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
   const seeded = examples
     ? fanNotes
     : [{ ...fanNotes[0], likes: 0, replies: [] }];
+  const allNotes = [...local, ...seeded];
+  const displayedNotes = allPosts ? allNotes : allNotes.slice(0, 7);
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const pollIssue = pollOptions ? validatePoll(pollOptions) : null;
@@ -82,245 +90,248 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
       <h2 id="fan-space-heading" className="sr-only">
         Fan feed
       </h2>
-      <form className="mark-composer simple-composer" onSubmit={submit}>
-        <div className="compose-row">
-          <span className="little-avatar" aria-hidden="true">
-            YOU
-          </span>
-          <label htmlFor="fan-mark" className="sr-only">
-            Your post to the Army
-          </label>
-          <textarea
-            id="fan-mark"
-            ref={composerInput}
-            value={draft}
-            onChange={(e) => {
-              setDraft(e.target.value);
-              setNotice("");
-            }}
-            maxLength={500}
-            rows={3}
-            placeholder={
-              pollOptions ? "Ask the Army a question…" : "What’s happening?"
-            }
-          />
-        </div>
-        {attachment && (
-          <div className="attachment-preview">
-            {!attachment.animated || animationsEnabled ? (
-              <Image
-                src={attachment.dataUrl}
-                unoptimized
-                width={attachment.width}
-                height={attachment.height}
-                alt="Your selected attachment"
-              />
-            ) : (
-              <p>Animated image attached · animation paused</p>
-            )}
-            <button
-              type="button"
-              className="icon-button"
-              aria-label="Remove attachment"
-              onClick={() => setAttachment(undefined)}
-            >
-              <X size={16} />
-            </button>
-          </div>
-        )}
-        {pollOptions && (
-          <fieldset
-            className="poll-editor"
-            onKeyDown={(e) => {
-              if (e.key === "Escape") {
-                e.preventDefault();
-                cancelPoll();
+      {!allPosts && (
+        <form className="mark-composer simple-composer" onSubmit={submit}>
+          <div className="compose-row">
+            <span className="little-avatar" aria-hidden="true">
+              YOU
+            </span>
+            <label htmlFor="fan-mark" className="sr-only">
+              Your post to the Army
+            </label>
+            <textarea
+              id="fan-mark"
+              ref={composerInput}
+              value={draft}
+              onChange={(e) => {
+                setDraft(e.target.value);
+                setNotice("");
+              }}
+              maxLength={500}
+              rows={3}
+              placeholder={
+                pollOptions ? "Ask the Army a question…" : "What’s happening?"
               }
-            }}
-          >
-            <legend>Poll choices</legend>
-            <button
-              type="button"
-              className="poll-close"
-              aria-label="Close poll"
-              onClick={cancelPoll}
-            >
-              <X size={18} />
-            </button>
-            {pollOptions.map((option, index) => (
-              <label key={index}>
-                Choice {index + 1}
-                <input
-                  value={option}
-                  maxLength={80}
-                  required
-                  onChange={(e) =>
-                    setPollOptions((current) =>
-                      current!.map((value, i) =>
-                        i === index ? e.target.value : value,
-                      ),
-                    )
-                  }
-                />
-              </label>
-            ))}
-            <div>
-              {pollOptions.length < 4 && (
-                <button
-                  type="button"
-                  onClick={() => setPollOptions([...pollOptions, ""])}
-                >
-                  + Add choice
-                </button>
-              )}
-              <button type="button" onClick={cancelPoll}>
-                Cancel poll
-              </button>
-            </div>
-            <small>One choice per person · local demo</small>
-          </fieldset>
-        )}
-        <div className="composer-actions">
-          <div className="composer-tools">
-            <button
-              type="button"
-              className="composer-attach"
-              aria-label="Attach a photo"
-              title="Attach a photo"
-              disabled={uploading || !!pollOptions}
-              onClick={() => {
-                if (fileInput.current) {
-                  fileInput.current.accept = "image/jpeg,image/png,image/webp";
-                  fileInput.current.click();
-                }
-              }}
-            >
-              <StanPhotoIcon />
-              <span>Photo</span>
-            </button>
-            <button
-              type="button"
-              className="composer-attach"
-              aria-label="Open GIF picker"
-              title="Choose a GIF"
-              aria-expanded={picker === "gifs"}
-              onClick={(e) => {
-                pickerTrigger.current = e.currentTarget;
-                setPicker(picker === "gifs" ? null : "gifs");
-              }}
-            >
-              <StanGifIcon />
-              <span>GIF</span>
-            </button>
-            <button
-              type="button"
-              className="composer-attach"
-              aria-label="Add a poll"
-              title="Add a poll"
-              aria-pressed={!!pollOptions}
-              disabled={uploading || !!attachment}
-              onClick={() => {
-                setPollOptions(pollOptions ? null : ["", ""]);
-                setNotice("");
-              }}
-            >
-              <StanPollIcon />
-              <span>Poll</span>
-            </button>
-            <button
-              type="button"
-              className="composer-attach"
-              aria-label="Open emoji picker"
-              aria-expanded={picker === "emoji"}
-              onClick={(e) => {
-                pickerTrigger.current = e.currentTarget;
-                setPicker(picker === "emoji" ? null : "emoji");
-              }}
-            >
-              <StanEmojiIcon />
-              <span>Emoji</span>
-            </button>
-            <input
-              ref={fileInput}
-              type="file"
-              className="sr-only"
-              tabIndex={-1}
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                e.target.value = "";
-                if (!file) return;
-                setUploading(true);
-                setNotice("");
-                try {
-                  setAttachment(await readImage(file));
-                } catch (error) {
-                  setNotice(
-                    error instanceof Error
-                      ? error.message
-                      : "Could not read image.",
-                  );
-                } finally {
-                  setUploading(false);
-                }
-              }}
             />
           </div>
-          <span>{draft.length}/500</span>
-          <button
-            type="submit"
-            disabled={
-              uploading ||
-              (!draft.trim() && !attachment) ||
-              !!(pollOptions && validatePoll(pollOptions))
-            }
-          >
-            {uploading ? "Reading…" : "Post"}
-          </button>
-        </div>
-        {picker && (
-          <ReactionPicker
-            key={picker}
-            initialTab={picker}
-            canAttach={!pollOptions}
-            onBusy={setUploading}
-            onClose={closePicker}
-            onEmoji={(emoji) => {
-              const field = composerInput.current;
-              const start = field?.selectionStart ?? draft.length;
-              const end = field?.selectionEnd ?? draft.length;
-              const next = draft.slice(0, start) + emoji + draft.slice(end);
-              if (next.length > 500) {
-                setNotice("Keep your post to 500 characters.");
-                return;
+          {attachment && (
+            <div className="attachment-preview">
+              {!attachment.animated || animationsEnabled ? (
+                <Image
+                  src={attachment.dataUrl}
+                  unoptimized
+                  width={attachment.width}
+                  height={attachment.height}
+                  alt="Your selected attachment"
+                />
+              ) : (
+                <p>Animated image attached · animation paused</p>
+              )}
+              <button
+                type="button"
+                className="icon-button"
+                aria-label="Remove attachment"
+                onClick={() => setAttachment(undefined)}
+              >
+                <X size={16} />
+              </button>
+            </div>
+          )}
+          {pollOptions && (
+            <fieldset
+              className="poll-editor"
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  e.preventDefault();
+                  cancelPoll();
+                }
+              }}
+            >
+              <legend>Poll choices</legend>
+              <button
+                type="button"
+                className="poll-close"
+                aria-label="Close poll"
+                onClick={cancelPoll}
+              >
+                <X size={18} />
+              </button>
+              {pollOptions.map((option, index) => (
+                <label key={index}>
+                  Choice {index + 1}
+                  <input
+                    value={option}
+                    maxLength={80}
+                    required
+                    onChange={(e) =>
+                      setPollOptions((current) =>
+                        current!.map((value, i) =>
+                          i === index ? e.target.value : value,
+                        ),
+                      )
+                    }
+                  />
+                </label>
+              ))}
+              <div>
+                {pollOptions.length < 4 && (
+                  <button
+                    type="button"
+                    onClick={() => setPollOptions([...pollOptions, ""])}
+                  >
+                    + Add choice
+                  </button>
+                )}
+                <button type="button" onClick={cancelPoll}>
+                  Cancel poll
+                </button>
+              </div>
+              <small>One choice per person · local demo</small>
+            </fieldset>
+          )}
+          <div className="composer-actions">
+            <div className="composer-tools">
+              <button
+                type="button"
+                className="composer-attach"
+                aria-label="Attach a photo"
+                title="Attach a photo"
+                disabled={uploading || !!pollOptions}
+                onClick={() => {
+                  if (fileInput.current) {
+                    fileInput.current.accept =
+                      "image/jpeg,image/png,image/webp";
+                    fileInput.current.click();
+                  }
+                }}
+              >
+                <StanPhotoIcon />
+                <span>Photo</span>
+              </button>
+              <button
+                type="button"
+                className="composer-attach"
+                aria-label="Open GIF picker"
+                title="Choose a GIF"
+                aria-expanded={picker === "gifs"}
+                onClick={(e) => {
+                  pickerTrigger.current = e.currentTarget;
+                  setPicker(picker === "gifs" ? null : "gifs");
+                }}
+              >
+                <StanGifIcon />
+                <span>GIF</span>
+              </button>
+              <button
+                type="button"
+                className="composer-attach"
+                aria-label="Add a poll"
+                title="Add a poll"
+                aria-pressed={!!pollOptions}
+                disabled={uploading || !!attachment}
+                onClick={() => {
+                  setPollOptions(pollOptions ? null : ["", ""]);
+                  setNotice("");
+                }}
+              >
+                <StanPollIcon />
+                <span>Poll</span>
+              </button>
+              <button
+                type="button"
+                className="composer-attach"
+                aria-label="Open emoji picker"
+                aria-expanded={picker === "emoji"}
+                onClick={(e) => {
+                  pickerTrigger.current = e.currentTarget;
+                  setPicker(picker === "emoji" ? null : "emoji");
+                }}
+              >
+                <StanEmojiIcon />
+                <span>Emoji</span>
+              </button>
+              <input
+                ref={fileInput}
+                type="file"
+                className="sr-only"
+                tabIndex={-1}
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = "";
+                  if (!file) return;
+                  setUploading(true);
+                  setNotice("");
+                  try {
+                    setAttachment(await readImage(file));
+                  } catch (error) {
+                    setNotice(
+                      error instanceof Error
+                        ? error.message
+                        : "Could not read image.",
+                    );
+                  } finally {
+                    setUploading(false);
+                  }
+                }}
+              />
+            </div>
+            <span>{draft.length}/500</span>
+            <button
+              type="submit"
+              disabled={
+                uploading ||
+                (!draft.trim() && !attachment) ||
+                !!(pollOptions && validatePoll(pollOptions))
               }
-              setDraft(next);
-              setNotice("");
-              setPicker(null);
-              requestAnimationFrame(() => {
-                field?.focus();
-                field?.setSelectionRange(
-                  start + emoji.length,
-                  start + emoji.length,
-                );
-              });
-            }}
-            onGif={(asset) => {
-              setAttachment(asset);
-              setNotice("");
-              closePicker();
-            }}
-          />
-        )}
-        {notice && (
-          <p role="status" className="mark-status">
-            {notice}
-          </p>
-        )}
-        <small className="composer-local-note">
-          Local demo · images up to 512 KB · posts reset on refresh
-        </small>
-      </form>
+            >
+              {uploading ? "Reading…" : "Post"}
+            </button>
+          </div>
+          {picker && (
+            <ReactionPicker
+              key={picker}
+              initialTab={picker}
+              canAttach={!pollOptions}
+              onBusy={setUploading}
+              onClose={closePicker}
+              onEmoji={(emoji) => {
+                const field = composerInput.current;
+                const start = field?.selectionStart ?? draft.length;
+                const end = field?.selectionEnd ?? draft.length;
+                const next = draft.slice(0, start) + emoji + draft.slice(end);
+                if (next.length > 500) {
+                  setNotice("Keep your post to 500 characters.");
+                  return;
+                }
+                setDraft(next);
+                setNotice("");
+                setPicker(null);
+                requestAnimationFrame(() => {
+                  field?.focus();
+                  field?.setSelectionRange(
+                    start + emoji.length,
+                    start + emoji.length,
+                  );
+                });
+              }}
+              onGif={(asset) => {
+                setAttachment(asset);
+                setNotice("");
+                closePicker();
+              }}
+            />
+          )}
+          {notice && (
+            <p role="status" className="mark-status">
+              {notice}
+            </p>
+          )}
+          <small className="composer-local-note">
+            Local demo · images up to 512 KB · posts reset on refresh
+          </small>
+        </form>
+      )}
       <div className="feed-controls">
         <p>{local.length ? `${local.length} of your posts · ` : ""}Posts</p>
         <label>
@@ -339,7 +350,7 @@ export function LivingFanSpace({ armyId }: { armyId: string }) {
         </p>
       )}
       <div className="fan-note-list">
-        {[...local, ...seeded].map((note) => (
+        {displayedNotes.map((note) => (
           <FanNoteCard key={note.id} note={note} armyId={armyId} />
         ))}
       </div>

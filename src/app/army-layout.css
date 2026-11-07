@@ -271,3 +271,68 @@
     height: 40px;
   }
 }
+.profile-canvas .living-army .army-creator-credit {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  font-size: 11px;
+  margin-top: 8px;
+  line-height: 1.6;
+  color: var(--theme-page-text, #c6c4cd);
+}
+.army-creator-credit a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.army-creator-credit .identity-demo-label {
+  margin-left: 8px;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  opacity: 0.8;
+}
+.profile-canvas .living-army .feed-more-links {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px 20px;
+  margin-top: 24px;
+  border-radius: 12px;
+  background: var(--theme-bg, #0b0b0d);
+  color: var(--theme-page-link, #a0f4cc);
+}
+.feed-more-links a {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  font-size: 13px;
+  min-height: 36px;
+}
+.army-posts-page {
+  max-width: 900px;
+  padding-block: 32px 48px;
+}
+.all-posts-heading {
+  padding: 24px;
+  margin-top: 24px;
+  border-radius: 15px;
+  background: var(--theme-bg, #0b0b0d);
+  color: var(--theme-page-text, #f7f7f4);
+}
+.all-posts-heading h1 {
+  font-size: 40px;
+  margin: 10px 0 14px;
+}
+.all-posts-heading > p:last-of-type {
+  font-size: 14px;
+  line-height: 1.7;
+}
+.all-posts-heading small {
+  display: block;
+  font-size: 11px;
+  margin-top: 12px;
+}

@@ -15,9 +15,7 @@ import {
 } from "lucide-react";
 import { ArmyView, armyPath, armyAddress } from "@/lib/data";
 import { LivingFanSpace, OrbitFans } from "./living-fan-space";
-import { FanMediaPreviews } from "./fan-media";
 import { ArmyAnnouncements } from "./army-announcements";
-import { DemoNote } from "./shell";
 import { MusicPanel } from "./music-panel";
 import { SidebarPlaylist } from "./sidebar-playlist";
 import { DiscussionBoard } from "./discussion-board";
@@ -141,12 +139,6 @@ function ArmySpaceContent({
       className={`artist-page accent-${army.accent} ${isNova ? "living-army turn-up-army" : ""}`}
     >
       <div className="container">
-        <div className="artist-breadcrumb">
-          <Link href="/discover">
-            <ArrowLeft size={14} /> Discover the armies
-          </Link>
-          <DemoNote compact />
-        </div>
         {!isNova && (
           <>
             <section
@@ -224,6 +216,15 @@ function ArmySpaceContent({
               <p className="identity-meta">
                 @{artist.officialHandle} <span>·</span> <MapPin size={13} />{" "}
                 {artist.city}
+              </p>
+              <p className="army-creator-credit">
+                Army by{" "}
+                {founder.id === "fan-jess" ? (
+                  <Link href="/fans/jess-wav">@{founder.handle}</Link>
+                ) : (
+                  <span>@{founder.handle}</span>
+                )}
+                <span className="identity-demo-label">Demo Army</span>
               </p>
             </div>
           </div>
@@ -307,7 +308,20 @@ function ArmySpaceContent({
               <ArmyModule name="feed">
                 <LivingFanSpace armyId={army.id} />
               </ArmyModule>
-              <FanMediaPreviews />
+              {(theme.modules.feed || theme.modules.videos) && (
+                <nav className="feed-more-links" aria-label="More Army posts">
+                  {theme.modules.feed && (
+                    <Link href="/armies/nova/posts">
+                      View all posts <ArrowUpRight size={15} />
+                    </Link>
+                  )}
+                  {theme.modules.videos && (
+                    <Link href="/armies/nova/videos">
+                      Videos <ArrowUpRight size={14} />
+                    </Link>
+                  )}
+                </nav>
+              )}
               <ArmyModule name="announcements">
                 <details className="army-voices-fold" id="artist-posts">
                   <summary>
@@ -545,22 +559,6 @@ function ArmySpaceContent({
             </section>
           </>
         )}
-        <div className="founder-love-credit">
-          <span aria-hidden="true">♡</span>
-          <p>
-            This little corner of the internet was made possible by{" "}
-            {founder.id === "fan-jess" ? (
-              <Link href="/fans/jess-wav">@{founder.handle}</Link>
-            ) : (
-              <b>@{founder.handle}</b>
-            )}
-            .<br />
-            <span>
-              Give {founder.id === "fan-jess" ? "her" : "them"} some love. The
-              fans make this place.
-            </span>
-          </p>
-        </div>
         <ArmyModule name="discussions">
           <DiscussionBoard key={army.id} boardId={`s/${army.slug}`} />
         </ArmyModule>

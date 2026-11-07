@@ -42,7 +42,12 @@ try {
   await page.reload({ waitUntil: "networkidle" });
   assert.equal(await page.locator(".sidebar-playlist").count(), 0);
   assert.equal(await page.locator(".shoebox-preview").count(), 0);
-  assert.equal(await page.locator(".video-shelf-preview").count(), 1);
+  assert.equal(
+    await page
+      .locator('.feed-more-links a[href="/armies/nova/videos"]')
+      .count(),
+    1,
+  );
   await page.getByRole("button", { name: "View clean", exact: true }).click();
   assert.equal(await page.locator(".sidebar-playlist").count(), 0);
   assert.equal(await page.locator(".shoebox-preview").count(), 0);
