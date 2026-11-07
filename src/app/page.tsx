@@ -8,7 +8,7 @@ import { armies, armyView } from "@/lib/data";
 export const metadata = {
   title: "Stan for something.",
   description:
-    "Unapologetically human. Slightly obsessive. Utterly yours. Build your Army around anything you love.",
+    "Unapologetically loud. Slightly obsessive. Utterly yours. Build your Army around anything you love.",
 };
 export default function Home() {
   return (
@@ -21,7 +21,7 @@ export default function Home() {
             <span className="love-word">something.</span>
           </h1>
           <div className="hero-description">
-            <p>Unapologetically human. Slightly obsessive. Utterly yours.</p>
+            <p>Unapologetically loud. Slightly obsessive. Utterly yours.</p>
           </div>
           <div className="hero-actions">
             <Link href="/create" className="button button-blue">
@@ -34,7 +34,9 @@ export default function Home() {
             <div className="avatar-stack">
               <Image src="/images/sienna.jpg" width={34} height={34} alt="" />
               <Image src="/images/atlas.jpg" width={34} height={34} alt="" />
-              <Image src="/images/artist.jpg" width={34} height={34} alt="" />
+              <span className="hero-community-mark" aria-hidden="true">
+                <StanStarIcon size={22} />
+              </span>
             </div>
             <p>
               For the stans. Built by the stans.

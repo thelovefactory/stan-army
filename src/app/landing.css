@@ -409,35 +409,14 @@
   display: block;
   min-width: 0;
   text-align: center;
-  font-family: "Stan Anton", Impact, sans-serif;
-  font-size: clamp(11px, 1.35vw, 20px);
+  font-family: "Stan Bungee", Impact, sans-serif;
+  font-size: clamp(14px, 1.6vw, 24px);
   font-weight: 400;
   letter-spacing: -0.025em;
   line-height: 1.5;
-  animation: ticker-type 2.4s steps(1, end) infinite;
-}
-.ticker span:nth-of-type(2) {
-  font-family: "Stan Bungee", Impact, sans-serif;
-  animation-delay: -0.8s;
-}
-.ticker span:nth-of-type(3) {
-  font-family: "Stan Rubik Mono", monospace;
-  animation-delay: -1.6s;
 }
 .ticker > div > svg {
   justify-self: center;
-}
-@keyframes ticker-type {
-  0%,
-  100% {
-    font-family: "Stan Anton", Impact, sans-serif;
-  }
-  33.333% {
-    font-family: "Stan Bungee", Impact, sans-serif;
-  }
-  66.666% {
-    font-family: "Stan Rubik Mono", monospace;
-  }
 }
 @media (max-width: 800px) {
   .landing-header .header-end > .button {
@@ -453,13 +432,8 @@
     height: 96px;
   }
   .ticker span {
-    font-size: clamp(9px, 2.5vw, 12px);
+    font-size: 12px;
     letter-spacing: -0.04em;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .ticker span {
-    animation: none;
   }
 }
 
@@ -470,4 +444,22 @@
     transform: scale(var(--frame-mobile-scale, 1));
     transform-origin: 75% 0%;
   }
+}
+
+@media (max-width: 400px) {
+  .ticker > div {
+    grid-template-columns: minmax(0, 1fr) 18px minmax(0, 1.35fr) 18px minmax(
+        0,
+        1fr
+      );
+  }
+}
+
+.landing-hero .avatar-stack > .hero-community-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--mint);
+  color: #111;
 }
