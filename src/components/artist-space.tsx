@@ -597,6 +597,9 @@ function ArmySpaceContent({
             </span>
           </p>
         </div>
+        <ArmyModule name="discussions">
+          <DiscussionBoard key={army.id} boardId={`s/${army.slug}`} />
+        </ArmyModule>
         <div className="artist-bottom-note">
           <span>✳</span>
           <p>
@@ -608,9 +611,6 @@ function ArmySpaceContent({
             Make a space of your own <ArrowUpRight size={18} />
           </Link>
         </div>
-        <ArmyModule name="discussions">
-          <DiscussionBoard key={army.id} boardId={`s/${army.slug}`} />
-        </ArmyModule>
       </div>
     </main>
   );
