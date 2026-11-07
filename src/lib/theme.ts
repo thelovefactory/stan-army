@@ -64,6 +64,7 @@ export const defaultModules: Record<ArmyModuleName, boolean> = {
 export type Theme = {
   schemaVersion: 1;
   playerSkin: PlayerSkin;
+  participationColor: string;
   modules: Record<ArmyModuleName, boolean>;
   preset: PresetId;
   background: {
@@ -97,6 +98,7 @@ export type Theme = {
 export const defaultTheme: Theme = {
   schemaVersion: 1,
   playerSkin: "desktop",
+  participationColor: "#161619",
   modules: { ...defaultModules },
   preset: "blank-canvas",
   background: {
@@ -148,6 +150,7 @@ export const presets: {
     theme: {
       ...defaultTheme,
       preset: "glitter-bomb",
+      participationColor: "#300d29",
       playerSkin: "y2k",
       background: { ...defaultTheme.background, color: "#2c092a" },
       colors: {
@@ -176,6 +179,7 @@ export const presets: {
     theme: {
       ...defaultTheme,
       preset: "scene-queen",
+      participationColor: "#1e0925",
       background: { ...defaultTheme.background, color: "#130b21" },
       colors: {
         text: "#fff8ff",
@@ -203,6 +207,7 @@ export const presets: {
     theme: {
       ...defaultTheme,
       preset: "burning-desire",
+      participationColor: "#220c0c",
       background: { ...defaultTheme.background, color: "#170707" },
       colors: {
         text: "#fff2e9",
@@ -230,6 +235,7 @@ export const presets: {
     theme: {
       ...defaultTheme,
       preset: "digital-dream",
+      participationColor: "#25213f",
       playerSkin: "minimal",
       background: { ...defaultTheme.background, color: "#201c3c" },
       colors: {
@@ -258,6 +264,7 @@ export const presets: {
     theme: {
       ...defaultTheme,
       preset: "cyber-trash",
+      participationColor: "#151e0f",
       playerSkin: "toxic",
       background: { ...defaultTheme.background, color: "#11170c" },
       colors: {
@@ -392,6 +399,10 @@ export function validateTheme(value: unknown): Theme {
   }
   return {
     schemaVersion: 1,
+    participationColor: safeColor(
+      t.participationColor,
+      safeColor(p.color, d.panels.color),
+    ),
     modules: Object.fromEntries(
       Object.entries(defaultModules).map(([name, enabled]) => [
         name,

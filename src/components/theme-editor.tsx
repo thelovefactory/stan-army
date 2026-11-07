@@ -34,9 +34,13 @@ export function ThemeEditor({
   onChange,
   onBusyChange,
   showModules = false,
+  galleryControls = false,
+  motionActive = false,
 }: {
   theme: Theme;
   showModules?: boolean;
+  galleryControls?: boolean;
+  motionActive?: boolean;
   onChange: (t: Theme) => void;
   onBusyChange: (busy: boolean) => void;
 }) {
@@ -116,20 +120,22 @@ export function ThemeEditor({
             Army needs. Spotify is for every Army.
           </p>
           <div className="module-toggles">
-            {Object.entries(moduleLabels).map(([name, label]) => (
-              <label key={name}>
-                <input
-                  type="checkbox"
-                  checked={theme.modules[name as ArmyModuleName]}
-                  onChange={(e) =>
-                    update({
-                      modules: { ...theme.modules, [name]: e.target.checked },
-                    })
-                  }
-                />
-                {label}
-              </label>
-            ))}
+            {Object.entries(moduleLabels)
+              .filter(([name]) => name !== "gallery" || galleryControls)
+              .map(([name, label]) => (
+                <label key={name}>
+                  <input
+                    type="checkbox"
+                    checked={theme.modules[name as ArmyModuleName]}
+                    onChange={(e) =>
+                      update({
+                        modules: { ...theme.modules, [name]: e.target.checked },
+                      })
+                    }
+                  />
+                  {label}
+                </label>
+              ))}
           </div>
           <p className="editor-hint">
             Visibility changes preview immediately. Save keeps them; Cancel
@@ -144,36 +150,42 @@ export function ThemeEditor({
         <p>Six moods. Absolutely no taste police.</p>
         <ThemePresetPicker theme={theme} onChange={onChange} busy={busy} />
         <p className="editor-hint">
-          Presets replace the current preview, including uploads. Cancel
-          restores your saved theme.
+          Presets replace appearance settings and uploads; module visibility is
+          kept. Cancel restores your saved theme.
         </p>
       </section>
-      <section className="editor-section">
-        <h3>♫ The Army Player</h3>
-        <label>
-          Player skin
-          <select
-            id="army-player-skin"
-            value={theme.playerSkin}
-            onChange={(e) =>
-              update({ playerSkin: e.target.value as PlayerSkin })
-            }
-          >
-            {Object.entries(playerSkins).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <p className="editor-hint">
-          Try it live on the Army Player. Save keeps this skin with the Army’s
-          theme. Clean view uses a restrained player.
-        </p>
-      </section>
+      {showModules && (
+        <section className="editor-section">
+          <h3>Player appearance</h3>
+          <label>
+            Player skin
+            <select
+              id="army-player-skin"
+              value={theme.playerSkin}
+              onChange={(e) =>
+                update({ playerSkin: e.target.value as PlayerSkin })
+              }
+            >
+              {Object.entries(playerSkins).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <p className="editor-hint">
+            Styles the Spotify frame and the full Army Player only. Spotify’s
+            own embedded controls cannot be restyled. Open the listening room to
+            see the full skin.
+            {!theme.modules.playlist &&
+              !theme.modules.videos &&
+              " Enable Music / Spotify or Videos under Tools to preview a player."}
+          </p>
+        </section>
+      )}
       <section className="editor-section">
         <h3>
-          <Wallpaper size={16} /> Set the scene
+          <Wallpaper size={16} /> Page background
         </h3>
         <AssetInput
           target="background"
@@ -200,8 +212,9 @@ export function ThemeEditor({
             }
           />
           <label>
-            Image sizing
+            Background sizing
             <select
+              disabled={!theme.background.image}
               value={theme.background.size}
               onChange={(e) =>
                 update({
@@ -215,12 +228,13 @@ export function ThemeEditor({
               <option value="cover">Cover</option>
               <option value="contain">Contain</option>
               <option value="tile">Tile / repeat</option>
-              <option value="natural">Original size / centre</option>
+              <option value="natural">Original size</option>
             </select>
           </label>
           <label>
-            Position
+            Background position
             <select
+              disabled={!theme.background.image}
               value={theme.background.position}
               onChange={(e) =>
                 update({
@@ -239,8 +253,9 @@ export function ThemeEditor({
             </select>
           </label>
           <label>
-            Scroll behaviour
+            Wallpaper scroll
             <select
+              disabled={!theme.background.image}
               value={theme.background.attachment}
               onChange={(e) =>
                 update({
@@ -257,20 +272,35 @@ export function ThemeEditor({
           </label>
         </div>
         <p className="editor-hint">
-          JPG, PNG, WebP or GIF · 512 KB each · 1 MB combined · max 4096 px.
-          Files stay in this browser; nothing uploads to a server.
+          {!theme.background.image &&
+            "Choose an image to enable sizing, position and scrolling. "}
+          {theme.background.image?.animated &&
+            !motionActive &&
+            "Your motion preference currently hides this animated image. Choose a static image to preview the wallpaper. "}
+          Background colour also supplies readable header/caption backplates.
+          Image sizing, position and scroll settings affect wallpaper only. JPG,
+          PNG, WebP or GIF · 512 KB each · 1 MB combined · max 4096 px. Files
+          stay in this browser; nothing uploads to a server.
         </p>
       </section>
       <section className="editor-section">
         <h3>
-          <Palette size={16} /> Your colours, your call
+          <Palette size={16} /> Colours & participation
         </h3>
         <div className="editor-grid">
           {(["text", "links", "buttons", "borders", "accent"] as const).map(
             (k) => (
               <ColorInput
                 key={k}
-                label={k[0].toUpperCase() + k.slice(1)}
+                label={
+                  {
+                    text: "Page & panel text",
+                    links: "Links",
+                    buttons: "Primary buttons",
+                    borders: "Panel borders",
+                    accent: "Decorative accents",
+                  }[k]
+                }
                 value={theme.colors[k]}
                 onChange={(v) =>
                   update({ colors: { ...theme.colors, [k]: v } })
@@ -279,6 +309,21 @@ export function ThemeEditor({
             ),
           )}
         </div>
+        {showModules && (
+          <div className="participation-colour-control">
+            <ColorInput
+              label="Participation Colour"
+              value={theme.participationColor}
+              onChange={(participationColor) => update({ participationColor })}
+            />
+            <p className="editor-hint">
+              Shared by the post composer and Army Chat only. Other panels keep
+              their own colour. Text is protected automatically; current
+              participation text:{" "}
+              {readableColor(theme.colors.text, theme.participationColor)}.
+            </p>
+          </div>
+        )}
         <p className="editor-hint">
           Readable text is protected automatically. Low-contrast text and link
           colours get a readable fallback in the preview.
@@ -289,10 +334,10 @@ export function ThemeEditor({
       </section>
       <section className="editor-section">
         <h3>
-          <Type size={16} /> Typographical crimes
+          <Type size={16} /> Headings & personality
         </h3>
         <label>
-          Font collection
+          Heading & decorative font
           <select
             value={theme.font}
             onChange={(e) => update({ font: e.target.value as Theme["font"] })}
@@ -310,22 +355,30 @@ export function ThemeEditor({
           my army gets me. ♥
         </p>
         <p className="editor-hint">
-          System font stacks; retro fonts fall back to the closest installed
-          option. Music, chat and controls keep readable interface fonts.
+          Changes page headings and decorative copy. Author-styled sample posts
+          retain their own lettering. Posting, chat, navigation and controls
+          keep familiar interface fonts. Retro font stacks use the closest
+          installed font.
         </p>
       </section>
       <section className="editor-section">
         <h3>
-          <LayoutPanelTop size={16} /> Panel personality
+          <LayoutPanelTop size={16} /> Shared panels
         </h3>
+        <p className="editor-hint">
+          Secondary panels, ordinary posts and board surfaces use this
+          background. The composer and chat use Participation Colour.
+          Author-styled sample posts keep their own paper and ink, while shared
+          frame corners and borders still follow the Army.
+        </p>
         <div className="editor-grid">
           <ColorInput
-            label="Panel background"
+            label="Secondary panel background"
             value={theme.panels.color}
             onChange={(v) => update({ panels: { ...theme.panels, color: v } })}
           />
           <label>
-            Corners
+            Panel corners
             <select
               value={theme.panels.corners}
               onChange={(e) =>
@@ -344,7 +397,7 @@ export function ThemeEditor({
             </select>
           </label>
           <label>
-            Border style
+            Panel border style
             <select
               value={theme.panels.border}
               onChange={(e) =>
@@ -363,7 +416,7 @@ export function ThemeEditor({
           </label>
         </div>
         <label className="range-label">
-          Panel opacity <span>{theme.panels.opacity}%</span>
+          Secondary panel opacity <span>{theme.panels.opacity}%</span>
           <input
             type="range"
             min="0"
@@ -377,13 +430,14 @@ export function ThemeEditor({
           />
         </label>
         <p className="editor-hint">
-          Chat, player and text backplates stay opaque so the army stays usable,
-          even at 0% panel opacity.
+          {showModules
+            ? "Affects decorative content panels, including events and announcements. Their text backplates stay opaque. The composer, chat, player, posts and boards remain opaque for reading. Panel corners and borders affect shared panel frames, not button shapes."
+            : "Affects the fill of fan-profile content panels. Text backplates and controls stay opaque for reading. Panel corners and borders affect shared frames, not button shapes."}
         </p>
       </section>
       <section className="editor-section">
         <h3>
-          <Sparkles size={16} /> More is more
+          <Sparkles size={16} /> Stickers & motion
         </h3>
         <label>
           Original CSS sticker set
@@ -443,11 +497,11 @@ export function ThemeEditor({
       </section>
       <section className="editor-section">
         <h3>
-          <ImagePlus size={16} /> Put a face to the feeling
+          <ImagePlus size={16} /> Header & profile image
         </h3>
         <AssetInput
           target="banner"
-          label="Custom banner"
+          label="Header image"
           asset={assetFor("banner")}
           busy={busy}
           upload={upload}
@@ -461,26 +515,23 @@ export function ThemeEditor({
           upload={upload}
           remove={() => setAsset("avatar", null)}
         />
+        <p className="editor-hint">
+          {showModules
+            ? "The header image appears behind the Army identity card; the profile image changes its portrait. Open the main Army page to preview these when editing from the listening room or media pages."
+            : "The header image changes your fan-profile banner; the profile image changes your portrait."}
+        </p>
       </section>
-      <section className="editor-section advanced-section">
-        <h3>
-          <Code size={16} /> Advanced CSS · a sneak peek
-        </h3>
+      <details className="editor-section advanced-section">
+        <summary>
+          <Code size={16} /> Advanced styling · read-only
+        </summary>
         <p>Structured tokens today. A scoped editor later.</p>
-        <pre>{`--profile-background: ${theme.background.color};\n--profile-accent: ${theme.colors.accent};\n--panel-opacity: ${theme.panels.opacity / 100};`}</pre>
-        <label>
-          Custom CSS
-          <textarea
-            disabled
-            placeholder="Arbitrary CSS is disabled in this prototype."
-            rows={3}
-          />
-        </label>
+        <pre>{`--theme-bg: ${theme.background.color};\n--theme-accent: ${theme.colors.accent};\n--panel-opacity: ${theme.panels.opacity / 100};`}</pre>
         <p className="editor-hint">
           No HTML, JavaScript, remote asset URLs or free-form CSS is executed.
           Only validated profile settings reach the page.
         </p>
-      </section>
+      </details>
       {(error || busy) && (
         <p
           className={`editor-upload-status ${error ? "is-error" : ""}`}

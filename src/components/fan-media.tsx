@@ -70,6 +70,7 @@ export function FanMediaPage({
       profileId={`army:${view.army.id}`}
       legacyProfileId={`artist:${view.artist.slug}`}
       kind="army"
+      galleryControls={mode === "gallery"}
       name={`${view.artist.name}’s Army`}
       officialParticipation
     >

@@ -47,3 +47,6 @@ The user supplied https://open.spotify.com/playlist/0EO3CxjNLb1gFi9QuPT6YE for t
 
 ## GIF/emoji picker
 `public/gifs/leave-your-mark.gif` and `bside-people.gif` are original two-second, 240px-wide GIF conversions of the existing original silent MP4 typography studies, generated with FFmpeg at 8 fps. Matching PNGs are still frames from 0.6 seconds, used for reduced-motion-friendly picker previews. Each GIF is under 20 KB; no artist recording, fan art or GIPHY asset is copied. Emoji are Unicode characters rendered using the visitor’s system font. `StanEmojiIcon` is another original inline SVG. GIPHY is an explicitly labelled external search destination (`https://giphy.com/search/<encoded-query>`), not the source of the local GIF collection or an active API integration.
+
+## Consistent interface markers
+StanStarIcon and StanCommunityIcon in src/components/stan-icons.tsx are original inline SVG interface drawings. They replace colour-font glyphs in identity/chat/board headings so the theme’s accent/contrast controls affect their strokes reliably. They do not redraw or replace the supplied hand-drawn Stan Army logo, which remains the original image asset.

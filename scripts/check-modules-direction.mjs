@@ -35,7 +35,6 @@ try {
   assert.equal(await page.locator(".sidebar-playlist").count(), 1);
   await customise();
   await music.uncheck();
-  await page.getByRole("checkbox", { name: "Gallery", exact: true }).uncheck();
   await page.locator(".preset-glitter-bomb").click();
   assert.equal(await music.isChecked(), false);
   await page.getByRole("button", { name: "Save theme", exact: true }).click();
@@ -57,7 +56,6 @@ try {
     "Fan posts",
     "Music / Spotify playlist",
     "Videos",
-    "Gallery",
     "Army chat",
     "Announcements",
     "Events & links",
@@ -89,6 +87,9 @@ try {
   await page.getByRole("button", { name: "Save theme", exact: true }).click();
   assert.equal(await page.locator(".sidebar-playlist").count(), 1);
   await page.goto(`${base}/armies/nova/gallery`, { waitUntil: "networkidle" });
+  await customise();
+  await page.getByRole("checkbox", { name: "Gallery", exact: true }).uncheck();
+  await page.getByRole("button", { name: "Save theme", exact: true }).click();
   assert.equal(await page.locator(".module-hidden-note").count(), 1);
   await page.goto(`${base}/armies/nova`, { waitUntil: "networkidle" });
   await page.locator(".demo-role select").selectOption("official-artist");

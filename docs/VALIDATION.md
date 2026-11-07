@@ -180,3 +180,26 @@ Screenshots: [clean desktop](screenshots/layout-clean-desktop.png), [custom desk
 
 Screenshots: [all posts](screenshots/all-posts.png), [creator in Army header](screenshots/army-creator-header.png). Existing module browser checks now locate the small Videos link instead of the removed preview tile. Theme keys, permissions and local-only contribution boundaries are unchanged. The legacy gallery fixture page remains separate; it is not used to store old feed posts.
 The updated `check-modules-direction.mjs` also passes against this production build, confirming existing module Save/Cancel/clean-view behavior, official-role boundaries, per-Army Spotify and non-music preview creation remain working after the archive/header changes.
+
+## Customisation audit and consistent participation
+Final commands passed:
+- `npm run lint` — zero errors/warnings.
+- `npm run typecheck` — passed.
+- `npm test` — **30 passed, zero failed**, including Participation Colour migration/isolation/contrast coverage.
+- `npm run build` — passed, **45 outputs**.
+
+Against the compiled production preview (`npm run start -- --port 3001`), each command below passed with `BASE_URL=http://localhost:3001 PLAYWRIGHT_MODULE=/tmp/stan-army-browser/node_modules/playwright-core/index.mjs`:
+- `node scripts/check-customisation-audit.mjs`
+- `node scripts/check-army-community.mjs`
+- `node scripts/check-boards-picker.mjs`
+- `node scripts/check-modules-direction.mjs`
+- `node scripts/check-polls-theme.mjs`
+- `node scripts/check-post-archive.mjs`
+
+The audit verifies legacy records derive their former panel colour without being rewritten; Participation Colour changes composer/chat without changing board/events/player backgrounds; other panel colour stays independent; primary colours, border styles (including visible double), corners and opacity affect their named targets; typography leaves typing/control fonts stable; wallpaper sizing/position/fixed/scroll and file removal work; header/portrait uploads are independent; six decoration choices, glitter, four player skins and animation preferences work. Uploaded-image assertions wait for decoding; theme assertions wait for local hydration. Keyboard focus is checked through actual Tab/Shift+Tab, not just programmatic mouse-mode focus.
+
+Three worlds (monochrome, pink/glitter and fluorescent yellow with an original tiled pattern) were checked at desktop plus 390/320px. Composer/chat text contrast meets 4.5:1 and their header icons meet 3:1. Board-header actions have transparent backgrounds, zero borders, matching desktop baselines, usable mobile targets and visible keyboard focus. Bookmarking, board opening and starting a discussion still work. The audit also submits a feed reply, checks Save/Cancel/refresh/Reset appearance, confirms reset preserves hidden modules, and proves theme isolation on Nova, Sienna and Atlas. No page errors occurred. Existing post/chat/poll/archive/board/permission tests remain working; the current hostile-theme contrast regression measures 17.28:1.
+
+The full control inventory, fixes and deliberate provider/font/motion/context limits are in [CUSTOMISATION_AUDIT.md](CUSTOMISATION_AUDIT.md). No auth/backend/migration/service was created. The normal webpack development preview is restored on port 3000 after temporary production verification.
+
+Screenshots: [monochrome](screenshots/participation-monochrome.png), [pink](screenshots/participation-pink.png), [neon](screenshots/participation-neon.png), [neon mobile](screenshots/participation-neon-mobile.png), [minimal board actions](screenshots/board-text-actions.png). These are actual browser renders in isolated test contexts; the user's personal wallpaper and stored themes are not replaced.

@@ -57,3 +57,18 @@ export function StanEmojiIcon(props: IconProps) {
     </Frame>
   );
 }
+
+export function StanStarIcon(props: IconProps) {
+  return (
+    <Frame {...props}>
+      <path d="M12 2v20M2 12h20M5 5l14 14M19 5 5 19" />
+    </Frame>
+  );
+}
+export function StanCommunityIcon(props: IconProps) {
+  return (
+    <Frame {...props}>
+      <path d="m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3Z" />
+    </Frame>
+  );
+}

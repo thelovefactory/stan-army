@@ -1,9 +1,16 @@
 "use client";
 import Link from "next/link";
 import { boardById, boardPath, Thread } from "@/lib/boards";
+import { StanStarIcon, StanCommunityIcon } from "./stan-icons";
 import { useBoards } from "./boards-provider";
 import { useState } from "react";
-import { ArrowUp, ArrowDown, MessageSquare, Plus, X } from "lucide-react";
+import {
+  ArrowUp,
+  ArrowDown,
+  MessageSquare,
+  ArrowUpRight,
+  X,
+} from "lucide-react";
 export function DiscussionBoard({
   boardId = "s/nova",
   standalone = false,
@@ -55,29 +62,39 @@ export function DiscussionBoard({
           </p>
           <h2 id="discussion-heading">
             {board.id}
-            <span>{board.kind === "s" ? "✳" : "✦"}</span>
+            <span>
+              {board.kind === "s" ? (
+                <StanStarIcon size={30} />
+              ) : (
+                <StanCommunityIcon size={30} />
+              )}
+            </span>
           </h2>
           <p>{board.description}</p>
         </div>
         <div className="board-header-actions">
           <button
-            className="button"
+            className="board-text-action"
             aria-pressed={saved}
             onClick={() => toggleFavourite(board.id)}
           >
             {saved ? "Saved to My Boards" : "+ My Boards"}
           </button>
           {standalone ? (
-            <Link href="/boards">Explore boards ↗</Link>
+            <Link href="/boards">
+              Explore boards <ArrowUpRight size={14} aria-hidden="true" />
+            </Link>
           ) : (
-            <Link href={boardPath(board)}>Open board ↗</Link>
+            <Link href={boardPath(board)}>
+              Open board <ArrowUpRight size={14} aria-hidden="true" />
+            </Link>
           )}
           <button
-            className="button button-mint"
+            className="board-text-action board-start-action"
             aria-expanded={composing}
             onClick={() => setComposing(!composing)}
           >
-            <Plus size={16} /> Start a discussion
+            <span aria-hidden="true">+</span> Start a discussion
           </button>
         </div>
       </header>

@@ -5,6 +5,7 @@ import "./pivot.css";
 import "./living.css";
 import "./player.css";
 import "./army-layout.css";
+import "./participation.css";
 import { Header, Footer } from "@/components/shell";
 import { BoardsProvider } from "@/components/boards-provider";
 import { DemoProvider } from "@/components/demo-provider";

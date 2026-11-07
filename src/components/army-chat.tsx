@@ -2,6 +2,7 @@
 import { useState, useRef } from "react";
 import { Send, Pin, MessageCircle } from "lucide-react";
 import { ArmyView } from "@/lib/data";
+import { StanStarIcon } from "./stan-icons";
 import { useDemo } from "./demo-provider";
 const initialMessages = [
   {
@@ -60,7 +61,9 @@ export function ArmyChat({
       <div className="panel-title">
         <h2 id="chat-heading">
           <MessageCircle size={18} /> Army Chat{" "}
-          <span className="mint-text">✳</span>
+          <span className="mint-text">
+            <StanStarIcon size={22} />
+          </span>
         </h2>
         <span className="demo-pill">DEMO ROOM</span>
       </div>

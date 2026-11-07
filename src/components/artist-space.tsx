@@ -19,6 +19,7 @@ import { ArmyAnnouncements } from "./army-announcements";
 import { MusicPanel } from "./music-panel";
 import { SidebarPlaylist } from "./sidebar-playlist";
 import { DiscussionBoard } from "./discussion-board";
+import { StanStarIcon } from "./stan-icons";
 import { ArmyModule } from "./army-module";
 import { ArmyChat } from "./army-chat";
 import { useDemo } from "./demo-provider";
@@ -181,11 +182,11 @@ function ArmySpaceContent({
           </>
         )}
         <section
-          className={`artist-identity ${isNova ? "nova-identity-compact" : ""}`}
+          className={`artist-identity ${isNova ? "nova-identity-compact" : ""} ${customBanner ? "has-custom-banner" : ""}`}
           style={
             isNova && customBanner
               ? {
-                  backgroundImage: `linear-gradient(90deg,${theme.background.color}f2,${theme.background.color}ed),url("${customBanner}")`,
+                  backgroundImage: `linear-gradient(90deg,${theme.background.color}8c,${theme.background.color}66),url("${customBanner}")`,
                 }
               : undefined
           }
@@ -211,7 +212,9 @@ function ArmySpaceContent({
               </p>
               <h1>
                 {artist.name}
-                <span className="identity-star">✳</span>
+                <span className="identity-star">
+                  <StanStarIcon size={24} />
+                </span>
               </h1>
               <p className="identity-meta">
                 @{artist.officialHandle} <span>·</span> <MapPin size={13} />{" "}

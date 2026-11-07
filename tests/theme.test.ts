@@ -272,3 +272,33 @@ test("older v1 themes default to enabled modules; only boolean visibility values
   assert.equal("unknown" in custom.modules, false);
   assert.deepEqual(parseTheme(JSON.stringify(custom)).modules, custom.modules);
 });
+
+test("Participation Colour migrates from the old panel colour without changing existing settings", () => {
+  const { participationColor: _colour, ...old } = structuredClone(defaultTheme);
+  void _colour;
+  old.panels.color = "#25fac4";
+  old.colors.buttons = "#ff1493";
+  const migrated = validateTheme(old);
+  assert.equal(migrated.participationColor, "#25fac4");
+  const { participationColor: _migrated, ...unchanged } = migrated;
+  void _migrated;
+  assert.deepEqual(unchanged, old);
+  const changed = validateTheme({ ...migrated, participationColor: "#ffff00" });
+  assert.deepEqual(changed.panels, migrated.panels);
+  assert.deepEqual(changed.colors, migrated.colors);
+  assert.deepEqual(changed.modules, migrated.modules);
+  assert.equal(
+    parseTheme(JSON.stringify(changed)).participationColor,
+    "#ffff00",
+  );
+  assert.equal(
+    validateTheme({ ...migrated, participationColor: "url(https://x.test)" })
+      .participationColor,
+    "#25fac4",
+  );
+});
+test("participation text stays readable for monochrome, pink, mint and fluorescent yellow", () => {
+  for (const colour of ["#000000", "#ffffff", "#ff1493", "#25fac4", "#ffff00"])
+    for (const text of ["#000000", "#ffffff", "#ff1493"])
+      assert.ok(contrast(readableColor(text, colour), colour) >= 4.5);
+});

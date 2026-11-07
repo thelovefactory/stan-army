@@ -85,6 +85,7 @@ export function ProfileTheme({
   officialParticipation = false,
   previewTheme,
   compactControls = false,
+  galleryControls = false,
 }: {
   profileId: string;
   kind: "army" | "fan";
@@ -92,6 +93,7 @@ export function ProfileTheme({
   officialParticipation?: boolean;
   previewTheme?: Theme;
   compactControls?: boolean;
+  galleryControls?: boolean;
   name: string;
   children: React.ReactNode;
 }) {
@@ -171,15 +173,25 @@ export function ProfileTheme({
       );
     }
   }
+  const participation = theme.participationColor;
   const panel = theme.panels.color,
     bg = theme.background.color;
   const vars = {
+    "--participation-colour": participation,
+    "--participation-text": readableColor(theme.colors.text, participation),
+    "--participation-link": readableColor(theme.colors.links, participation),
+    "--participation-accent": readableColor(theme.colors.accent, participation),
+    "--participation-border": readableColor(
+      theme.colors.borders,
+      participation,
+    ),
     "--theme-bg": bg,
     "--theme-panel": panel,
     "--theme-text": readableColor(theme.colors.text, panel),
     "--theme-page-text": readableColor(theme.colors.text, bg),
     "--theme-link": readableColor(theme.colors.links, panel),
     "--theme-page-link": readableColor(theme.colors.links, bg),
+    "--theme-page-accent": readableColor(theme.colors.accent, bg),
     "--theme-button": theme.colors.buttons,
     "--theme-button-text": readableColor("#ffffff", theme.colors.buttons),
     "--theme-border": theme.colors.borders,
@@ -196,6 +208,7 @@ export function ProfileTheme({
             ? "8px 35px 5px 24px"
             : "15px",
     "--theme-border-style": theme.panels.border,
+    "--theme-border-width": theme.panels.border === "double" ? "3px" : "1px",
     backgroundColor: custom ? bg : undefined,
     backgroundImage:
       custom && visibleAsset(theme.background.image)
@@ -398,6 +411,8 @@ export function ProfileTheme({
             <ThemeEditor
               theme={draft}
               showModules={kind === "army"}
+              galleryControls={galleryControls}
+              motionActive={playing}
               onChange={setDraft}
               onBusyChange={setUploading}
             />
@@ -406,13 +421,16 @@ export function ProfileTheme({
                 className="editor-reset"
                 disabled={uploading}
                 onClick={() => {
-                  setDraft(structuredClone(defaultTheme));
+                  setDraft({
+                    ...structuredClone(defaultTheme),
+                    modules: { ...draft.modules },
+                  });
                   setStatus(
-                    "Default theme previewed. Save to keep it, or Cancel to restore your saved theme.",
+                    "Default appearance previewed; module visibility is unchanged. Save to keep it, or Cancel to restore your saved theme.",
                   );
                 }}
               >
-                <RotateCcw size={14} /> Reset to default
+                <RotateCcw size={14} /> Reset appearance
               </button>
               <div>
                 <button className="theme-control" onClick={close}>
