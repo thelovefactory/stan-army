@@ -581,18 +581,6 @@ function ArmySpaceContent({
             </section>
           </>
         )}
-        <section className="flames-concept panel">
-          <span>✳</span>
-          <div>
-            <p className="eyebrow">FUTURE CONCEPT · NO PAYMENTS</p>
-            <h2>FAN. THE FLAMES.</h2>
-            <p>
-              Fans can one day pool optional support for transparent, clearly
-              labelled promotional campaigns. Organic discovery stays organic.
-              No guaranteed streams, fake engagement or ownership for sale.
-            </p>
-          </div>
-        </section>
         <div className="founder-love-credit">
           <span aria-hidden="true">♡</span>
           <p>
