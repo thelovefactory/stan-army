@@ -233,3 +233,6 @@ Supersedes earlier campaign controls: the temporary montage is now a 208px deskt
 
 ### Leopard action and mint heading follow-up
 Landing CTAs use an original local fuchsia/purple leopard SVG with solid light-pink labels. The community heading's “It's ours.” uses the same `--mint` token as the hero and ticker, reserving pink for actions. Lint and TypeScript passed for the button/component changes. Focused browser checks verified single-line subline, action background and no overflow at 320/390/600/800/1024/1440px, plus compact loop/reduced motion. The mint change is a scoped CSS colour declaration.
+
+### Denser leopard and readable white labels
+Replaced sparse rosette pattern with a denser reference-inspired generated texture and strengthened white label weight/stroke/shadow. Hover scale and motion preferences remain unchanged. `npm run lint` passed. Focused Chromium checks passed at 320/390/600/800/1024/1440px with no overflow; desktop screenshot visually inspected for label readability and pattern rendering.

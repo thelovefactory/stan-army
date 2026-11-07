@@ -79,3 +79,6 @@ Sneakers, Brie/pets, TV/books and pop-music objects/cameras cover the requested 
 
 ## Homepage leopard actions
 `public/decorations/stan-leopard.svg` is an original locally drawn rosette pattern in fuchsia and purple, inspired by the user's colour/pattern direction. The attached Mac-local leopard JPG was not accessible and is not copied or represented as licensed source artwork. The original SVG is used only on landing-page primary buttons, with solid light-pink label areas for readable dark text.
+
+### Denser leopard button refinement
+`public/decorations/stan-leopard-dense.png` replaces the simple SVG in landing actions. It is an original imagegen pattern created using the user's attached pattern as reference, with denser irregular purple rosettes on hot pink. It is not the inaccessible Mac-local JPG. Retained generated original: `/workspace/generated_images/exec-80578d01-1d2f-4ff0-b2ae-085a88d1193d.png`. The older SVG remains preserved. White button labels now have a dark stroke/shadow for separation from both pattern colours, without a solid label panel.
