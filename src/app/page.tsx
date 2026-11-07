@@ -145,9 +145,14 @@ export default function Home() {
             Your people. Your army.
           </h2>
         </div>
-        <Link href="/create" className="button button-blue">
-          Create your Army <ArrowUpRight size={20} />
-        </Link>
+        <div className="final-cta-actions">
+          <Link href="/create" className="button button-blue">
+            Create your army <ArrowUpRight size={20} />
+          </Link>
+          <Link href="/discover" className="text-link">
+            Find your army <ChevronRight size={18} />
+          </Link>
+        </div>
       </section>
     </main>
   );

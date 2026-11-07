@@ -183,3 +183,24 @@
     display: none;
   }
 }
+.final-cta-actions {
+  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 800px) {
+  .final-cta-actions {
+    flex-shrink: 1;
+  }
+}
+
+@media (max-width: 600px) {
+  .final-cta-actions {
+    grid-column: 2;
+    margin-left: 0;
+  }
+}
