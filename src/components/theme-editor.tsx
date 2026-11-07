@@ -143,6 +143,58 @@ export function ThemeEditor({
           </p>
         </section>
       )}
+      {showModules && (
+        <section className="editor-section">
+          <h3>Outside the Army appearance</h3>
+          <p>Public social previews. Manage account links on the Army page.</p>
+          <label>
+            <input
+              type="checkbox"
+              checked={theme.outsideArmy.accent === null}
+              onChange={(e) =>
+                update({
+                  outsideArmy: {
+                    ...theme.outsideArmy,
+                    accent: e.target.checked ? null : theme.colors.accent,
+                  },
+                })
+              }
+            />{" "}
+            Use Army accent colour
+          </label>
+          <label>
+            Module accent{" "}
+            <input
+              type="color"
+              aria-label="Outside the Army accent"
+              disabled={theme.outsideArmy.accent === null}
+              value={theme.outsideArmy.accent ?? theme.colors.accent}
+              onChange={(e) =>
+                update({
+                  outsideArmy: { ...theme.outsideArmy, accent: e.target.value },
+                })
+              }
+            />
+          </label>
+          <label>
+            Module treatment{" "}
+            <select
+              value={theme.outsideArmy.treatment}
+              onChange={(e) =>
+                update({
+                  outsideArmy: {
+                    ...theme.outsideArmy,
+                    treatment: e.target.value as "panel" | "outline",
+                  },
+                })
+              }
+            >
+              <option value="panel">Panel with accent detail</option>
+              <option value="outline">Accent outline</option>
+            </select>
+          </label>
+        </section>
+      )}
       <section className="editor-section">
         <h3>
           <Sparkles size={16} /> The grossness library

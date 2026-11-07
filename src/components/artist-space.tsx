@@ -22,6 +22,7 @@ import { DiscussionBoard } from "./discussion-board";
 import { StanStarIcon } from "./stan-icons";
 import { ArmyModule } from "./army-module";
 import { ArmyChat } from "./army-chat";
+import { OutsideArmy } from "./outside-army";
 import { useDemo } from "./demo-provider";
 import { ProfileTheme, useProfileTheme } from "./profile-theme";
 export function ArmySpace({
@@ -305,7 +306,7 @@ function ArmySpaceContent({
         )}
         {isNova ? (
           <div
-            className={`living-layout ${theme.modules.playlist || theme.modules.chat || theme.modules.events ? "" : "modules-no-sidebar"}`}
+            className={`living-layout ${theme.modules.playlist || theme.modules.chat || theme.modules.outside || theme.modules.events ? "" : "modules-no-sidebar"}`}
           >
             <div className="living-primary">
               <ArmyModule name="feed">
@@ -351,6 +352,9 @@ function ArmySpaceContent({
                   <ArmyChat view={view} />
                 </ArmyModule>
               </div>
+              <ArmyModule name="outside">
+                <OutsideArmy armyId={army.id} />
+              </ArmyModule>
               <ArmyModule name="events">
                 <aside id="events" className="panel events-panel">
                   <div className="panel-title">
@@ -443,6 +447,9 @@ function ArmySpaceContent({
               </div>
               <ArmyModule name="chat">
                 <ArmyChat view={view} />
+              </ArmyModule>
+              <ArmyModule name="outside">
+                <OutsideArmy armyId={army.id} />
               </ArmyModule>
             </div>
             <section id="artist-posts" className="artist-post-section">

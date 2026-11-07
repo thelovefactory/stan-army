@@ -6,6 +6,7 @@ import "./living.css";
 import "./player.css";
 import "./army-layout.css";
 import "./participation.css";
+import "./outside-army.css";
 import "./landing.css";
 import { Header, Footer } from "@/components/shell";
 import { BoardsProvider } from "@/components/boards-provider";

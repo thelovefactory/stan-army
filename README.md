@@ -88,3 +88,6 @@ Automated checks and generated-output checks are recorded in [VALIDATION.md](doc
 
 ## Documents
 [Product](docs/PRODUCT_SPEC.md) · [Architecture](docs/ARCHITECTURE.md) · [Database design](docs/DATABASE_SCHEMA.md) · [Roadmap](docs/ROADMAP.md) · [Theme engine](docs/THEME_ENGINE.md) · [Asset sources](docs/ASSET_SOURCES.md) · [Pivot audit](docs/PIVOT_AUDIT_PLAN.md)
+
+### Outside the Army
+On `/armies/nova`, the optional external social window sits below chat. In the founding-stan/admin demo role, open **Manage channels** to save or remove Instagram/X profile links on this device. In **Customise**, toggle **Outside the Army** and choose its accent/treatment; save the theme to retain appearance changes. Visitors choose **Load … preview** before either provider is contacted. Instagram's supplied profile can display official thumbnails; X may show an unavailable message with its original link. These are public previews, not verified account connections or a guaranteed live feed. [Research, supported routes and limitations](docs/OUTSIDE_THE_ARMY.md).

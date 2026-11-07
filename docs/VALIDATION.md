@@ -255,3 +255,24 @@ The execution workspace is unavailable: shell execution fails with an exec-serve
 Source review checked actual Army/playlist/chat/feed markup, stylesheet order and existing theme variables; the new CSS has balanced blocks and uses existing contrast-guarded button/text tokens without storage/schema changes. It scopes primary action geometry and colours to Army pages and Nova-specific alignment/metadata to the living Army, preserving post bodies and artwork. Mobile rules allow wrapping and retain existing panel-gap/inset tokens. New styles are additive and preserve event handlers and element semantics.
 
 Pending when execution returns: run lint/typecheck/tests/build; verify clean/custom modes and saved monochrome, mint, pink and fluorescent themes; inspect 320/390/800/1440 layouts, Join/share, Post, Send, Spotify load/unload, poll/photo tools, reply/discussion actions, visible focus, disabled states, metadata contrast and timestamp/badge wrapping. Confirm no selector is overridden by theme/skin rules in computed styles. No rendered-layout verification is claimed yet.
+
+### Outside the Army — final checks (2026-11-07)
+The cloud workspace became available again. The current PR branch was cloned without resetting user files, dependencies installed with `npm ci --cache /tmp/stan-army-npm`, and all checks ran against the completed module.
+
+| Command | Result |
+| --- | --- |
+| `npm run lint` | Passed, no errors/warnings |
+| `npm run typecheck` | Passed, route type generation and TypeScript |
+| `npm test` | 33 passed / 0 failed, including three new social URL/configuration/migration tests |
+| `npm run build` | Passed; 45 static outputs generated |
+| `node /tmp/stan-army-browser/social.mjs` | Passed controlled Chromium interaction checks |
+| `node /tmp/stan-army-browser/social-failure.mjs` | Passed controlled failure/storage checks |
+| `node /tmp/stan-army-browser/social-production.mjs` | Passed production-build theme/geometry checks |
+
+The focused browser scripts used an external temporary Playwright installation with `/usr/bin/chromium`; no browser dependency was added to the app. Deterministic tests intercept provider responses with explicitly labelled fixtures and do not establish live availability. They cover: placement directly below chat; no Instagram/X requests before clicking; founder/admin management versus visitor/official-artist restrictions; add/replace/remove and reload persistence; invalid URLs; loading/closing each provider; one preview at once; disabled module saved through refresh and respected in clean view; custom accent/outline persistence; readable module colours and no overflow at 320/390/800/1440; visible keyboard focus; no browser exceptions; X unavailable handling, Instagram's persistent fallback/source link, and a failed localStorage write preserving channels.
+
+A separate real-provider Chromium probe (`node /tmp/stan-army-browser/social-live.mjs`) used the configured proxy and trusted only the supplied CA's SPKI to correct an initial environment-only trust failure. Instagram displayed the supplied public profile and real post thumbnails. X's official script/resources loaded but returned no visible timeline, so the module showed an unavailable message with the source profile link. No real X post content or timestamps were verified. HTTP 200 alone was not counted as successful post rendering. Research HTTP probes separately verified Meta's current tokenless oEmbed announcement and its differing behaviour for the supplied profile. Details and primary sources: [OUTSIDE_THE_ARMY.md](OUTSIDE_THE_ARMY.md).
+
+Production checks used `npm run start -- --port 3001` and additionally verified the previously unverified Army consistency pass: all four primary Join/Post/Send/Spotify actions share 44px minimum heights and theme colours; four sidebar/module titles share 18px UI typography; module text exceeded 4.5:1 on monochrome, mint/neon and pink themes; mobile pages did not overflow. These checks close that earlier geometry/contrast validation gap for the tested themes.
+
+Screenshots: `screenshots/outside-army-desktop.png`, `outside-army-mobile.png`, `outside-army-mint.png`, and `outside-army-instagram.png` (actual provider content). No OAuth, credentials, API polling, scraping, database migration, endpoint, paid service or deployment was introduced. Channel links are local demo configuration, not authenticated connections or verified affiliations; role switching remains a prototype simulation. Third-party iframe internals, post order, timestamps, sign-in restrictions and refresh behaviour remain provider-controlled.

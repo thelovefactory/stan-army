@@ -46,6 +46,7 @@ export const moduleLabels = {
   videos: "Videos",
   gallery: "Gallery",
   chat: "Army chat",
+  outside: "Outside the Army",
   announcements: "Announcements",
   events: "Events & links",
   discussions: "Discussion board",
@@ -57,6 +58,7 @@ export const defaultModules: Record<ArmyModuleName, boolean> = {
   videos: true,
   gallery: true,
   chat: true,
+  outside: true,
   announcements: true,
   events: true,
   discussions: true,
@@ -65,6 +67,7 @@ export type Theme = {
   schemaVersion: 1;
   playerSkin: PlayerSkin;
   participationColor: string;
+  outsideArmy: { accent: string | null; treatment: "panel" | "outline" };
   modules: Record<ArmyModuleName, boolean>;
   preset: PresetId;
   background: {
@@ -99,6 +102,7 @@ export const defaultTheme: Theme = {
   schemaVersion: 1,
   playerSkin: "desktop",
   participationColor: "#161619",
+  outsideArmy: { accent: null, treatment: "panel" },
   modules: { ...defaultModules },
   preset: "blank-canvas",
   background: {
@@ -399,6 +403,17 @@ export function validateTheme(value: unknown): Theme {
   }
   return {
     schemaVersion: 1,
+    outsideArmy: {
+      accent:
+        record(t.outsideArmy).accent == null
+          ? null
+          : safeColor(record(t.outsideArmy).accent, d.colors.accent),
+      treatment: choice(
+        record(t.outsideArmy).treatment,
+        ["panel", "outline"],
+        "panel",
+      ),
+    },
     participationColor: safeColor(
       t.participationColor,
       safeColor(p.color, d.panels.color),

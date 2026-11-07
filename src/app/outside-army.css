@@ -1,0 +1,237 @@
+/* External previews have their own compact surface, never fan-feed styling. */
+.profile-canvas .profile-content .outside-army {
+  width: 100%;
+  min-width: 0;
+  padding: var(--army-inset, 24px);
+  border: var(--theme-border-width, 1px) var(--theme-border-style, solid)
+    var(--theme-border, #45434d);
+  border-radius: var(--theme-radius, 15px);
+  background: var(--theme-panel, #161619);
+  color: var(--theme-text, #f7f7f4);
+  font:
+    400 13px/1.6 Arial,
+    Helvetica,
+    sans-serif;
+}
+.profile-canvas .profile-content .outside-army.outside-outline {
+  border: 2px solid var(--outside-accent);
+}
+.outside-header,
+.outside-header h2,
+.outside-source,
+.outside-source > span,
+.outside-source a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.profile-canvas .profile-content .outside-army .outside-header {
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--outside-accent);
+}
+.profile-canvas .profile-content .outside-army .outside-header h2 {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font:
+    700 18px/1.35 Arial,
+    Helvetica,
+    sans-serif;
+  letter-spacing: -0.02em;
+}
+.outside-header h2 svg {
+  color: var(--outside-accent);
+  flex-shrink: 0;
+}
+.outside-header > span {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+.profile-canvas .profile-content .outside-army :is(p, label, li, summary) {
+  background: transparent;
+  color: inherit;
+}
+.outside-intro {
+  margin-top: 12px;
+  font-size: 13px;
+}
+.outside-channel {
+  padding-block: 12px;
+  border-bottom: 1px solid var(--theme-control-border, #888);
+  min-width: 0;
+}
+.outside-source {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 12px;
+}
+.outside-source > span {
+  color: var(--outside-accent);
+}
+.profile-canvas .profile-content .outside-army .outside-source a {
+  color: var(--theme-link, #a0f4cc);
+  min-height: 36px;
+  overflow-wrap: anywhere;
+}
+.outside-source a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.profile-canvas
+  .profile-content
+  .outside-army
+  :is(.outside-load, .outside-close) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 0;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--theme-link, #a0f4cc);
+  font:
+    600 12px/1.6 Arial,
+    Helvetica,
+    sans-serif;
+  text-align: left;
+}
+.outside-load:hover,
+.outside-close:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.profile-canvas .profile-content .outside-army .outside-hint {
+  display: block;
+  margin: 12px 0 0;
+  font:
+    400 11px/1.65 Arial,
+    Helvetica,
+    sans-serif;
+}
+.outside-instagram {
+  display: block;
+  width: 100%;
+  height: 280px;
+  border: 0;
+  border-radius: 10px;
+  background: #fff;
+  margin-top: 12px;
+}
+.outside-widget {
+  max-height: 280px;
+  overflow: auto;
+  margin-top: 12px;
+  border-radius: 10px;
+}
+.outside-widget:empty {
+  margin: 0;
+}
+.outside-widget iframe {
+  max-width: 100%;
+}
+.outside-manage {
+  margin-top: 12px;
+}
+.outside-manage summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+.outside-manage ul {
+  list-style: none;
+  margin: 12px 0;
+  padding: 0;
+}
+.outside-manage li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+.profile-canvas .profile-content .outside-army .outside-manage li button {
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 10px;
+  color: inherit;
+}
+.outside-manage form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.outside-manage label {
+  font-size: 12px;
+}
+.profile-canvas .profile-content .outside-army input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--theme-control-border, #888);
+  border-radius: 10px;
+  background: var(--theme-panel, #161619);
+  color: var(--theme-text, #f7f7f4);
+  font:
+    400 13px/1.6 Arial,
+    Helvetica,
+    sans-serif;
+}
+.profile-canvas .profile-content .outside-army input::placeholder {
+  color: var(--theme-text, #f7f7f4);
+  opacity: 1;
+}
+.profile-canvas .profile-content .outside-army form button {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 11px 16px;
+  background: var(--theme-button, #305bff);
+  color: var(--theme-button-text, #fff);
+  border: 1px solid currentColor;
+  border-radius: 10px;
+  font:
+    700 13px/1.4 Arial,
+    Helvetica,
+    sans-serif;
+}
+.outside-status {
+  margin-top: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.outside-manage button:hover {
+  filter: brightness(0.94);
+}
+
+.outside-channel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0 8px;
+}
+.outside-source {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  min-width: 0;
+}
+.outside-channel
+  > :is(.outside-instagram, .outside-widget, .outside-hint, .outside-close) {
+  grid-column: 1 / -1;
+}
+.outside-channel .outside-load {
+  justify-self: end;
+}
