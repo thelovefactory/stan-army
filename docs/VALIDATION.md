@@ -209,3 +209,6 @@ Screenshots: [monochrome](screenshots/participation-monochrome.png), [pink](scre
 
 Review images: [desktop](screenshots/landing-culture-desktop.png), [mobile](screenshots/landing-culture-mobile.png). The asset is an original generated illustration made under the user’s express permission, not their unavailable local PNG or a stock photo; provenance is recorded in ASSET_SOURCES.md. The original logo and existing Army functionality/themes are untouched. Review the homepage at http://localhost:3000/ .
 `npm run build` also passed with 45 outputs. This landing-only change used focused browser verification rather than adding unit tests for static copy/CSS. The local webpack preview was restarted after the build.
+
+### Landing community copy follow-up
+`npm run lint` and `npm run typecheck` passed. A focused Chromium check verified exact ticker/discovery/belonging copy, all three feature leads and descriptions, the creation CTA destination and actual navigation, and no overflow at 320/390/800/1440px. Mobile ticker layout now displays all three phrases rather than clipping the older wide strip. [Belonging-section screenshot](screenshots/landing-ours-section.png). No application-model logic or dependencies changed; no additional unit tests were added for static copy.

@@ -1,12 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import {
-  ArrowUpRight,
-  ArrowRight,
-  Headphones,
-  MessageCircle,
-  Heart,
-} from "lucide-react";
+import { ArrowUpRight, ArrowRight, ChevronRight } from "lucide-react";
+import { StanStarIcon } from "@/components/stan-icons";
 import { ArmyCard } from "@/components/artist-card";
 import { DemoNote } from "@/components/shell";
 import { armies, armyView } from "@/lib/data";
@@ -60,27 +55,24 @@ export default function Home() {
           />
         </div>
       </section>
-      <div className="ticker" aria-label="Listen. Connect. Belong.">
+      <div
+        className="ticker"
+        aria-label="Find your people. Back your obsessions. Make some noise."
+      >
         <div>
-          <span>LISTEN TOGETHER</span>
-          <b>✳</b>
-          <span>FIND YOUR PEOPLE</span>
-          <b>✳</b>
-          <span>BACK YOUR ARTISTS</span>
-          <b>✳</b>
-          <span>MAKE SOME NOISE</span>
-          <b>✳</b>
+          <span>Find your people</span>
+          <StanStarIcon size={26} />
+          <span>Back your obsessions</span>
+          <StanStarIcon size={26} />
+          <span>Make some noise</span>
+          <StanStarIcon size={26} />
         </div>
       </div>
       <section className="container explore-section">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">SMALL DISCOVERIES. BIG FEELINGS.</p>
-            <h2>
-              Your next obsession
-              <br />
-              has a home here.
-            </h2>
+            <p className="eyebrow">DIFFERENT OBSESSIONS. STAN ENERGY.</p>
+            <h2>There&apos;s an Army for that.</h2>
           </div>
           <Link href="/discover" className="text-link">
             Explore the armies <ArrowUpRight size={19} />
@@ -108,32 +100,40 @@ export default function Home() {
           </span>
         </div>
         <div className="belonging-copy">
-          <p className="eyebrow">A LITTLE OLD INTERNET. A WHOLE NEW ENERGY.</p>
+          <p className="eyebrow">LESS ABOUT ME. MORE ABOUT US.</p>
           <h2>
-            It’s not my space.
+            It&apos;s not my space.
             <br />
-            It’s yours.
-            <br />
-            <span>And theirs.</span>
+            <span>It&apos;s ours.</span>
           </h2>
           <p>
-            A place that feels like your artist. A room full of people who get
-            it. No disappearing into the feed.
+            Find your people, share what you love, and make a little corner of
+            the internet your own. No chasing followers. Just good company and
+            plenty of obsession.
           </p>
           <div className="feature-row">
-            <Headphones />
-            <span>Listen, discover, repeat.</span>
+            <StanStarIcon size={22} />
+            <span>
+              <strong>Make it yours.</strong> Every Army has its own look, feel
+              and personality.
+            </span>
           </div>
           <div className="feature-row">
-            <MessageCircle />
-            <span>Conversation at the heart of every army.</span>
+            <StanStarIcon size={22} />
+            <span>
+              <strong>Find your people.</strong> Real conversations, shared
+              obsessions and opinions.
+            </span>
           </div>
           <div className="feature-row">
-            <Heart />
-            <span>Show up for the artists you love.</span>
+            <StanStarIcon size={22} />
+            <span>
+              <strong>Keep the internet weird.</strong> From princesses to
+              Parmesan. If you love it, there&apos;s room for it.
+            </span>
           </div>
-          <Link href="/armies/nova" className="button">
-            Step inside a demo army <ArrowUpRight size={18} />
+          <Link href="/create" className="button">
+            Create your army <ChevronRight size={18} />
           </Link>
         </div>
       </section>
