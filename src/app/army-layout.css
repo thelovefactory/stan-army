@@ -5,6 +5,7 @@
   --army-inset: 24px;
   --army-card-radius: var(--theme-radius, 20px);
   --army-control-radius: 10px;
+  padding-top: var(--army-gap);
 }
 .profile-canvas .living-army .artist-breadcrumb {
   margin: 0 0 16px;
