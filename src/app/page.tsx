@@ -107,8 +107,7 @@ export default function Home() {
           </h2>
           <p>
             Find your people, share what you love, and make a little corner of
-            the internet your own. No chasing followers. Just good company and
-            plenty of obsession.
+            the internet your own.
           </p>
           <div className="feature-row">
             <StanStarIcon size={22} />
@@ -128,7 +127,7 @@ export default function Home() {
             <StanStarIcon size={22} />
             <span>
               <strong>Keep the internet weird.</strong> From princesses to
-              Parmesan. If you love it, there&apos;s room for it.
+              parmesan. If you love it, there&apos;s an army for it.
             </span>
           </div>
           <Link href="/create" className="button">
