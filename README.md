@@ -91,3 +91,6 @@ Automated checks and generated-output checks are recorded in [VALIDATION.md](doc
 
 ### Outside the Army
 On `/armies/nova`, the optional external social window sits below chat. In the founding-stan/admin demo role, open **Manage channels** to save or remove Instagram/X profile links on this device. In **Customise**, toggle **Outside the Army** and choose its accent/treatment; save the theme to retain appearance changes. Visitors choose **Load … preview** before either provider is contacted. Instagram's supplied profile can display official thumbnails; X may show an unavailable message with its original link. These are public previews, not verified account connections or a guaranteed live feed. [Research, supported routes and limitations](docs/OUTSIDE_THE_ARMY.md).
+
+### Beta signup design preview
+Open `/beta` for the email-only beta screen, using the existing hero collage and REGISTER FOR BETA button. The form is design-only: native email validation works, but pressing Register only shows a preview notice. Nothing is sent, stored or subscribed. “Explore Stan Army” returns to the homepage.

@@ -4,6 +4,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowUpRight, ArrowRight, Menu, X, Headphones } from "lucide-react";
 import { useState } from "react";
+function BrandLogo() {
+  return (
+    <Link href="/" aria-label="Stan Army home" className="logo">
+      <Image
+        src="/brand/stanarmy-header.png"
+        width={502}
+        height={224}
+        alt="Stan Army"
+        priority
+      />
+    </Link>
+  );
+}
 export function Header() {
   const path = usePathname();
   const [open, setOpen] = useState(false);
@@ -13,6 +26,23 @@ export function Header() {
     { href: "/fans/jess-wav", label: "Fan space" },
     { href: "/boards", label: "My Boards" },
   ];
+  if (path === "/beta")
+    return (
+      <>
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
+        <header className="site-header beta-header">
+          <div className="container header-inner">
+            <BrandLogo />
+            <span className="beta-header-label">BETA PREVIEW</span>
+            <Link href="/" className="text-link">
+              Explore Stan Army <ArrowUpRight size={17} />
+            </Link>
+          </div>
+        </header>
+      </>
+    );
   return (
     <>
       <a href="#main" className="skip-link">
@@ -20,15 +50,7 @@ export function Header() {
       </a>
       <header className={`site-header${path === "/" ? " landing-header" : ""}`}>
         <div className="container header-inner">
-          <Link href="/" aria-label="Stan Army home" className="logo">
-            <Image
-              src="/brand/stanarmy-header.png"
-              width={502}
-              height={224}
-              alt="Stan Army"
-              priority
-            />
-          </Link>
+          <BrandLogo />
           <nav aria-label="Main navigation" className="desktop-nav">
             {links.map((l) => (
               <Link

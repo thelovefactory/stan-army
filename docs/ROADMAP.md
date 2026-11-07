@@ -42,3 +42,6 @@ Adopt ../STAN_ARMY_PRODUCT_DIRECTION.md for future decisions: one flexible Army 
 
 ### Outside the Army follow-up
 Delivered the optional click-to-load public social window with local account configuration and theme integration. Before a future structured/automatically refreshed feed: select a provider/API access model, validate entitlements and authorised account types, design encrypted server-only credentials and revocation, enforce owner/admin writes with RLS, and specify caching/deletion/rate-limit behaviour. Do not treat prototype profile links as account-ownership verification or claim live updates. See OUTSIDE_THE_ARMY.md for actual Instagram/X findings; no backend work is included in this milestone.
+
+### Beta registration design
+Delivered `/beta` as an email-only design preview, with no collection or list integration. Before enabling real registration, choose the consent/privacy copy and invitation workflow, then implement an explicitly authorised backend/provider connection with server-side validation and abuse controls. No service or mailing list has been created in this visual pass.

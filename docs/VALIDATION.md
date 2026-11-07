@@ -286,3 +286,14 @@ Brie/cat crop follow-up: desktop focal position is now 50% 32%, lowering the ima
 ### Static chunky strip, loud subline and asterisk circle
 Removed ticker font cycling; all three existing statements use the larger static Bungee face and fixed star slots. Mobile columns accommodate the longest statement without clipping. Hero copy/metadata now uses “Unapologetically loud. Slightly obsessive. Utterly yours.” The avatar row is two faces plus the original Stan star SVG in a mint circle.
 `npm run lint` and `npm run typecheck` passed. Focused Chromium checks confirmed exact copy, two image circles plus one star circle, unchanged three ticker statements, one static font/no animation, no clipping or page overflow at 320/390/800/801/1024/1440px. Screenshots: `screenshots/ticker-static-chunky.png`, `screenshots/hero-loud-star.png`. This supersedes the prior rotating-font direction; font assets remain preserved.
+
+### Beta registration design screen
+Implemented `/beta` with the existing hero/collage, static mint strip, face/asterisk row, supplied communal-internet invitation, one labelled email field and REGISTER FOR BETA action. The compact beta header returns to the homepage. Shared brand components preserve the homepage's original creation CTA and visual content.
+
+- `npm run lint`: passed.
+- `npm run typecheck`: passed.
+- `npm test`: 33 passed, 0 failed.
+- `npm run build`: passed, 46 static outputs including `/beta`.
+- `node /tmp/stan-army-browser/beta.mjs` and `beta-production.mjs`: passed development and production Chromium checks for exact invitation, only one email field, preserved collage/star/ticker, required/email validation, keyboard submit and visible focus, truthful preview notice, no submission/navigation or storage change on registration, no browser exceptions, and no overflow at 320/390/600/800/1024/1440px. Explore navigates back to the unchanged homepage hero/creation action.
+
+Screenshots: `screenshots/beta-desktop.png`, `screenshots/beta-mobile.png` (production build). No signup endpoint, server action, email payload, mailing list, analytics, storage, authentication or deployment was added. The form stores only a boolean to display its design-preview notice; there is no false registration-success state. Existing unit checks were run without adding implementation-mirroring tests for static design.
