@@ -138,12 +138,8 @@ export default function Home() {
       <section className="container final-cta">
         <span className="big-asterisk">✳</span>
         <div>
-          <p className="eyebrow">ONE FAN CAN START SOMETHING.</p>
-          <h2>
-            Their music.
-            <br />
-            Your people. Your army.
-          </h2>
+          <p className="eyebrow">ONE STAN CAN START AN ARMY.</p>
+          <h2>What&apos;s your obsession?</h2>
         </div>
         <div className="final-cta-actions">
           <Link href="/create" className="button button-blue">
