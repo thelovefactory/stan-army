@@ -154,6 +154,12 @@
   color: #f7f7f4;
   font-weight: 700;
 }
+.ticker span {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.025em;
+}
 .ticker > div > svg {
   flex-shrink: 0;
   color: #294b3b;
