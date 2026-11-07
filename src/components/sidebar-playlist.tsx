@@ -5,7 +5,7 @@ import { ExternalLink, Music2, Play } from "lucide-react";
 import { useProfileTheme } from "./profile-theme";
 export const spotifyPlaylist =
   "https://open.spotify.com/playlist/0EO3CxjNLb1gFi9QuPT6YE";
-export function SidebarPlaylist() {
+export function SidebarPlaylist({ armySlug = "nova" }: { armySlug?: string }) {
   const [loaded, setLoaded] = useState(false);
   const { theme, clean } = useProfileTheme();
   return (
@@ -54,7 +54,7 @@ export function SidebarPlaylist() {
         <a href={spotifyPlaylist} target="_blank" rel="noreferrer">
           Open in Spotify <ExternalLink size={12} />
         </a>
-        <Link href="/armies/nova/room">Full Army Player ↗</Link>
+        <Link href={`/armies/${armySlug}/room`}>Full Army Player ↗</Link>
       </footer>
       <small>
         Spotify loads on click. Playback and availability are controlled by

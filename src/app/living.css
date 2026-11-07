@@ -3339,3 +3339,37 @@
     padding: 10px;
   }
 }
+
+.module-toggles {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0;
+}
+.module-toggles label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.module-toggles input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: #a0f4cc;
+}
+.modules-no-sidebar {
+  grid-template-columns: minmax(0, 1fr);
+}
+.modules-no-sidebar .living-sidebar,
+.sidebar-player:empty,
+#army-room:empty {
+  display: none;
+}
+.module-hidden-note {
+  padding: 22px;
+  border: 1px dashed currentColor;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+}

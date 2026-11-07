@@ -245,3 +245,30 @@ test("Army theme migration reads legacy customisation without overwriting it; ne
     null,
   );
 });
+
+test("older v1 themes default to enabled modules; only boolean visibility values restore", () => {
+  const { modules: _modules, ...old } = structuredClone(defaultTheme);
+  void _modules;
+  const restored = validateTheme({
+    ...old,
+    colors: { ...old.colors, text: "#123456" },
+  });
+  assert.ok(Object.values(restored.modules).every(Boolean));
+  assert.equal(restored.colors.text, "#123456");
+  const custom = validateTheme({
+    ...defaultTheme,
+    modules: {
+      playlist: false,
+      chat: false,
+      gallery: "false",
+      videos: 0,
+      unknown: false,
+    },
+  });
+  assert.equal(custom.modules.playlist, false);
+  assert.equal(custom.modules.chat, false);
+  assert.equal(custom.modules.gallery, true);
+  assert.equal(custom.modules.videos, true);
+  assert.equal("unknown" in custom.modules, false);
+  assert.deepEqual(parseTheme(JSON.stringify(custom)).modules, custom.modules);
+});

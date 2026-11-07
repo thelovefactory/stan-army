@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import type { CSSProperties } from "react";
 import {
+  moduleLabels,
+  ArmyModuleName,
   playerSkins,
   PlayerSkin,
   fontLabels,
@@ -31,8 +33,10 @@ export function ThemeEditor({
   theme,
   onChange,
   onBusyChange,
+  showModules = false,
 }: {
   theme: Theme;
+  showModules?: boolean;
   onChange: (t: Theme) => void;
   onBusyChange: (busy: boolean) => void;
 }) {
@@ -104,6 +108,35 @@ export function ThemeEditor({
       theme.colors.links;
   return (
     <fieldset disabled={busy} className="editor-fields" aria-busy={busy}>
+      {showModules && (
+        <section className="editor-section">
+          <h3>Tools for your Army</h3>
+          <p>
+            Whatever you stan for. Stan for it here. Show only the modules your
+            Army needs. Spotify is for every Army.
+          </p>
+          <div className="module-toggles">
+            {Object.entries(moduleLabels).map(([name, label]) => (
+              <label key={name}>
+                <input
+                  type="checkbox"
+                  checked={theme.modules[name as ArmyModuleName]}
+                  onChange={(e) =>
+                    update({
+                      modules: { ...theme.modules, [name]: e.target.checked },
+                    })
+                  }
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+          <p className="editor-hint">
+            Visibility changes preview immediately. Save keeps them; Cancel
+            restores your saved settings. Clean view respects hidden modules.
+          </p>
+        </section>
+      )}
       <section className="editor-section">
         <h3>
           <Sparkles size={16} /> The grossness library
@@ -544,7 +577,12 @@ export function ThemePresetPicker({
           type="button"
           aria-pressed={theme.preset === p.id}
           className={`preset-button preset-${p.id}`}
-          onClick={() => onChange(structuredClone(p.theme))}
+          onClick={() =>
+            onChange({
+              ...structuredClone(p.theme),
+              modules: { ...theme.modules },
+            })
+          }
           disabled={busy}
           style={{ "--preset-color": p.color } as CSSProperties}
         >

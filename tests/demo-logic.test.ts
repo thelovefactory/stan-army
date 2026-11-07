@@ -188,3 +188,15 @@ test("fan welcome preserves optional safe music-link behaviour and rejects unsaf
   ])
     assert.ok(validateArmyDraft({ ...draft, musicLink }, 2));
 });
+
+test("non-music subjects can create a preview without artist metadata or a music link", () => {
+  const draft = {
+    ...initialArmyDraft,
+    artistName: "Brie cheese",
+    artistContext: "The soft French cheese, made from cow’s milk.",
+    address: "brie-cheese",
+    welcome: "A little home for everyone who loves Brie.",
+  };
+  for (const step of [0, 1, 2])
+    assert.equal(validateArmyDraft(draft, step), null);
+});

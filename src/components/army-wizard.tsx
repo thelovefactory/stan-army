@@ -24,7 +24,7 @@ import { defaultTheme, Theme } from "@/lib/theme";
 import { ThemePresetPicker } from "./theme-editor";
 import { ProfileTheme } from "./profile-theme";
 const steps = [
-  "Pick your artist",
+  "Pick your subject",
   "Your Army address",
   "Make it yours",
   "Rally the fans",
@@ -111,8 +111,8 @@ export function ArmyWizard({ prefill = "" }: { prefill?: string }) {
           with <span>one stan.</span>
         </h1>
         <p>
-          You bring the love. The artist doesn’t need to sign up, approve or
-          pay.
+          Whatever you stan for. Stan for it here. Music is our starting point;
+          your Army can be about anything you love.
         </p>
       </div>
       <div className="wizard-founder">
@@ -125,7 +125,7 @@ export function ArmyWizard({ prefill = "" }: { prefill?: string }) {
         <p>
           Starting as <b>@{currentFan.handle}</b>
           <span>
-            Your fan identity stays yours. It never becomes the artist’s
+            Your fan identity stays yours. It never becomes the subject’s
             identity.
           </span>
         </p>
@@ -158,10 +158,10 @@ export function ArmyWizard({ prefill = "" }: { prefill?: string }) {
             <h3>
               The fans build it.
               <br />
-              The artist inspires it.
+              The subject inspires it.
             </h3>
             <p>
-              One canonical Army per artist. A local preview never reserves a
+              One canonical Army per subject. A local preview never reserves a
               public address or publishes a community.
             </p>
             <Link className="text-link" href="/official-access">
@@ -189,9 +189,9 @@ export function ArmyWizard({ prefill = "" }: { prefill?: string }) {
           </h2>
           <p className="wizard-description">
             {step === 0
-              ? "Find an artist first. If their Army already exists, join it. If it doesn’t, you could be the founding stan."
+              ? "Choose who or what you stan. If an Army already exists, join it. Otherwise, you could be its founding stan."
               : step === 1
-                ? "An Army address identifies the community. It is separate from your fan handle and the artist’s official identity."
+                ? "An Army address identifies the community. It is separate from your fan handle and the subject’s identity."
                 : step === 2
                   ? "Pick an initial theme, choose imagery and write a welcome in your own voice. The shared visual editor can take your full demo Army further."
                   : "Fan-run, fan-built, and clearly labelled. This local preview does not create a public Army or a working invite."}
@@ -199,7 +199,7 @@ export function ArmyWizard({ prefill = "" }: { prefill?: string }) {
           {!complete && step === 0 && (
             <div className="form-fields">
               <label htmlFor="army-artist">
-                Artist name <span>Required</span>
+                Who or what do you stan? <span>Required</span>
               </label>
               <input
                 id="army-artist"
@@ -208,7 +208,7 @@ export function ArmyWizard({ prefill = "" }: { prefill?: string }) {
                 onChange={(e) =>
                   update({ artistName: e.target.value, artistId: "" })
                 }
-                placeholder="Search or add an artist…"
+                placeholder="An artist, team, film, designer, Brie cheese…"
               />
               <div
                 className="artist-search-options"
@@ -252,8 +252,8 @@ export function ArmyWizard({ prefill = "" }: { prefill?: string }) {
                 !selected && (
                   <>
                     <label htmlFor="artist-context">
-                      Help us distinguish this artist{" "}
-                      <span>Required for unlisted artists</span>
+                      Help us identify your subject{" "}
+                      <span>Required for an unlisted subject</span>
                     </label>
                     <textarea
                       id="artist-context"
@@ -263,7 +263,7 @@ export function ArmyWizard({ prefill = "" }: { prefill?: string }) {
                       onChange={(e) =>
                         update({ artistContext: e.target.value })
                       }
-                      placeholder="Genre, city, an official catalogue link, or another distinguishing detail."
+                      placeholder="An official website, location, full name, or another distinguishing detail."
                     />
                     <p className="input-help">
                       Unlisted identities would need conflict review before a
@@ -298,7 +298,7 @@ export function ArmyWizard({ prefill = "" }: { prefill?: string }) {
               </p>
               <div className="identity-separation">
                 <p>
-                  <b>Artist:</b> {draft.artistName}
+                  <b>Subject:</b> {draft.artistName}
                 </p>
                 <p>
                   <b>Founding fan:</b> @{currentFan.handle}
@@ -324,11 +324,11 @@ export function ArmyWizard({ prefill = "" }: { prefill?: string }) {
                 placeholder="I started this Army because…"
               />
               <p className="input-help">
-                {draft.welcome.length}/500 · Write as yourself, not as the
-                artist.
+                {draft.welcome.length}/500 · Use your own fan voice. Don’t imply
+                official affiliation.
               </p>
               <label htmlFor="army-music-link">
-                A public music link <span>Optional</span>
+                Playlist or public media link <span>Optional</span>
               </label>
               <input
                 type="url"
@@ -339,8 +339,8 @@ export function ArmyWizard({ prefill = "" }: { prefill?: string }) {
                 placeholder="https://…"
               />
               <p className="input-help">
-                A permitted public music/video or catalogue link. It stays a
-                link in this preview; nothing is scraped or hosted.
+                Any Army can feature Spotify, music or video. This stays a link
+                in this preview; nothing is scraped or hosted.
               </p>
               <fieldset>
                 <legend>Pick a starting image</legend>
@@ -428,8 +428,8 @@ export function ArmyWizard({ prefill = "" }: { prefill?: string }) {
                     </a>
                   )}
                   <p className="input-help">
-                    Community stewardship is not ownership of the artist’s name,
-                    music or IP.
+                    Community stewardship is not ownership of the subject’s
+                    name, work or IP.
                   </p>
                 </div>
               </section>

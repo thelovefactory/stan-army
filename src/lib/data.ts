@@ -360,7 +360,7 @@ export function validateArmyDraft(
 ): string | null {
   if (step === 0) {
     if (d.artistName.trim().length < 2 || d.artistName.length > 80)
-      return "Choose or enter an artist name between 2 and 80 characters.";
+      return "Choose or enter a subject name between 2 and 80 characters.";
     if (
       d.artistId &&
       !artists.some(
@@ -377,7 +377,7 @@ export function validateArmyDraft(
     if (id && armyForArtist(id))
       return "This artist already has an Army. Visit and enlist instead of creating a duplicate.";
     if (!id && d.artistContext.trim().length < 10)
-      return "Add at least 10 characters of distinguishing details, such as city, genre or an official catalogue link.";
+      return "Add at least 10 characters of identifying details, such as an official website, location or full name.";
   }
   if (step === 1) {
     if (!/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(d.address))

@@ -40,9 +40,31 @@ export const playerSkins = {
   toxic: "Toxic chrome",
 } as const;
 export type PlayerSkin = keyof typeof playerSkins;
+export const moduleLabels = {
+  feed: "Fan posts",
+  playlist: "Music / Spotify playlist",
+  videos: "Videos",
+  gallery: "Gallery",
+  chat: "Army chat",
+  announcements: "Announcements",
+  events: "Events & links",
+  discussions: "Discussion board",
+} as const;
+export type ArmyModuleName = keyof typeof moduleLabels;
+export const defaultModules: Record<ArmyModuleName, boolean> = {
+  feed: true,
+  playlist: true,
+  videos: true,
+  gallery: true,
+  chat: true,
+  announcements: true,
+  events: true,
+  discussions: true,
+};
 export type Theme = {
   schemaVersion: 1;
   playerSkin: PlayerSkin;
+  modules: Record<ArmyModuleName, boolean>;
   preset: PresetId;
   background: {
     color: string;
@@ -75,6 +97,7 @@ export type Theme = {
 export const defaultTheme: Theme = {
   schemaVersion: 1,
   playerSkin: "desktop",
+  modules: { ...defaultModules },
   preset: "blank-canvas",
   background: {
     color: "#0b0b0d",
@@ -369,6 +392,14 @@ export function validateTheme(value: unknown): Theme {
   }
   return {
     schemaVersion: 1,
+    modules: Object.fromEntries(
+      Object.entries(defaultModules).map(([name, enabled]) => [
+        name,
+        typeof record(t.modules)[name] === "boolean"
+          ? record(t.modules)[name]
+          : enabled,
+      ]),
+    ) as Record<ArmyModuleName, boolean>,
     playerSkin: choice(
       t.playerSkin,
       Object.keys(playerSkins) as PlayerSkin[],

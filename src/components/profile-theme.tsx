@@ -126,7 +126,11 @@ export function ProfileTheme({
   const trigger = useRef<HTMLButtonElement>(null);
   const theme =
     previewTheme ??
-    (clean && !editing ? defaultTheme : editing ? draft : saved);
+    (clean && !editing
+      ? { ...defaultTheme, modules: saved.modules }
+      : editing
+        ? draft
+        : saved);
   const canEditCommunity =
     kind === "army" && ["founder", "admin"].includes(role);
   const canPostOfficial =
@@ -221,7 +225,7 @@ export function ProfileTheme({
         role,
         canEditCommunity,
         canPostOfficial,
-        theme: custom ? theme : defaultTheme,
+        theme: custom ? theme : { ...defaultTheme, modules: theme.modules },
         visibleAsset: (asset) => (custom ? visibleAsset(asset) : null),
       }}
     >
@@ -393,6 +397,7 @@ export function ProfileTheme({
             </div>
             <ThemeEditor
               theme={draft}
+              showModules={kind === "army"}
               onChange={setDraft}
               onBusyChange={setUploading}
             />

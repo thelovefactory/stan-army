@@ -12,40 +12,47 @@ import {
 import { ArmyView, armyPath } from "@/lib/data";
 import { memories } from "@/lib/fan-space";
 import { useDemo } from "./demo-provider";
-import { ProfileTheme } from "./profile-theme";
+import { ProfileTheme, useProfileTheme } from "./profile-theme";
+import { ArmyModule } from "./army-module";
 import { ArmyPlayer } from "./army-player";
 import { MemoryVisual } from "./memory-visual";
 export function FanMediaPreviews() {
+  const { theme } = useProfileTheme();
+  if (!theme.modules.gallery && !theme.modules.videos) return null;
   return (
     <section className="fan-media-previews">
-      <div className="memory-preview-heading">
-        <div>
-          <p className="eyebrow">WE KEEP THE LITTLE THINGS.</p>
-          <h2>The communal shoebox.</h2>
-        </div>
-        <Link href="/armies/nova/gallery">
-          Open the gallery <ArrowUpRight size={16} />
-        </Link>
-      </div>
-      <div className="shoebox-preview">
-        {memories.slice(0, 3).map((m) => (
-          <Link key={m.id} href={`/armies/nova/gallery?memory=${m.id}`}>
-            <MemoryVisual memoryId={m.id} />
-            <span>{m.title}</span>
-            <small>@{m.by} · demo</small>
+      <ArmyModule name="gallery">
+        <div className="memory-preview-heading">
+          <div>
+            <p className="eyebrow">WE KEEP THE LITTLE THINGS.</p>
+            <h2>The communal shoebox.</h2>
+          </div>
+          <Link href="/armies/nova/gallery">
+            Open the gallery <ArrowUpRight size={16} />
           </Link>
-        ))}
-      </div>
-      <Link className="video-shelf-preview" href="/armies/nova/videos">
-        <span className="video-preview-play">
-          <Play size={20} />
-        </span>
-        <div>
-          <b>Someone stayed up making this.</b>
-          <span>Fan video studies & a little after-hours creativity.</span>
         </div>
-        <ArrowUpRight size={21} />
-      </Link>
+        <div className="shoebox-preview">
+          {memories.slice(0, 3).map((m) => (
+            <Link key={m.id} href={`/armies/nova/gallery?memory=${m.id}`}>
+              <MemoryVisual memoryId={m.id} />
+              <span>{m.title}</span>
+              <small>@{m.by} · demo</small>
+            </Link>
+          ))}
+        </div>
+      </ArmyModule>
+      <ArmyModule name="videos">
+        <Link className="video-shelf-preview" href="/armies/nova/videos">
+          <span className="video-preview-play">
+            <Play size={20} />
+          </span>
+          <div>
+            <b>Someone stayed up making this.</b>
+            <span>Fan video studies & a little after-hours creativity.</span>
+          </div>
+          <ArrowUpRight size={21} />
+        </Link>
+      </ArmyModule>
     </section>
   );
 }
@@ -108,9 +115,13 @@ export function FanMediaPage({
           </div>
         </div>
         {mode === "gallery" ? (
-          <MemoryGallery initialMemory={initialMemory} />
+          <ArmyModule name="gallery" fallback>
+            <MemoryGallery initialMemory={initialMemory} />
+          </ArmyModule>
         ) : (
-          <FanVideos />
+          <ArmyModule name="videos" fallback>
+            <FanVideos />
+          </ArmyModule>
         )}
       </main>
     </ProfileTheme>
