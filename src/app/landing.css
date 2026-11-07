@@ -316,25 +316,30 @@
 .landing-hero .hero-copy {
   container-type: inline-size;
 }
-.landing-page .button {
-  background: #ff20bb url("/decorations/stan-leopard-dense.png") repeat;
+:is(.landing-page, .landing-header) .button {
+  background-image:
+    linear-gradient(#0006, #0006), url("/decorations/stan-leopard-dense.png");
+  background-color: #9b0878;
+  background-repeat: repeat;
   background-size: 220px 220px;
   color: #fff;
   border: 1px solid #ff54c7;
-  padding: 8px;
+  padding: 14px 22px;
+  min-height: 54px;
+  border-radius: 6px;
   box-shadow: 0 2px 0 #6411ef;
   transition:
     transform 180ms ease,
     border-color 180ms ease;
 }
-.landing-page .button > span {
+:is(.landing-page, .landing-header) .button > span {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 14px;
   background: transparent;
   color: #fff;
-  padding: 7px 12px;
+  padding: 0;
   font-family: "Stan Anton", Impact, "Arial Narrow", sans-serif;
   font-weight: 400;
   font-size: 21px;
@@ -344,15 +349,15 @@
   text-shadow: none;
   -webkit-text-stroke: 0;
 }
-.landing-page .button:hover {
+:is(.landing-page, .landing-header) .button:hover {
   transform: scale(1.05);
   border-color: #ffb1e6;
 }
 @media (prefers-reduced-motion: reduce) {
-  .landing-page .button {
+  :is(.landing-page, .landing-header) .button {
     transition: none;
   }
-  .landing-page .button:hover {
+  :is(.landing-page, .landing-header) .button:hover {
     transform: none;
   }
 }
@@ -373,4 +378,80 @@
   object-fit: contain;
   filter: none;
   mix-blend-mode: normal;
+}
+
+/* Override context-specific hero/header sizes so every creation CTA matches. */
+.landing-page .hero-actions .button,
+:is(.landing-page, .landing-header) .button {
+  padding: 14px 22px;
+}
+@font-face {
+  font-family: "Stan Bungee";
+  src: url("/fonts/Bungee-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Stan Rubik Mono";
+  src: url("/fonts/RubikMonoOne-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+.ticker span {
+  font-family: "Stan Anton", Impact, sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  animation: ticker-type 12s steps(1, end) infinite;
+}
+@keyframes ticker-type {
+  0%,
+  100% {
+    font-family: "Stan Anton", Impact, sans-serif;
+  }
+  33.333% {
+    font-family: "Stan Bungee", Impact, sans-serif;
+  }
+  66.666% {
+    font-family: "Stan Rubik Mono", monospace;
+  }
+}
+@media (max-width: 800px) {
+  .ticker span {
+    font-size: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker span {
+    animation: none;
+  }
+}
+.ticker > div {
+  min-height: 72px;
+}
+.ticker span {
+  font-size: clamp(14px, 1.35vw, 20px);
+}
+@media (max-width: 800px) {
+  .ticker > div {
+    height: 96px;
+  }
+  .ticker span {
+    font-size: 12px;
+  }
+}
+@media (max-width: 800px) {
+  .landing-header .header-end > .button {
+    display: none;
+  }
+}
+@media (max-width: 800px) {
+  .ticker > div {
+    gap: 8px;
+    padding-inline: 12px;
+  }
+  .ticker span {
+    font-size: clamp(9px, 2.5vw, 12px);
+    letter-spacing: -0.04em;
+  }
 }

@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, Menu, X, Headphones } from "lucide-react";
+import { ArrowUpRight, ArrowRight, Menu, X, Headphones } from "lucide-react";
 import { useState } from "react";
 export function Header() {
   const path = usePathname();
@@ -18,7 +18,7 @@ export function Header() {
       <a href="#main" className="skip-link">
         Skip to content
       </a>
-      <header className="site-header">
+      <header className={`site-header${path === "/" ? " landing-header" : ""}`}>
         <div className="container header-inner">
           <Link href="/" aria-label="Stan Army home" className="logo">
             <Image
@@ -45,7 +45,15 @@ export function Header() {
               <span /> VISUAL PROTOTYPE
             </span>
             <Link href="/create" className="button button-small">
-              Start an Army <ArrowUpRight size={15} />
+              {path === "/" ? (
+                <span>
+                  Build your army <ArrowRight size={19} />
+                </span>
+              ) : (
+                <>
+                  Start an Army <ArrowUpRight size={15} />
+                </>
+              )}
             </Link>
             <button
               className="menu-button"
@@ -59,13 +67,17 @@ export function Header() {
         </div>
         {open && (
           <nav aria-label="Mobile navigation" className="mobile-nav">
-            {[...links, { href: "/create", label: "Start an Army" }].map(
-              (l) => (
-                <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>
-                  {l.label} <ArrowUpRight size={16} />
-                </Link>
-              ),
-            )}
+            {[
+              ...links,
+              {
+                href: "/create",
+                label: path === "/" ? "Build your army" : "Start an Army",
+              },
+            ].map((l) => (
+              <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>
+                {l.label} <ArrowUpRight size={16} />
+              </Link>
+            ))}
           </nav>
         )}
       </header>
