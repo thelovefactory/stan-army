@@ -11,9 +11,9 @@ import { DesktopChat, DesktopComposer, DesktopDiscussions, DesktopMusic, Desktop
 import { StanStarIcon } from "./stan-icons";
 import {
   DESKTOP_COLUMNS, DESKTOP_GAP, DESKTOP_ROW, OWNER_DESKTOP_KEY, PANEL_IDS, PERSONAL_DESKTOP_KEY,
-  chatFirstDesktop, movePanel, packDesktop, parseDesktop, parseOwnerDesktop, resizePanel,
+  chatFirstDesktop, movePanel, packDesktop, parseDesktop, parseOwnerDesktop, placePanel, resizePanel, setPanelMinimized, swapPanelSlots,
 } from "@/lib/army-desktop";
-import type { DesktopLayout, DesktopLook, OwnerDesktop, PanelId, Participation } from "@/lib/army-desktop";
+import type { DesktopLayout, DesktopLook, OwnerDesktop, PanelId, Participation, WindowColour, WindowSkin } from "@/lib/army-desktop";
 import s from "./army-desktop-playground.module.css";
 
 const names: Record<PanelId, string> = { feed: "The Army", chat: "Army Chat", board: "Discussions", music: "Army Stereo" };
@@ -35,6 +35,9 @@ type Gesture = {
   id: PanelId; kind: "move" | "resize" | "resize-left"; pointerId: number;
   startX: number; startY: number; stepX: number; base: DesktopLayout;
   handle: HTMLButtonElement;
+  slots: Record<PanelId, { x: number; y: number; width: number; height: number }>;
+  gridX: number; gridY: number; gridWidth: number; offsetX: number; offsetY: number;
+  maxY: number;
 };
 
 export function ArmyDesktopPlayground() {
@@ -50,50 +53,51 @@ export function ArmyDesktopPlayground() {
   const layout = unsavedLayout ?? savedLayout;
   const desktop = useSyncExternalStore(subscribeDesktop, desktopSnapshot, () => false);
   const [role, setRole] = useState("visitor");
+  const [styledWindow, setStyledWindow] = useState<PanelId>("chat");
+  const [warning, setWarning] = useState(false);
   const [active, setActive] = useState<PanelId>("chat");
   const [focused, setFocused] = useState<PanelId | null>(null);
-  const [notice, setNotice] = useState("Your arrangement saves on this device. Everyone else keeps theirs.");
+  const [notice, setNotice] = useState("");
   const [preview, setPreview] = useState<{ id: PanelId; kind: "move" | "resize" | "resize-left"; layout: DesktopLayout } | null>(null);
   const gesture = useRef<Gesture | null>(null);
   const draft = useRef<DesktopLayout | null>(null);
   const grid = useRef<HTMLDivElement>(null);
   const dockRefs = useRef<Partial<Record<PanelId, HTMLButtonElement | null>>>({});
   const frames = useRef<Partial<Record<PanelId, HTMLElement | null>>>({});
-  const placements = packDesktop(layout);
-  const ghost = preview ? packDesktop(preview.layout).find((item) => item.id === preview.id) : undefined;
-  const ordered = desktop ? [...PANEL_IDS].sort((a, b) => {
-    const one = placements.find((item) => item.id === a), two = placements.find((item) => item.id === b);
-    return (one?.y ?? 99) - (two?.y ?? 99) || (one?.x ?? 99) - (two?.x ?? 99);
-  }) : layout.order;
+  const displayLayout = preview?.layout ?? (focused ? resizePanel(layout, focused, { width: 12, height: Math.max(6, layout.sizes[focused].height) }) : layout);
+  const placements = packDesktop(displayLayout);
+  const ghost = preview ? placements.find((item) => item.id === preview.id) : undefined;
+  // Keep DOM nodes stable throughout gestures: moving DOM nodes can lose pointer capture.
+  const ordered = layout.order;
   const join = () => { if (!joined) demo.toggle("army-nova"); };
 
   function save(next: DesktopLayout, message: string) {
     try {
-      localStorage.setItem(PERSONAL_DESKTOP_KEY, JSON.stringify(next)); setUnsavedLayout(null);
+      localStorage.setItem(PERSONAL_DESKTOP_KEY, JSON.stringify(next)); setUnsavedLayout(null); setWarning(false);
       window.dispatchEvent(new Event(eventName)); setNotice(message);
     } catch {
-      setUnsavedLayout(next); setNotice("Layout changed for this visit, but browser storage is unavailable. It won’t survive refresh.");
+      setUnsavedLayout(next); setWarning(true); setNotice("Layout changed for this visit, but browser storage is unavailable. It won’t survive refresh.");
     }
   }
   function saveOwner(next: OwnerDesktop, message: string) {
     if (role !== "host") return;
     try {
-      localStorage.setItem(OWNER_DESKTOP_KEY, JSON.stringify(next)); setUnsavedOwner(null);
+      localStorage.setItem(OWNER_DESKTOP_KEY, JSON.stringify(next)); setUnsavedOwner(null); setWarning(false);
       window.dispatchEvent(new Event(eventName)); setNotice(message);
-    } catch { setUnsavedOwner(next); setNotice("Host changes are visible for this visit but could not be saved."); }
+    } catch { setUnsavedOwner(next); setWarning(true); setNotice("Host changes are visible for this visit but could not be saved."); }
   }
   function reset() {
     finish(false);
     setFocused(null); setActive("feed");
     try {
-      localStorage.removeItem(PERSONAL_DESKTOP_KEY); setUnsavedLayout(null);
+      localStorage.removeItem(PERSONAL_DESKTOP_KEY); setUnsavedLayout(null); setWarning(false);
       window.dispatchEvent(new Event(eventName)); setNotice("Back to the Army’s starting layout. Your drafts are still here.");
-    } catch { setUnsavedLayout(structuredClone(owner.layout)); setNotice("Starting layout restored for this visit; browser storage could not be updated."); }
+    } catch { setUnsavedLayout(structuredClone(owner.layout)); setWarning(true); setNotice("Starting layout restored for this visit; browser storage could not be updated."); }
   }
   function minimize(id: PanelId) {
     const hidden = layout.minimized.includes(id);
     if (focused === id) setFocused(null);
-    save({ ...layout, minimized: hidden ? layout.minimized.filter((item) => item !== id) : [...layout.minimized, id] }, `${names[id]} ${hidden ? "restored" : "minimized to the dock"}. Drafts stay in the window.`);
+    save(setPanelMinimized(layout, id, !hidden), `${names[id]} ${hidden ? "restored" : "minimized to the dock"}. Drafts stay in the window.`);
     if (!hidden) requestAnimationFrame(() => dockRefs.current[id]?.focus());
   }
   function resize(id: PanelId, width: number, height = layout.sizes[id].height) {
@@ -101,7 +105,8 @@ export function ArmyDesktopPlayground() {
     save(next, `${names[id]}: ${next.sizes[id].width} columns wide, ${next.sizes[id].height} rows high. Neighbours made room.`);
   }
   function move(id: PanelId, index: number) {
-    save(movePanel(layout, id, index), `${names[id]} moved. The grid made room.`);
+    const target = layout.order[index];
+    save(desktop && target && target !== id && !layout.minimized.includes(target) ? swapPanelSlots(layout, id, target) : movePanel(layout, id, index), `${names[id]} moved.`);
   }
   function finish(commit: boolean) {
     const current = gesture.current;
@@ -124,10 +129,21 @@ export function ArmyDesktopPlayground() {
   function start(event: PointerEvent<HTMLButtonElement>, id: PanelId, kind: Gesture["kind"]) {
     if (!desktop || focused || event.button !== 0 || !grid.current) return;
     event.preventDefault();
+    for (const menu of grid.current.querySelectorAll("details[open]")) menu.removeAttribute("open");
+    const bounds = grid.current.getBoundingClientRect();
+    const slots = {} as Gesture["slots"];
+    for (const item of packDesktop(layout)) {
+      const rect = frames.current[item.id]!.getBoundingClientRect();
+      slots[item.id] = { x: rect.x, y: rect.y + window.scrollY, width: rect.width, height: rect.height };
+    }
+    const origin = slots[id];
     setActive(id);
     gesture.current = { id, kind, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY + window.scrollY,
       stepX: (grid.current.getBoundingClientRect().width + DESKTOP_GAP) / DESKTOP_COLUMNS,
-      base: layout, handle: event.currentTarget };
+      base: layout, handle: event.currentTarget, slots,
+      gridX: bounds.x, gridY: bounds.y + window.scrollY, gridWidth: bounds.width,
+      offsetX: event.clientX - origin.x, offsetY: event.clientY + window.scrollY - origin.y,
+      maxY: Math.min(48, Math.max(...packDesktop(layout).map((item) => item.y + item.height)) + 1) };
     event.currentTarget.setPointerCapture(event.pointerId);
   }
   function track(event: PointerEvent<HTMLButtonElement>) {
@@ -138,24 +154,22 @@ export function ArmyDesktopPlayground() {
     let next: DesktopLayout;
     if (current.kind !== "move") {
       const size = current.base.sizes[current.id];
-      next = resizePanel(current.base, current.id, { width: size.width + Math.round(dx / current.stepX) * (current.kind === "resize-left" ? -1 : 1), height: size.height + Math.round(dy / (DESKTOP_ROW + DESKTOP_GAP)) });
+      next = resizePanel(current.base, current.id, { width: size.width + Math.round(dx / current.stepX) * (current.kind === "resize-left" ? -1 : 1), height: size.height + Math.round(dy / (DESKTOP_ROW + DESKTOP_GAP)) }, current.kind === "resize-left");
     } else {
-      const others = current.base.order.filter((id) => id !== current.id && !current.base.minimized.includes(id));
-      let target: PanelId | undefined;
-      let distance = Infinity;
-      for (const id of others) {
-        const frame = frames.current[id]; if (!frame) continue;
-        const rect = frame.getBoundingClientRect();
-        const cx = Math.max(rect.left, Math.min(rect.right, event.clientX));
-        const cy = Math.max(rect.top, Math.min(rect.bottom, event.clientY));
-        const score = (cx - event.clientX) ** 2 + (cy - event.clientY) ** 2;
-        if (score < distance) { target = id; distance = score; }
+      const x = event.clientX, y = event.clientY + window.scrollY;
+      if (x < current.gridX || x > current.gridX + current.gridWidth || y < current.gridY) {
+        draft.current = null; setPreview(null); return;
       }
-      const order = current.base.order.filter((id) => id !== current.id);
-      const rect = target ? frames.current[target]?.getBoundingClientRect() : null;
-      const after = rect ? event.clientY > rect.top + rect.height / 2 || event.clientX > rect.left + rect.width * .6 : true;
-      const index = target ? order.indexOf(target) + Number(after) : order.length;
-      next = movePanel(current.base, current.id, index);
+      const hit = current.base.order.find((id) => {
+        const rect = current.slots[id];
+        return rect && x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;
+      });
+      if (hit === current.id) { draft.current = null; setPreview(null); return; }
+      if (hit) next = swapPanelSlots(current.base, current.id, hit);
+      else next = placePanel(current.base, current.id, {
+        x: Math.round((x - current.gridX - current.offsetX) / current.stepX),
+        y: Math.min(current.maxY, Math.max(0, Math.round((y - current.gridY - current.offsetY) / (DESKTOP_ROW + DESKTOP_GAP)))),
+      });
     }
     draft.current = next; setPreview({ id: current.id, kind: current.kind, layout: next });
     if (event.clientY > window.innerHeight - 45) window.scrollBy({ top: 16, behavior: "instant" });
@@ -174,7 +188,7 @@ export function ArmyDesktopPlayground() {
   }
 
   return <main id="main" className={`${s.desktop} ${s[owner.look]}`} data-desktop-playground
-    style={{ "--participation": { mint: "#b8f5d9", pink: "#f7c5e4", yellow: "#f2efa8" }[owner.participation] } as CSSProperties}
+    style={{ "--participation": { mint: "#e1f5eb", pink: "#fce8f3", yellow: "#fff6d5" }[owner.participation] } as CSSProperties}
     onKeyDown={(event) => { if (event.key === "Escape") { if (gesture.current) finish(false); else if (focused) setFocused(null); } }}>
     <div className={s.wrap}>
       <div className={s.breadcrumb}><Link href="/armies/nova"><ArrowLeft size={14} />Original Army</Link><span>DESKTOP PLAYGROUND · LOCAL DEMO</span></div>
@@ -184,31 +198,35 @@ export function ArmyDesktopPlayground() {
         <button className={s.join} aria-pressed={joined} onClick={() => demo.toggle("army-nova")}>{joined ? <Check size={17} /> : <Plus size={17} />}{joined ? "Joined" : "Join this Army"}</button>
       </header>
       <div className={s.tools}>
-        <div><strong>Same Army. Your arrangement.</strong><p className={s.desktopHint}>Drag a title bar. Pull a corner. Make room.</p><p className={s.mobileHint}>Your windows stack here. Reorder them from their menus.</p></div>
         <button onClick={() => { setFocused(null); save(chatFirstDesktop(), "Chat has the big space. Discussions take the smaller window. This is just your view."); }}><MessageCircle size={16} />Chat first</button>
         <button onClick={reset}><RotateCcw size={16} />Reset to Army layout</button>
         <label className={s.role}><span>Demo role</span><select aria-label="Demo role" value={role} onChange={(event) => setRole(event.target.value)}><option value="visitor">Community member</option><option value="host">Community host</option></select></label>
         {role === "host" && <details className={s.ownerSettings}><summary><Palette size={16} />Army style</summary><div>
-          <strong>You set the atmosphere.</strong><p>Members arrange their own windows. This host demo saves only on this device; it isn’t authentication.</p>
+          <small className={s.demoLabel}>LOCAL HOST PREVIEW</small>
           <label>Room style<select aria-label="Army room style" value={owner.look} onChange={(event) => saveOwner({ ...owner, look: event.target.value as DesktopLook }, "Host appearance saved on this device. Your personal arrangement stayed put.")}><option value="electric">Electric leopard</option><option value="afterhours">After hours</option><option value="chrome">Chrome room</option></select></label>
           <label>Participation colour<select aria-label="Army participation colour" value={owner.participation} onChange={(event) => saveOwner({ ...owner, participation: event.target.value as Participation }, "Composer and chat updated together.")}><option value="mint">Mint</option><option value="pink">Pink</option><option value="yellow">Yellow</option></select></label>
+          <div className={s.windowAppearance}>
+            <label>Window<select aria-label="Style window" value={styledWindow} onChange={(event) => setStyledWindow(event.target.value as PanelId)}>{PANEL_IDS.map((id) => <option key={id} value={id}>{names[id]}</option>)}</select></label>
+            <label>Colour<select aria-label="Window colour" value={owner.windows[styledWindow].colour} onChange={(event) => saveOwner({ ...owner, windows: { ...owner.windows, [styledWindow]: { ...owner.windows[styledWindow], colour: event.target.value as WindowColour } } }, "Window colour saved.")}><option value="mint">Mint</option><option value="pink">Pink</option><option value="blue">Blue</option><option value="yellow">Yellow</option><option value="neutral">Neutral</option></select></label>
+            <label>Skin<select aria-label="Window skin" value={owner.windows[styledWindow].skin} onChange={(event) => saveOwner({ ...owner, windows: { ...owner.windows, [styledWindow]: { ...owner.windows[styledWindow], skin: event.target.value as WindowSkin } } }, "Window skin saved.")}><option value="solid">Solid</option><option value="leopard">Leopard</option><option value="grid">Grid</option></select></label>
+          </div>
           <button onClick={() => saveOwner({ ...owner, layout: structuredClone(layout) }, "Starting layout saved for this local host demo. Members can still make their own arrangement.")}>Use this as the starting layout <Check size={16} /></button>
         </div></details>}
       </div>
-      <p className={s.status} role="status" aria-live="polite">{notice}</p>
-      <p id="desktop-key-help" className="sr-only">Drag the title to reorder. Arrow keys on a title move its window earlier or later. Shift plus arrows resizes it. Arrow keys on the corner resize. Escape cancels dragging. Sizing also has a menu. Mobile uses stacked windows.</p>
-      {focused && <button className={s.focusReturn} onClick={() => setFocused(null)}><ArrowLeft size={16} />Back to all windows</button>}
+      <p className={warning ? s.status : "sr-only"} role="status" aria-live="polite">{notice}</p>
+      <p id="desktop-key-help" className="sr-only">Drag a window onto another to exchange their spaces, or into an empty grid space. Arrow keys on a title exchange nearby window spaces. Shift plus arrows resizes it. Arrow keys on the corner resize. Escape cancels dragging. Sizing also has a menu. Mobile uses stacked windows.</p>
+      {focused && <button className={s.focusReturn} onClick={() => setFocused(null)}><ArrowLeft size={16} />Restore layout</button>}
 
       <div ref={grid} className={`${s.grid} ${preview ? s.gridActive : ""}`} data-window-grid>
         {ordered.map((id) => {
           const placement = placements.find((item) => item.id === id);
-          const hidden = !placement || (focused !== null && focused !== id);
+          const hidden = layout.minimized.includes(id);
           const Icon = icons[id];
-          const size = layout.sizes[id];
-          const visiblePlacement = focused === id ? { x: 0, y: 0, width: 12, height: 8 } : placement;
+          const size = displayLayout.sizes[id];
+          const visiblePlacement = placement;
           return <section key={id} ref={(element) => { frames.current[id] = element; }} hidden={hidden}
-            className={`${s.window} ${s[id]} ${active === id ? s.active : ""} ${preview?.id === id ? s.moving : ""}`}
-            data-panel-id={id} data-expanded={focused === id ? "true" : undefined} aria-labelledby={`window-title-${id}`}
+            className={`${s.window} ${active === id ? s.active : ""} ${preview?.id === id ? s.moving : ""}`}
+            data-panel-id={id} data-window-colour={owner.windows[id].colour} data-window-skin={owner.windows[id].skin} data-expanded={focused === id ? "true" : undefined} aria-labelledby={`window-title-${id}`}
             style={{ gridColumn: visiblePlacement ? `${visiblePlacement.x + 1} / span ${visiblePlacement.width}` : undefined,
               gridRow: visiblePlacement ? `${visiblePlacement.y + 1} / span ${visiblePlacement.height}` : undefined,
               "--window-height": `${size.height * DESKTOP_ROW + (size.height - 1) * DESKTOP_GAP}px` } as CSSProperties}
@@ -227,13 +245,12 @@ export function ArmyDesktopPlayground() {
                 <summary aria-label={`Size and position ${names[id]}`} title="Size & position"><Scan size={16} /></summary>
                 <div>
                   <label>Window width<select aria-label={`${names[id]} width`} disabled={!desktop || !!focused} value={size.width} onChange={(event) => resize(id, Number(event.target.value))}>{Array.from({ length: 9 }, (_, index) => index + 4).map((width) => <option value={width} key={width}>{width}/12{width === 4 ? " · narrow" : width === 8 ? " · wide" : width === 12 ? " · full" : ""}</option>)}</select></label>
-                  <label>Window height<select aria-label={`${names[id]} height`} disabled={!desktop || !!focused} value={size.height} onChange={(event) => resize(id, size.width, Number(event.target.value))}>{Array.from({ length: 7 }, (_, index) => index + 2).map((height) => <option value={height} key={height}>{height} rows</option>)}</select></label>
+                  <label>Window height<select aria-label={`${names[id]} height`} disabled={!desktop || !!focused} value={size.height} onChange={(event) => resize(id, size.width, Number(event.target.value))}>{Array.from({ length: 6 }, (_, index) => index + 3).map((height) => <option value={height} key={height}>{height} rows</option>)}</select></label>
                   <button disabled={layout.order.indexOf(id) === 0} onClick={() => move(id, layout.order.indexOf(id) - 1)}><ArrowLeft size={15} />Move earlier</button>
                   <button disabled={layout.order.indexOf(id) === layout.order.length - 1} onClick={() => move(id, layout.order.indexOf(id) + 1)}><ArrowDown size={15} />Move later</button>
-                  <p>{desktop ? "The grid makes room for you." : "Widths fit your screen on mobile."}</p>
                 </div>
               </details>
-              <button className={s.windowControl} aria-label={`${focused === id ? "Restore" : "Expand"} ${names[id]}`} onClick={() => { setFocused(focused === id ? null : id); setActive(id); }}><Maximize2 size={15} /></button>
+              <button className={s.windowControl} aria-label={`${focused === id ? "Restore" : "Expand"} ${names[id]}`} onClick={() => { setFocused(focused === id ? null : id); setActive(id); requestAnimationFrame(() => frames.current[id]?.scrollIntoView({block:"nearest", behavior:"instant"})); }}><Maximize2 size={15} /></button>
               <button className={s.windowControl} aria-label={`Minimize ${names[id]}`} onClick={() => minimize(id)}><Minus size={16} /></button>
             </header>
             <div className={s.windowBody} data-window-content={id}>
@@ -252,17 +269,15 @@ export function ArmyDesktopPlayground() {
               onKeyDown={(event) => keys(event, id, true)}><span aria-hidden="true">◢</span></button>}
           </section>;
         })}
-        {ghost && <div className={s.ghost} data-drop-preview aria-hidden="true" style={{ gridColumn: `${ghost.x + 1} / span ${ghost.width}`, gridRow: `${ghost.y + 1} / span ${ghost.height}` }}><span>{names[ghost.id]} · snap here</span></div>}
-        {layout.minimized.length === PANEL_IDS.length && <div className={s.empty}><StanStarIcon size={40} /><h2>Everyone’s in the dock.</h2><p>Pick a window below to bring it back.</p></div>}
+        {ghost && <div className={s.ghost} data-drop-preview aria-hidden="true" style={{ gridColumn: `${ghost.x + 1} / span ${ghost.width}`, gridRow: `${ghost.y + 1} / span ${ghost.height}` }} /> }
+        {layout.minimized.length === PANEL_IDS.length && <div className={s.empty}><StanStarIcon size={40} /><h2>Everyone’s in the dock.</h2></div>}
       </div>
-      <nav className={s.dock} aria-label="Army window dock"><span className={s.dockBrand}><StanStarIcon size={22} /><b>YOUR ARMY DESKTOP</b></span>{PANEL_IDS.map((id) => { const Icon = icons[id]; const open = !layout.minimized.includes(id) && (!focused || focused === id);
+      <nav className={s.dock} aria-label="Army window dock"><span className={s.dockBrand}><StanStarIcon size={22} /><b>YOUR ARMY DESKTOP</b></span>{PANEL_IDS.map((id) => { const Icon = icons[id]; const open = !layout.minimized.includes(id);
         return <button key={id} ref={(element) => { dockRefs.current[id] = element; }} aria-label={`Show ${names[id]}`} aria-pressed={open} onClick={() => {
           if (layout.minimized.includes(id)) { minimize(id); setFocused(null); setActive(id); }
-          else if (active === id && !focused) minimize(id);
           else { setFocused(null); setActive(id); requestAnimationFrame(() => frames.current[id]?.scrollIntoView({ block: "nearest", behavior: "instant" })); }
         }}><Icon size={17} /><span>{names[id]}</span><i aria-hidden="true" /></button>;
       })}<Link href="/create" className={s.dockCreate}>Start your own Army <ArrowUpRight size={16} /></Link></nav>
-      <p className={s.footnote}>A local layout experiment. Messages and posts reset on refresh; your window arrangement stays on this device. Original Nova and its saved themes are unchanged.</p>
     </div>
   </main>;
 }

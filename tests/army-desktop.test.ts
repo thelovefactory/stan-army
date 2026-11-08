@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {
   DEFAULT_DESKTOP, DESKTOP_COLUMNS, OWNER_DESKTOP_KEY, PANEL_IDS, PERSONAL_DESKTOP_KEY,
   chatFirstDesktop, movePanel, overlaps, packDesktop, parseDesktop, parseOwnerDesktop,
-  resizePanel, validateDesktop,
+  resizePanel, validateDesktop, placePanel, setPanelMinimized, swapPanelSlots,
 } from "../src/lib/army-desktop";
 import type { DesktopLayout } from "../src/lib/army-desktop";
 
@@ -58,7 +58,7 @@ test("stored layouts reject foreign IDs, styling, forged roles and unsafe geomet
   assert.deepEqual(layout.minimized, ["music"]);
   assert.deepEqual(layout.sizes.chat, {width: 4, height: 8});
   assert.deepEqual(layout.sizes.feed, DEFAULT_DESKTOP.sizes.feed);
-  assert.deepEqual(layout.sizes.board, {width: 12, height: 2});
+  assert.deepEqual(layout.sizes.board, {width: 12, height: 3});
   assert.equal(JSON.stringify(layout).includes("host"), false);
   assert.equal(JSON.stringify(layout).includes("evil"), false);
   assertPacked(layout);
@@ -86,4 +86,61 @@ test("owner appearance and personal layout are separate, versioned and cannot su
   assert.equal(JSON.stringify(owner).includes("role"), false);
   const unsafe = parseOwnerDesktop('{"version":1,"look":"url(evil)","participation":"<script>"}');
   assert.equal(unsafe.look, "electric"); assert.equal(unsafe.participation, "mint");
+});
+
+
+test("dropping windows exchanges their exact footprints without moving unrelated panels", () => {
+  const before = packDesktop(DEFAULT_DESKTOP);
+  const next = swapPanelSlots(DEFAULT_DESKTOP, "chat", "board");
+  const after = assertPacked(next);
+  const chat = after.find((item) => item.id === "chat")!;
+  const board = after.find((item) => item.id === "board")!;
+  const oldChat = before.find((item) => item.id === "chat")!;
+  const oldBoard = before.find((item) => item.id === "board")!;
+  assert.deepEqual({...chat, id:"board"}, oldBoard);
+  assert.deepEqual({...board, id:"chat"}, oldChat);
+  assert.deepEqual(after.find((item) => item.id === "feed"), before.find((item) => item.id === "feed"));
+  assert.deepEqual(after.find((item) => item.id === "music"), before.find((item) => item.id === "music"));
+  assert.deepEqual(parseDesktop(JSON.stringify(next)), next);
+});
+
+test("a shared divider trades width while the resized window stays under the pointer", () => {
+  const resized = resizePanel(DEFAULT_DESKTOP, "chat", {width:8,height:4}, true);
+  const after = assertPacked(resized);
+  assert.deepEqual(after.find((item) => item.id === "chat"), {id:"chat",x:4,y:0,width:8,height:4});
+  assert.deepEqual(after.find((item) => item.id === "feed"), {id:"feed",x:0,y:0,width:4,height:7});
+  assert.equal(after.find((item) => item.id === "board")!.y,7);
+  const small = resizePanel(resized,"chat",{width:4,height:3});
+  assert.equal(assertPacked(small).find((item)=>item.id==="chat")!.y,0);
+});
+
+test("minimising preserves neighbour positions and restoring into an occupied space keeps everyone visible", () => {
+  const hidden = setPanelMinimized(DEFAULT_DESKTOP,"chat",true);
+  const before = assertPacked(hidden);
+  assert.deepEqual(before.find((item)=>item.id==="feed"),packDesktop(DEFAULT_DESKTOP).find((item)=>item.id==="feed"));
+  const filled = placePanel(hidden,"music",{x:8,y:0},{width:4,height:3});
+  const restored = setPanelMinimized(filled,"chat",false);
+  assert.equal(assertPacked(restored).length,4);
+  assert.deepEqual(packDesktop(restored).find((item)=>item.id==="music"),packDesktop(filled).find((item)=>item.id==="music"));
+});
+
+test("repeated spatial swaps and resizes never lose panels or create collisions", () => {
+  let layout=structuredClone(DEFAULT_DESKTOP);
+  for(let i=0;i<100;i++) {
+    layout=swapPanelSlots(layout,PANEL_IDS[i%4],PANEL_IDS[(i+1)%4]);
+    layout=resizePanel(layout,PANEL_IDS[i%4],{width:4+(i*3)%9,height:3+i%6},i%2===0);
+    assertPacked(layout);
+    layout=parseDesktop(JSON.stringify(layout));
+    assert.equal(assertPacked(layout).length,4);
+  }
+});
+
+test("per-window skins are validated separately from geometry and old owner preferences migrate safely", () => {
+  const old=parseOwnerDesktop(JSON.stringify({version:1,look:"chrome",participation:"pink",layout:DEFAULT_DESKTOP}));
+  assert.equal(old.look,"chrome"); assert.equal(old.windows.chat.skin,"solid");
+  const next=parseOwnerDesktop(JSON.stringify({...old,windows:{chat:{skin:"leopard",colour:"blue"},feed:{skin:"url(evil)",colour:"<script>"}}}));
+  assert.deepEqual(next.windows.chat,{skin:"leopard",colour:"blue"});
+  assert.equal(next.windows.feed.skin,"solid");
+  assert.equal(JSON.stringify(next).includes("evil"),false);
+  assert.deepEqual(next.layout,old.layout);
 });

@@ -1,38 +1,31 @@
 # Army desktop playground
 
-Review `/nova-playground`. This is a separate snap-to-grid experiment using Nova's existing demo content. `/armies/nova`, its saved themes and `/nova-preview` retain their existing presentation.
+Review `/nova-playground`. This separate grid experiment uses Nova’s existing demo content. `/armies/nova`, its saved themes and `/nova-preview` retain their existing presentation.
 
-## What to try
+## Spatial behaviour
 
-- Drag any title bar to move a panel in the reading order. A ghost shows its snapped destination before dropping. The grid packs the other panels around it without overlap.
-- Drag either bottom corner to change a window's column span and height. The right edge grows with a rightward drag; the left edge grows with a leftward drag. Resizing reflows the grid rather than anchoring an absolute screen coordinate.
-- Use **Chat first** to compare an 8-column chat with a 4-column discussion board.
-- Minimise to the dock; restore from the dock. Expand one window for focus and return to all windows. Contents remain mounted when minimised/focused, preserving draft text and audio playback.
-- Use the **Size & position** menu instead of dragging. Arrow keys on a title reorder; Shift+arrows resize. Arrow keys on a corner resize. Escape cancels an in-progress gesture, closes a window menu or exits focus view.
-- **Reset to Army layout** restores the host's starting arrangement without clearing drafts or modifying existing Army theme settings.
+The desktop has twelve columns, 72px rows and 16px gaps. Windows are 4–12 columns wide and 3–8 rows high. Stable grid coordinates supplement the existing v1 layout schema; older saved layouts acquire coordinates on their first spatial edit.
 
-## Why a grid first
+Dropping a title bar onto another window exchanges their actual spaces, including dimensions. Other windows stay put. Small movements within the original window do nothing. Empty-space drops snap to a cell. Resizing anchors the active window; a shared vertical divider trades width with a same-row neighbour when both retain at least four columns. Otherwise only colliding neighbours relocate to the nearest available space. Every affected window previews its resulting position before release. DOM order stays stable during pointer capture. Escape cancels without saving.
 
-This tests personal spatial control without introducing overlapping windows, escalating z-index problems or inaccessible off-screen title bars. A 12-column first-fit layout reflows neighbours. Widths are bounded to 4–12 columns and heights to 2–8 rows. Menus remain within the frame, and keyboard/menu alternatives make dragging optional.
+Only the explicit minimise control hides a window. Dock buttons reveal or restore; repeated clicks cannot minimise an open window. Minimising preserves neighbours’ coordinates. Restoring into a space that has since been occupied finds another free slot rather than moving visible windows. Expanding temporarily widens a window and makes room around it; other windows remain visible. Restore layout/Escape returns to the saved geometry. Content remains mounted, preserving drafts and audio during rearrangements and minimising.
 
-Below 1000px the windows stack to fit the screen. Dragging and resizing are disabled, with order controls still available. Saved desktop widths are preserved for a later desktop visit. Minimised windows remain available in the dock; even minimising everything is recoverable. Focus view is temporary and does not overwrite saved dimensions.
+Below 1000px windows stack in their saved reading order. Dragging/resizing are disabled; order controls remain available. Desktop geometry is preserved. Arrow keys on title bars exchange spaces on desktop or change the reading order on mobile. Shift+arrows and corner arrow keys resize. Menus provide alternatives to dragging.
 
-## Host atmosphere versus personal arrangement
+## Appearance and discovery
 
-The initial role is **Community member**. Personal moves, resizes, order and minimised state save only under `stan-army:desktop:personal:v1:army-nova` on this device.
+A single restrained window system uses slim tinted headers, consistent controls, thin borders and readable opaque content. Simulated hosts can select a colour and Solid, Leopard or Grid header skin for each window. Header skins do not interfere with content or alter geometry. Room appearances remain Electric leopard, After hours and Chrome. Mint/pink/yellow participation surfaces link composer and chat.
 
-Switch the explicitly simulated **Demo role** to **Community host** to try **Army style**. Host controls provide Electric leopard, After hours and Chrome room appearances, a linked mint/pink/yellow participation surface for composer and chat, and **Use this as the starting layout**. These save separately under `stan-army:desktop:owner:v1:army-nova`. A personal arrangement takes precedence; reset returns to the current host default.
+Visible tutorial blocks, gesture instructions and routine success notices have been removed. Hover hints and screen-reader instructions remain. Real storage failures still display a warning. Menus retain functional labels and the prototype retains its local-demo disclosures.
 
-This is a local prototype, not authentication, real community role enforcement, a published default or cross-device syncing. No role or permissions are restored from storage. Host styling remains readable and does not change which controls do what. Storage failures retain an operable temporary layout and explicitly report that it is unsaved.
+## Local prototype boundaries
 
-## Implementation boundaries
+The initial role is Community member. Personal arrangements use `stan-army:desktop:personal:v1:army-nova`. Switching the simulated Demo role to Community host reveals Army style. Host appearance and starting layout save separately under `stan-army:desktop:owner:v1:army-nova`. Personal arrangements take precedence; Reset to Army layout restores the current host default. Neither key grants or restores permissions.
 
-The page has its own CSS module and safe enum/numeric layout schema. It adds no dependency, arbitrary CSS storage, third-party embeds, database, billing, backend or new posting feed. The first-fit packing and validation are pure functions in `army-desktop.ts`. Existing study content components are reused with opt-in suppression of duplicate window headings; their default rendering is unchanged. The original root navigation, pages and theme schemas remain untouched.
-
-Posts, chat, membership and discussions retain the existing demo-only behaviour. Drafts survive rearrangement and minimising, but do not survive refresh. Layout preferences survive refresh. Music uses existing original sample audio, not an unlicensed or purported Nova recording.
+This adds no authentication, database, publishing, arbitrary CSS, third-party embeds or new posting feed. Styling is scoped to the playground. Stored options use validated enums and bounded numbers. Invalid collisions are repaired without dropping panels. Existing study components are reused; their normal rendering is unchanged. Drafts survive rearrangement but not refresh. Layout preferences survive refresh. Storage failure keeps the temporary arrangement operable.
 
 ## Validation
 
-44 tests cover existing behaviour plus packing, collision-free reflow across 180 size combinations, clamping, persistence parsing, minimised state and owner/personal separation. Browser checks cover real pointer dragging and left resizing, keyboard movement/resizing, Escape cancellation, draft retention, audio continuing while minimised, focus/restore, refresh, host styling/defaults, member-only controls, reset, fully minimised recovery, blocked browser storage, menus and responsive layouts at 320/390/800/999/1000/1024/1100/1440px. No runtime or hydration errors occurred in interaction checks.
+49 automated tests cover existing behaviour and desktop packing, validation, legacy migration, slot swaps, shared-divider resizing, minimising/restoring occupied slots, repeated spatial edits, skin enums and separate owner/personal storage. Lint, type checking and the production build are checked separately.
 
-The full interaction check also passed against the production build, and the prior Nova layout study regression passed with original Nova styling and saved theme unchanged. ESLint, TypeScript and production build passed. [Desktop](screenshots/army-desktop-playground.png) · [Chat first](screenshots/army-desktop-chat-first.png) · [Mobile](screenshots/army-desktop-mobile.png).
+Browser checks exercise pointer swaps and live previews, small in-slot drags, Escape cancellation, left-corner resizing, keyboard control, refresh persistence, minimum-height chat inputs, drafts, audio continuity, host styles, repeated dock activation, all-minimised recovery, blocked storage and layouts from 320–1440px. Runtime/hydration errors and panel/page overflow are checked. These are prototype interaction checks, not cross-browser certification.
