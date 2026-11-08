@@ -105,7 +105,7 @@ export function ArmyStyleEditor({ initial, visible, scope, section, onScope, onS
         <label className={s.field}>Window frame<select aria-label="Window frame" value={value.frame} onChange={(e) => update({ ...value, frame: e.target.value as OwnerDesktop["frame"] })}><option value="minimal">Minimal</option><option value="classic">Retro bevel</option></select></label>
       </section>}
       {section === "panels" && <section id="style-section-panels" role="tabpanel" aria-labelledby="style-tab-panels">
-        <label className={s.field}>Style<select aria-label="Style window" value={scope} onChange={(e) => onScope(e.target.value as StyleScope)}><option value="all">All panels</option>{PANEL_IDS.map((id) => <option key={id} value={id}>{names[id]}</option>)}</select></label>
+        <label className={s.field}>Editing panel<select aria-label="Style window" value={scope} onChange={(e) => onScope(e.target.value as StyleScope)}>{PANEL_IDS.map((id) => <option key={id} value={id}>{names[id]}</option>)}<option value="all">All panels together</option></select></label>
         <h3>{scope === "all" ? "Together, or totally different." : names[scope]}</h3>
         <p className={s.label}>Panel colour{!same("surface") && <small>Mixed</small>}</p><div className={s.swatches}>{surfaces.map(([surface, label, colour]) => <button key={surface} aria-label={`${label} panel colour`} aria-pressed={same("surface") && first.surface === surface} title={label} style={{ "--swatch": colour } as CSSProperties} onClick={() => editPanels({ surface })}><Check size={15} /></button>)}</div>
         <Colour label="Custom panel colour" value={first.customSurface} onChange={(customSurface) => editPanels({ surface: "custom", customSurface })} />

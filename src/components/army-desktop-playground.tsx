@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { CSSProperties, KeyboardEvent, PointerEvent } from "react";
-import { ArrowDown, ArrowLeft, ArrowUpRight, Check, ChevronDown, GripVertical, Maximize2, MessageCircle, MessageSquare, Minus, Music2, Newspaper, Palette, Plus, RotateCcw, Scan } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUpRight, Check, ChevronDown, GripVertical, Maximize2, MessageCircle, MessageSquare, Minus, Music2, MoreHorizontal, Newspaper, Palette, Plus, RotateCcw } from "lucide-react";
 import { useDemo } from "./demo-provider";
 import { fanNotes } from "@/lib/fan-space";
 import { DesktopChat, DesktopComposer, DesktopDiscussions, DesktopMusic, DesktopPost } from "./nova-layout-study";
@@ -54,9 +54,10 @@ export function ArmyDesktopPlayground() {
   const [draftOwner, setDraftOwner] = useState<OwnerDesktop | null>(null);
   const owner = draftOwner ?? committedOwner;
   const [editorVisible, setEditorVisible] = useState(false);
-  const [styleScope, setStyleScope] = useState<StyleScope>("all");
+  const [styleScope, setStyleScope] = useState<StyleScope>("feed");
   const [styleSection, setStyleSection] = useState<StyleSection>("themes");
   const styleTrigger = useRef<HTMLButtonElement>(null);
+  const styleReturn = useRef<HTMLElement | null>(null);
   const savedLayout = useMemo(() => parseDesktop(personalRaw, owner.layout), [personalRaw, owner.layout]);
   const [unsavedLayout, setUnsavedLayout] = useState<DesktopLayout | null>(null);
   const layout = unsavedLayout ?? savedLayout;
@@ -94,6 +95,7 @@ export function ArmyDesktopPlayground() {
     } catch { setUnsavedOwner(next); setWarning(true); setNotice("Host changes are visible for this visit but could not be saved."); }
   }
   function openStyle(id?: PanelId) {
+    if (!editorVisible || id) styleReturn.current = document.activeElement instanceof HTMLElement ? document.activeElement : styleTrigger.current;
     finish(false); setFocused(null);
     if (!draftOwner) setDraftOwner(structuredClone(committedOwner));
     if (id) { setStyleScope(id); setStyleSection("panels"); }
@@ -101,7 +103,11 @@ export function ArmyDesktopPlayground() {
   }
   function hideStyle() {
     setEditorVisible(false);
-    requestAnimationFrame(() => styleTrigger.current?.focus());
+    requestAnimationFrame(() => {
+      const origin = styleReturn.current;
+      if (origin?.isConnected && !origin.closest("[hidden]")) origin.focus();
+      else styleTrigger.current?.focus();
+    });
   }
   function cancelStyle() { setDraftOwner(null); hideStyle(); }
   function commitStyle(next: OwnerDesktop) {
@@ -229,7 +235,7 @@ export function ArmyDesktopPlayground() {
       backgroundPosition: owner.room.image ? `center ${owner.room.position}` : undefined,
     } as CSSProperties}
     onKeyDown={(event) => { if (event.key === "Escape") { if (gesture.current) finish(false); else if (editorVisible) hideStyle(); else {
-      const openMenu = event.currentTarget.querySelector<HTMLDetailsElement>("details[open]");
+      const openMenu = Array.from(event.currentTarget.querySelectorAll<HTMLDetailsElement>("details[open]")).find((menu) => menu.querySelector("summary")?.getClientRects().length);
       if (openMenu) { openMenu.open = false; openMenu.querySelector("summary")?.focus(); }
       else if (focused) setFocused(null);
     } } }}>
@@ -263,7 +269,7 @@ export function ArmyDesktopPlayground() {
           const visiblePlacement = placement;
           return <section key={id} ref={(element) => { frames.current[id] = element; }} hidden={hidden}
             className={`${s.window} ${active === id ? s.active : ""} ${preview?.id === id ? s.moving : ""}`}
-            data-panel-id={id} data-window-colour={owner.windows[id].colour} data-window-skin={owner.windows[id].skin} data-panel-surface={owner.windows[id].surface} data-panel-typeface={owner.windows[id].typeface} data-expanded={focused === id ? "true" : undefined} aria-labelledby={`window-title-${id}`}
+            data-panel-id={id} data-style-selected={editorVisible && styleScope === id ? "true" : undefined} data-window-colour={owner.windows[id].colour} data-window-skin={owner.windows[id].skin} data-panel-surface={owner.windows[id].surface} data-panel-typeface={owner.windows[id].typeface} data-expanded={focused === id ? "true" : undefined} aria-labelledby={`window-title-${id}`}
             style={{ ...(owner.windows[id].surface === "custom" ? {
                 "--surface-bg": owner.windows[id].customSurface,
                 "--surface-ink": readableColor("#f3f4f3", owner.windows[id].customSurface),
@@ -281,20 +287,23 @@ export function ArmyDesktopPlayground() {
                 onKeyDown={(event) => keys(event, id)} title="Drag to move · arrow keys to reorder">
                 <GripVertical className={s.grip} size={15} /><Icon size={17} /><span className={s.windowTitle}>{names[id]}</span>
               </button>
-              {draftOwner && <button className={s.windowControl} aria-label={`Edit ${names[id]} style`} title="Edit this panel" onClick={() => openStyle(id)}><Palette size={14} /></button>}
+              <button className={s.windowControl} aria-label={`Edit ${names[id]} style`} title={`Style ${names[id]}`} onClick={() => openStyle(id)}><Palette size={13} /></button>
               <details className={s.windowMenu} onKeyDown={(event) => {
-                if (event.key === "Escape") { event.stopPropagation(); event.currentTarget.open = false; event.currentTarget.querySelector("summary")?.focus(); }
+                if (event.key === "Escape" && event.currentTarget.open) { event.stopPropagation(); for (const submenu of event.currentTarget.querySelectorAll("details[open]")) submenu.removeAttribute("open"); event.currentTarget.open = false; event.currentTarget.querySelector("summary")?.focus(); }
               }}>
-                <summary aria-label={`Size and position ${names[id]}`} title="Size & position"><Scan size={16} /></summary>
+                <summary aria-label={`Panel options ${names[id]}`} title="Panel options"><MoreHorizontal size={15} /></summary>
                 <div>
+                  <button aria-label={`${focused === id ? "Restore" : "Expand"} ${names[id]}`} onClick={(event) => { const menu = event.currentTarget.closest("details"); const trigger = menu?.querySelector("summary"); for (const submenu of menu?.querySelectorAll("details[open]") ?? []) submenu.removeAttribute("open"); menu?.removeAttribute("open"); trigger?.focus({preventScroll:true}); setFocused(focused === id ? null : id); setActive(id); requestAnimationFrame(() => { frames.current[id]?.scrollIntoView({block:"nearest", behavior:"instant"}); }); }}><Maximize2 size={14} />{focused === id ? "Restore size" : "Expand panel"}</button>
+                  <details className={s.sizeOptions}><summary aria-label={`Size and position ${names[id]}`}>Size & position<ChevronDown size={13} /></summary><div>
                   <label>Window width<select aria-label={`${names[id]} width`} disabled={!desktop || !!focused} value={size.width} onChange={(event) => resize(id, Number(event.target.value))}>{Array.from({ length: 9 }, (_, index) => index + 4).map((width) => <option value={width} key={width}>{width}/12{width === 4 ? " · narrow" : width === 8 ? " · wide" : width === 12 ? " · full" : ""}</option>)}</select></label>
                   <label>Window height<select aria-label={`${names[id]} height`} disabled={!desktop || !!focused} value={size.height} onChange={(event) => resize(id, size.width, Number(event.target.value))}>{Array.from({ length: 6 }, (_, index) => index + 3).map((height) => <option value={height} key={height}>{height} rows</option>)}</select></label>
                   <button disabled={layout.order.indexOf(id) === 0} onClick={() => move(id, layout.order.indexOf(id) - 1)}><ArrowLeft size={15} />Move earlier</button>
                   <button disabled={layout.order.indexOf(id) === layout.order.length - 1} onClick={() => move(id, layout.order.indexOf(id) + 1)}><ArrowDown size={15} />Move later</button>
+                  </div></details>
                 </div>
               </details>
-              <button className={s.windowControl} aria-label={`${focused === id ? "Restore" : "Expand"} ${names[id]}`} onClick={() => { setFocused(focused === id ? null : id); setActive(id); requestAnimationFrame(() => frames.current[id]?.scrollIntoView({block:"nearest", behavior:"instant"})); }}><Maximize2 size={15} /></button>
-              <button className={s.windowControl} aria-label={`Minimize ${names[id]}`} onClick={() => minimize(id)}><Minus size={16} /></button>
+
+              <button className={s.windowControl} aria-label={`Minimize ${names[id]}`} onClick={() => minimize(id)}><Minus size={14} /></button>
             </header>
             <div className={s.windowBody} data-window-content={id}>
               {id === "feed" && <div className={s.feedContents}><DesktopComposer joined={joined} join={join} />{[...(demo.notes["army-nova"] ?? []), fanNotes[1], fanNotes[0], fanNotes[2], fanNotes[3]].map((note) => <DesktopPost key={note.id} note={note} />)}<Link className={s.archive} href="/armies/nova/posts">View all posts <ArrowUpRight size={16} /></Link></div>}
@@ -305,11 +314,11 @@ export function ArmyDesktopPlayground() {
             {!focused && <button className={`${s.resizeHandle} ${s.resizeLeft}`} aria-label={`Resize ${names[id]} from left`} aria-describedby="desktop-key-help" title="Drag left to make this window wider"
               onPointerDown={(event) => start(event, id, "resize-left")} onPointerMove={track}
               onPointerUp={() => finish(true)} onPointerCancel={() => finish(false)} onLostPointerCapture={() => { if (gesture.current) finish(false); }}
-              onKeyDown={(event) => keys(event, id, true)}><span aria-hidden="true">◢</span></button>}
+              onKeyDown={(event) => keys(event, id, true)}><span aria-hidden="true" /></button>}
             {!focused && <button className={s.resizeHandle} aria-label={`Resize ${names[id]}`} aria-describedby="desktop-key-help" title="Drag to resize · arrow keys to resize"
               onPointerDown={(event) => start(event, id, "resize")} onPointerMove={track}
               onPointerUp={() => finish(true)} onPointerCancel={() => finish(false)} onLostPointerCapture={() => { if (gesture.current) finish(false); }}
-              onKeyDown={(event) => keys(event, id, true)}><span aria-hidden="true">◢</span></button>}
+              onKeyDown={(event) => keys(event, id, true)}><span aria-hidden="true" /></button>}
           </section>;
         })}
         {ghost && <div className={s.ghost} data-drop-preview aria-hidden="true" style={{ gridColumn: `${ghost.x + 1} / span ${ghost.width}`, gridRow: `${ghost.y + 1} / span ${ghost.height}` }} /> }

@@ -49,14 +49,14 @@
 .window.active { border-color:var(--accent); box-shadow:0 6px 24px #15082240; }
 .window:has(.windowMenu[open]) { z-index:30; }
 .moving { box-shadow:0 12px 36px #15082255; }
-.titlebar { display:flex; align-items:center; gap:3px; min-height:49px; padding:0 6px; border-bottom:1px solid #39244615; border-radius:11px 11px 0 0; background:var(--window-tint); color:#282131; flex-shrink:0; }
-.dragHandle { display:flex; align-items:center; gap:7px; flex:1; min-width:0; min-height:44px; border:0; border-radius:7px; background:transparent; color:inherit; padding:8px 4px; text-align:left; cursor:grab; touch-action:none; user-select:none; }
+.titlebar { position:relative; display:flex; align-items:center; gap:3px; min-height:34px; padding:0 6px; border-bottom:1px solid #39244615; border-radius:11px 11px 0 0; background:var(--window-tint); color:#282131; flex-shrink:0; }
+.dragHandle { display:flex; align-items:center; gap:7px; flex:1; min-width:0; min-height:30px; border:0; border-radius:4px; background:transparent; color:inherit; padding:4px; text-align:left; cursor:grab; touch-action:none; user-select:none; }
 .dragHandle:active { cursor:grabbing; }
 .dragHandle > svg { flex-shrink:0; }
 .dragHandle > svg:not(.grip) { color:var(--accent); }
 .grip { opacity:.35; }
 .windowTitle { font:600 13px/1.3 Arial,sans-serif; letter-spacing:-.015em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.windowControl,.windowMenu > summary { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; width:44px; min-height:44px; padding:8px; border:0; border-radius:7px; background:transparent; box-shadow:none; color:#63576b; cursor:pointer; }
+.windowControl,.windowMenu > summary { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; width:28px; min-height:28px; padding:5px; border:0; border-radius:4px; background:transparent; box-shadow:none; color:#63576b; cursor:pointer; }
 .windowControl:hover,.windowMenu > summary:hover { background:#2411300b; color:#241c30; }
 .window[data-window-skin=leopard] .titlebar { background-image:linear-gradient(#ffffff20,#ffffff20),url('/decorations/stan-leopard-dense.png'); background-size:auto,260px; }
 .window[data-window-skin=grid] .titlebar { background-color:var(--window-tint); background-image:linear-gradient(90deg,#76628520 1px,transparent 1px),linear-gradient(#76628520 1px,transparent 1px); background-size:12px 12px; }
@@ -64,12 +64,12 @@
 .windowMenu { position:static; flex-shrink:0; }
 .windowMenu > summary { list-style:none; }
 .windowMenu > summary::-webkit-details-marker { display:none; }
-.windowMenu > div { position:absolute; right:8px; top:54px; width:230px; background:var(--paper); color:var(--ink); border:1px solid var(--rule); border-radius:10px; padding:14px; box-shadow:0 10px 30px #180b2a40; z-index:40; }
+.windowMenu > div { position:absolute; right:6px; top:calc(100% + 6px); width:230px; background:var(--paper); color:var(--ink); border:1px solid var(--rule); border-radius:10px; padding:14px; box-shadow:0 10px 30px #180b2a40; z-index:40; }
 .windowMenu label { display:flex; flex-direction:column; gap:4px; font-size:11px; margin-bottom:10px; }
 .windowMenu select { min-height:44px; padding:8px; border:1px solid #d3c5dc; border-radius:6px; background:#fff; font-size:12px; }
 .windowMenu button { display:flex; align-items:center; gap:8px; min-height:44px; width:100%; background:transparent; border:0; padding:8px 0; font-size:12px; }
 .windowBody { flex:1; min-height:0; min-width:0; overflow:auto; overscroll-behavior:contain; padding:14px; border-radius:0 0 11px 11px; font-size:13px; scrollbar-width:thin; background:var(--paper); }
-.window:has(.resizeHandle) .windowBody { margin-bottom:16px; }
+.window:has(.resizeHandle) .windowBody { margin-bottom:0; }
 .windowBody :is(button,input,textarea,select) { font-family:Arial,Helvetica,sans-serif; }
 .feedContents { display:flex; flex-direction:column; gap:16px; }
 .feedContents > section { margin:0; }
@@ -89,8 +89,8 @@
 .windowBody [data-board-search] { min-width:90px; max-width:160px; flex:1; margin-left:auto; }
 .windowBody [data-board-actions] > button { margin-left:auto; }
 .windowBody :is(input,textarea) { max-width:100%; }
-.resizeHandle { position:absolute; right:0; bottom:0; display:flex; align-items:flex-end; justify-content:flex-end; width:44px; height:28px; border:0; border-radius:0 0 10px 0; background:transparent; padding:0 5px 3px 0; color:#aa9caf; cursor:nwse-resize; touch-action:none; }
-.resizeHandle > span { font-size:15px; line-height:1; }
+.resizeHandle { position:absolute; right:0; bottom:0; display:flex; align-items:flex-end; justify-content:flex-end; width:24px; height:24px; border:0; border-radius:0 0 10px 0; background:transparent; padding:0 5px 3px 0; color:#aa9caf; cursor:nwse-resize; touch-action:none; }
+.resizeHandle > span { width:9px; height:9px; border-right:1px solid currentColor; border-bottom:1px solid currentColor; opacity:.5; }
 .resizeHandle:hover { color:var(--accent); }
 .resizeLeft { left:0; right:auto; padding:0 0 3px 5px; justify-content:flex-start; cursor:nesw-resize; border-radius:0 0 0 10px; }
 .resizeLeft > span { transform:scaleX(-1); }
@@ -159,13 +159,13 @@
 .desktop[data-interface=modern] .window[data-window-colour=yellow] { --accent:#e6e9a4; }
 .desktop[data-interface=modern] .window[data-window-colour=neutral] { --accent:#bfc9c4; }
 .desktop[data-interface=modern] .window.active { border-color:#6a897b; box-shadow:0 0 0 1px #a7f3d00c,0 8px 26px #0003; }
-.desktop[data-interface=modern] .titlebar { background:linear-gradient(#202522,#1c201e); color:#d2dad5; border-bottom:1px solid #303732; border-radius:8px 8px 0 0; padding:0 8px; gap:5px; min-height:49px; }
+.desktop[data-interface=modern] .titlebar { background:linear-gradient(#202522,#1c201e); color:#d2dad5; border-bottom:1px solid #303732; border-radius:8px 8px 0 0; padding:0 8px; gap:5px; min-height:34px; }
 .desktop[data-interface=modern] .windowTitle { font:500 10px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace; text-transform:uppercase; letter-spacing:.07em; }
 .desktop[data-interface=modern] .grip { opacity:.4; width:10px; }
 .desktop[data-interface=modern] .dragHandle { gap:8px; }
 .desktop[data-interface=modern] .dragHandle > svg:not(.grip) { width:15px; height:15px; }
-.desktop[data-interface=modern] .windowControl,.desktop[data-interface=modern] .windowMenu > summary { width:35px; min-height:35px; border:1px solid #3b443e; border-radius:4px; color:#b5c2b9; background:#252c27; box-shadow:0 1px 0 #ffffff08 inset; }
-.desktop[data-interface=modern] .windowControl:hover,.desktop[data-interface=modern] .windowMenu > summary:hover { background:#35443a; color:#c4fbe0; }
+.desktop[data-interface=modern] .windowControl,.desktop[data-interface=modern] .windowMenu > summary { width:28px; min-height:28px; border:0; border-radius:4px; color:#93a49a; background:transparent; box-shadow:none; }
+.desktop[data-interface=modern] .windowControl:hover,.desktop[data-interface=modern] .windowMenu > summary:hover { background:#ffffff0b; color:#c4fbe0; }
 .desktop[data-interface=modern] .window[data-window-skin=leopard] .titlebar { background-image:linear-gradient(#0008,#0008),url('/decorations/stan-leopard-dense.png'); background-size:auto,260px; }
 .desktop[data-interface=modern] .window[data-window-skin=grid] .titlebar { background-image:linear-gradient(90deg,#a7f3d015 1px,transparent 1px),linear-gradient(#a7f3d015 1px,transparent 1px); background-size:10px 10px; }
 .desktop[data-interface=modern] .window[data-window-skin=leopard] .dragHandle { background:#202622; }
@@ -194,7 +194,7 @@
 .desktop[data-interface=modern] .dock > button:hover { background:#354c3d; }
 .desktop[data-interface=modern] .communityInvite { background:#f5ff64; border:0; border-radius:9px; margin-top:28px; }
 .desktop[data-interface=modern] .communityInvite > svg { color:#bf4b91; }
-@media (max-width:999px) { .desktop[data-interface=modern] .windowControl,.desktop[data-interface=modern] .windowMenu > summary { width:44px; min-height:44px; } }
+@media (any-pointer:coarse) { .desktop[data-interface] .windowControl,.desktop[data-interface] .windowMenu > summary { width:44px; min-height:44px; } .desktop .dragHandle { min-height:44px; } }
 @media (max-width:650px) { .breadcrumb { flex-wrap:wrap; gap:8px; } .breadcrumb > span { display:none; } .viewSwitch { margin-left:auto; } .desktop[data-interface=modern] .identity { padding:20px 0 10px; gap:13px; } .desktop[data-interface=modern] .identity > img { width:56px; height:56px; border-radius:14px; } .desktop[data-interface=modern] .identity h1 { font-size:28px; margin-top:9px; } .desktop[data-interface=modern] .eyebrow { font-size:6px; } .desktop[data-interface=modern] .identity p { font-size:12px; } .desktop[data-interface=modern] .identity small { font-size:10px; } .desktop[data-interface=modern] .tools { padding:4px 0 14px; } .desktop[data-interface=modern] .windowBody { padding:12px; } .desktop[data-interface=modern] .windowTitle { font-size:9px; letter-spacing:.025em; } .desktop[data-interface=modern] .titlebar { gap:2px; padding-inline:5px; } .communityInvite { padding:20px; gap:12px; flex-wrap:wrap; } .communityInvite strong { font-size:26px; } .communityInvite a { flex-basis:100%; margin-left:42px; justify-content:flex-start; } .dock > button { flex:0 1 auto; min-width:44px; padding:8px; } .dock > button > span { display:inline; font-size:10px; } .dock { bottom:10px; } }
 
 /* Owners can make the room loud without changing how its windows work. */
@@ -283,3 +283,12 @@
 .desktop[data-header-typeface=mono] .armyHeader .identity h1 { letter-spacing:-.045em; }
 .desktop[data-room-style=black] { background-color:var(--page-colour,#0b0c0d); background-image:none; }
 .desktop .join { background:var(--button-colour,#ff009d); border-color:var(--button-colour,#ff009d); color:var(--button-ink,#fff); }
+
+/* Compact chrome; panel content owns the space. */
+.sizeOptions { border-top:1px solid var(--rule); }
+.sizeOptions > summary { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:40px; font-size:12px; cursor:pointer; list-style:none; }
+.sizeOptions > summary::-webkit-details-marker { display:none; }
+.sizeOptions > div { padding-top:10px; }
+.window[data-style-selected=true] { outline:1px solid #a7f3d0; outline-offset:3px; }
+.desktop .windowControl:hover,.desktop .windowMenu > summary:hover { background:#80808014; }
+.resizeHandle:focus-visible > span,.window:hover .resizeHandle > span { opacity:1; }
