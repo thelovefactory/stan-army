@@ -1,3 +1,6 @@
+import { safeColor, validAsset } from "./theme";
+import type { ThemeAsset } from "./theme";
+
 /** Bounded, versioned layout data only; never CSS, content or permissions. */
 export const PANEL_IDS = ["feed", "chat", "music", "board"] as const;
 export type PanelId = (typeof PANEL_IDS)[number];
@@ -156,30 +159,41 @@ export function chatFirstDesktop(): DesktopLayout {
 }
 export type DesktopLook = "black" | "electric" | "afterhours" | "chrome";
 export type Participation = "mint" | "pink" | "yellow";
-export type WindowColour = "mint" | "pink" | "blue" | "yellow" | "neutral";
+export type WindowColour = "mint" | "pink" | "blue" | "yellow" | "neutral" | "custom";
 export type WindowSkin = "solid" | "leopard" | "grid";
-export type WindowSurface = "dark" | "mint" | "pink" | "blue" | "yellow" | "cream";
+export type WindowSurface = "dark" | "mint" | "pink" | "blue" | "yellow" | "cream" | "custom";
 export type WindowTypeface = "sans" | "mono" | "chunky" | "serif";
-export type WindowAppearance = { colour: WindowColour; skin: WindowSkin; surface: WindowSurface; typeface: WindowTypeface };
-export type OwnerDesktop = { version: 1; look: DesktopLook; participation: Participation; layout: DesktopLayout; windows: Record<PanelId, WindowAppearance> };
-const defaultWindows: Record<PanelId, WindowAppearance> = { feed: {colour: "mint", skin: "solid", surface: "dark", typeface: "sans"}, chat: {colour: "pink", skin: "solid", surface: "dark", typeface: "sans"}, board: {colour: "blue", skin: "solid", surface: "dark", typeface: "sans"}, music: {colour: "yellow", skin: "solid", surface: "dark", typeface: "sans"} };
+export type WindowAppearance = { colour: WindowColour; skin: WindowSkin; surface: WindowSurface; typeface: WindowTypeface; customSurface: string; customAccent: string };
+export type RoomAppearance = { colour: string; image: ThemeAsset | null; fit: "cover" | "tile"; position: "center" | "top" | "bottom"; dim: number };
+export type HeaderAppearance = { colour: string; typeface: WindowTypeface };
+export const MAX_DESKTOP_OWNER_LENGTH = 800_000;
+export type OwnerDesktop = { version: 1; look: DesktopLook; participation: Participation; layout: DesktopLayout; windows: Record<PanelId, WindowAppearance>; room: RoomAppearance; header: HeaderAppearance; corners: "soft" | "square" | "round"; frame: "minimal" | "classic"; accent: string };
+const defaultWindows: Record<PanelId, WindowAppearance> = { feed: {colour: "mint", skin: "solid", surface: "dark", typeface: "sans", customSurface: "#151718", customAccent: "#a7f3d0"}, chat: {colour: "pink", skin: "solid", surface: "dark", typeface: "sans", customSurface: "#151718", customAccent: "#a7f3d0"}, board: {colour: "blue", skin: "solid", surface: "dark", typeface: "sans", customSurface: "#151718", customAccent: "#a7f3d0"}, music: {colour: "yellow", skin: "solid", surface: "dark", typeface: "sans", customSurface: "#151718", customAccent: "#a7f3d0"} };
 export function parseOwnerDesktop(raw: string | null): OwnerDesktop {
-  const fallback: OwnerDesktop = { version: 1, look: "black", participation: "mint", layout: structuredClone(DEFAULT_DESKTOP), windows: structuredClone(defaultWindows) };
-  if (!raw || raw.length > 10000) return fallback;
+  const fallback: OwnerDesktop = { version: 1, look: "black", participation: "mint", layout: structuredClone(DEFAULT_DESKTOP), windows: structuredClone(defaultWindows), room: { colour: "#0b0c0d", image: null, fit: "cover", position: "center", dim: 25 }, header: { colour: "#111614", typeface: "sans" }, corners: "soft", frame: "minimal", accent: "#ff009d" };
+  if (!raw || raw.length > MAX_DESKTOP_OWNER_LENGTH) return fallback;
   try {
     const value = record(JSON.parse(raw)); if (value.version !== 1) return fallback;
     const windows = structuredClone(defaultWindows);
     for (const id of PANEL_IDS) {
       const item = record(record(value.windows)[id]);
-      if (["mint", "pink", "blue", "yellow", "neutral"].includes(String(item.colour))) windows[id].colour = item.colour as WindowColour;
-      if (["dark", "mint", "pink", "blue", "yellow", "cream"].includes(String(item.surface))) windows[id].surface = item.surface as WindowSurface;
+      if (["mint", "pink", "blue", "yellow", "neutral", "custom"].includes(String(item.colour))) windows[id].colour = item.colour as WindowColour;
+      if (["dark", "mint", "pink", "blue", "yellow", "cream", "custom"].includes(String(item.surface))) windows[id].surface = item.surface as WindowSurface;
       if (["sans", "mono", "chunky", "serif"].includes(String(item.typeface))) windows[id].typeface = item.typeface as WindowTypeface;
+      windows[id].customSurface = safeColor(item.customSurface, "#151718");
+      windows[id].customAccent = safeColor(item.customAccent, "#a7f3d0");
       if (["solid", "leopard", "grid"].includes(String(item.skin))) windows[id].skin = item.skin as WindowSkin;
     }
+    const room = record(value.room), header = record(value.header);
     return { version: 1,
       look: ["black", "electric", "afterhours", "chrome"].includes(String(value.look)) ? value.look as DesktopLook : fallback.look,
       participation: ["mint", "pink", "yellow"].includes(String(value.participation)) ? value.participation as Participation : fallback.participation,
       layout: validateDesktop(value.layout), windows,
+      room: { colour: safeColor(room.colour, fallback.room.colour), image: validAsset(room.image), fit: room.fit === "tile" ? "tile" : "cover", position: room.position === "top" || room.position === "bottom" ? room.position : "center", dim: bounded(room.dim, 0, 85, 25) },
+      header: { colour: safeColor(header.colour, fallback.header.colour), typeface: ["sans", "mono", "chunky", "serif"].includes(String(header.typeface)) ? header.typeface as WindowTypeface : "sans" },
+      corners: value.corners === "square" || value.corners === "round" ? value.corners : "soft",
+      frame: value.frame === "classic" ? "classic" : "minimal",
+      accent: safeColor(value.accent, fallback.accent),
     };
   } catch { return fallback; }
 }

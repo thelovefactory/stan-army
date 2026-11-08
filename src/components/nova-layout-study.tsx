@@ -102,8 +102,8 @@ function Composer({ joined, join }: { joined: boolean; join: () => void }) {
     }}>
       <textarea ref={field} id="study-post" value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="Share something with your people…" required minLength={2} maxLength={500} rows={3} />
       <div className={s.composerEnd}><span>{draft.length}/500 · local demo</span>
-        {joined ? <button type="submit" className={s.primary} disabled={!!validateMark(draft)}>Post <ArrowUpRight size={16} /></button>
-          : <button type="button" className={s.primary} onClick={join}>Join to post <Plus size={16} /></button>}
+        {joined ? <button type="submit" data-army-action className={s.primary} disabled={!!validateMark(draft)}>Post <ArrowUpRight size={16} /></button>
+          : <button type="button" data-army-action className={s.primary} onClick={join}>Join to post <Plus size={16} /></button>}
       </div>
     </form>}
     {status && <p className={s.smallStatus} role="status">{status}</p>}
@@ -133,8 +133,8 @@ function Chat({ joined, join, windowed = false }: { joined: boolean; join: () =>
     }}>
       <label className="sr-only" htmlFor="study-chat-message">Message the Army</label>
       <input id="study-chat-message" value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={280} placeholder="Say something to the Army…" required />
-      <button className={s.sendButton} type="submit" disabled={!draft.trim()} aria-label="Send chat message"><Send size={17} /></button>
-    </form> : <button className={`${s.primary} ${s.joinChat}`} onClick={join}>Join the conversation <ArrowRight size={17} /></button>}
+      <button data-army-action className={s.sendButton} type="submit" disabled={!draft.trim()} aria-label="Send chat message"><Send size={17} /></button>
+    </form> : <button data-army-action className={`${s.primary} ${s.joinChat}`} onClick={join}>Join the conversation <ArrowRight size={17} /></button>}
     <p className={s.chatFoot} role="status">{status || "A shared room. Be kind. Stay human."}</p>
   </section>;
 }
@@ -195,8 +195,8 @@ function Discussions({ windowed = false }: { windowed?: boolean }) {
     }}>
       <label htmlFor="study-thread-title">Discussion title</label><input id="study-thread-title" value={title} onChange={(event) => setTitle(event.target.value)} minLength={5} maxLength={120} required placeholder="What’s on your mind?" />
       <label htmlFor="study-thread-body">Your opening thought</label><textarea id="study-thread-body" value={body} onChange={(event) => setBody(event.target.value)} minLength={2} maxLength={1000} required rows={3} />
-      <div><span className={s.smallStatus}>Local demo · resets on refresh</span>{joined ? <button className={s.primary} type="submit">Start discussion <ArrowUpRight size={16} /></button>
-        : <button className={s.primary} type="button" onClick={() => demo.toggle(view.army.id)}>Join to discuss <Plus size={16} /></button>}</div>
+      <div><span className={s.smallStatus}>Local demo · resets on refresh</span>{joined ? <button data-army-action className={s.primary} type="submit">Start discussion <ArrowUpRight size={16} /></button>
+        : <button data-army-action className={s.primary} type="button" onClick={() => demo.toggle(view.army.id)}>Join to discuss <Plus size={16} /></button>}</div>
     </form>}
     {ordered.map((thread) => <article className={s.thread} key={thread.id}>
       <div className={s.votes}><button aria-label={`Upvote ${thread.title}`} aria-pressed={votes[thread.id] === 1} onClick={() => boards.vote(board.id, thread.id, 1)}><ArrowUp size={17} /></button><span>{thread.score + (votes[thread.id] ?? 0)}</span><button aria-label={`Downvote ${thread.title}`} aria-pressed={votes[thread.id] === -1} onClick={() => boards.vote(board.id, thread.id, -1)}><ArrowDown size={17} /></button></div>

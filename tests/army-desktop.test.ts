@@ -139,7 +139,7 @@ test("per-window skins are validated separately from geometry and old owner pref
   const old=parseOwnerDesktop(JSON.stringify({version:1,look:"chrome",participation:"pink",layout:DEFAULT_DESKTOP}));
   assert.equal(old.look,"chrome"); assert.equal(old.windows.chat.skin,"solid");
   const next=parseOwnerDesktop(JSON.stringify({...old,windows:{chat:{skin:"leopard",colour:"blue"},feed:{skin:"url(evil)",colour:"<script>"}}}));
-  assert.deepEqual(next.windows.chat,{skin:"leopard",colour:"blue",surface:"dark",typeface:"sans"});
+  assert.deepEqual(next.windows.chat,{skin:"leopard",colour:"blue",surface:"dark",typeface:"sans",customSurface:"#151718",customAccent:"#a7f3d0"});
   assert.equal(next.windows.feed.skin,"solid");
   assert.equal(JSON.stringify(next).includes("evil"),false);
   assert.deepEqual(next.layout,old.layout);

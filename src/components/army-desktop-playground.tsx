@@ -13,7 +13,10 @@ import {
   DESKTOP_COLUMNS, DESKTOP_GAP, DESKTOP_ROW, OWNER_DESKTOP_KEY, PANEL_IDS, PERSONAL_DESKTOP_KEY,
   movePanel, packDesktop, parseDesktop, parseOwnerDesktop, placePanel, resizePanel, setPanelMinimized, swapPanelSlots,
 } from "@/lib/army-desktop";
-import type { DesktopLayout, DesktopLook, OwnerDesktop, PanelId, Participation, WindowColour, WindowSkin, WindowSurface, WindowTypeface } from "@/lib/army-desktop";
+import type { DesktopLayout, OwnerDesktop, PanelId } from "@/lib/army-desktop";
+import { ArmyStyleEditor } from "./army-style-editor";
+import type { StyleScope, StyleSection } from "./army-style-editor";
+import { readableDesktopColour as readableColor } from "@/lib/army-style-editor";
 import s from "./army-desktop-playground.module.css";
 
 const names: Record<PanelId, string> = { feed: "The Army", chat: "Army Chat", board: "Discussions", music: "Army Stereo" };
@@ -47,13 +50,18 @@ export function ArmyDesktopPlayground() {
   const personalRaw = useSyncExternalStore(subscribe, () => read(PERSONAL_DESKTOP_KEY), serverSnapshot);
   const savedOwner = useMemo(() => parseOwnerDesktop(ownerRaw), [ownerRaw]);
   const [unsavedOwner, setUnsavedOwner] = useState<OwnerDesktop | null>(null);
-  const owner = unsavedOwner ?? savedOwner;
+  const committedOwner = unsavedOwner ?? savedOwner;
+  const [draftOwner, setDraftOwner] = useState<OwnerDesktop | null>(null);
+  const owner = draftOwner ?? committedOwner;
+  const [editorVisible, setEditorVisible] = useState(false);
+  const [styleScope, setStyleScope] = useState<StyleScope>("all");
+  const [styleSection, setStyleSection] = useState<StyleSection>("themes");
+  const styleTrigger = useRef<HTMLButtonElement>(null);
   const savedLayout = useMemo(() => parseDesktop(personalRaw, owner.layout), [personalRaw, owner.layout]);
   const [unsavedLayout, setUnsavedLayout] = useState<DesktopLayout | null>(null);
   const layout = unsavedLayout ?? savedLayout;
   const desktop = useSyncExternalStore(subscribeDesktop, desktopSnapshot, () => false);
   const [modern, setModern] = useState(true);
-  const [styledWindow, setStyledWindow] = useState<PanelId>("chat");
   const [warning, setWarning] = useState(false);
   const [active, setActive] = useState<PanelId>("chat");
   const [focused, setFocused] = useState<PanelId | null>(null);
@@ -84,6 +92,20 @@ export function ArmyDesktopPlayground() {
       localStorage.setItem(OWNER_DESKTOP_KEY, JSON.stringify(next)); setUnsavedOwner(null); setWarning(false);
       window.dispatchEvent(new Event(eventName)); setNotice(message);
     } catch { setUnsavedOwner(next); setWarning(true); setNotice("Host changes are visible for this visit but could not be saved."); }
+  }
+  function openStyle(id?: PanelId) {
+    finish(false); setFocused(null);
+    if (!draftOwner) setDraftOwner(structuredClone(committedOwner));
+    if (id) { setStyleScope(id); setStyleSection("panels"); }
+    setEditorVisible(true);
+  }
+  function hideStyle() {
+    setEditorVisible(false);
+    requestAnimationFrame(() => styleTrigger.current?.focus());
+  }
+  function cancelStyle() { setDraftOwner(null); hideStyle(); }
+  function commitStyle(next: OwnerDesktop) {
+    saveOwner(next, "Army style saved on this device."); setDraftOwner(null); hideStyle();
   }
   function reset() {
     finish(false);
@@ -196,9 +218,17 @@ export function ArmyDesktopPlayground() {
     } else move(id, layout.order.indexOf(id) + direction);
   }
 
-  return <main id="main" className={`${s.desktop} ${s[!modern && owner.look === "black" ? "electric" : owner.look]}`} data-desktop-playground data-interface={modern ? "modern" : "original"} data-room-style={owner.look}
-    style={{ "--participation": { mint: "#e1f5eb", pink: "#fce8f3", yellow: "#fff6d5" }[owner.participation] } as CSSProperties}
-    onKeyDown={(event) => { if (event.key === "Escape") { if (gesture.current) finish(false); else {
+  return <main id="main" className={`${s.desktop} ${s[owner.look]}`} data-desktop-playground data-interface={modern ? "modern" : "original"} data-animated-background={owner.room.image?.animated ? "true" : undefined} data-room-style={owner.look} data-editor-open={editorVisible ? "true" : undefined} data-window-corners={owner.corners} data-window-frame={owner.frame} data-header-typeface={owner.header.typeface}
+    style={{ "--participation": { mint: "#e1f5eb", pink: "#fce8f3", yellow: "#fff6d5" }[owner.participation],
+      "--page-colour": owner.room.colour, "--header-colour": owner.header.colour, "--header-ink": readableColor("#f3f5f3", owner.header.colour),
+      "--header-font": { sans: "Arial,Helvetica,sans-serif", mono: "'Courier New',monospace", chunky: "DesktopChunky,Impact,sans-serif", serif: "Georgia,serif" }[owner.header.typeface],
+      "--violet": owner.accent, "--button-colour": owner.accent, "--button-ink": owner.accent === "#ff009d" ? "#ffffff" : readableColor("#ffffff", owner.accent),
+      backgroundImage: owner.room.image ? `linear-gradient(#000000${Math.round(owner.room.dim * 2.55).toString(16).padStart(2, "0")},#000000${Math.round(owner.room.dim * 2.55).toString(16).padStart(2, "0")}),url("${owner.room.image.dataUrl}")` : undefined,
+      backgroundSize: owner.room.image ? owner.room.fit === "tile" ? "auto, 320px auto" : "cover" : undefined,
+      backgroundRepeat: owner.room.image ? owner.room.fit === "tile" ? "repeat" : "no-repeat" : undefined,
+      backgroundPosition: owner.room.image ? `center ${owner.room.position}` : undefined,
+    } as CSSProperties}
+    onKeyDown={(event) => { if (event.key === "Escape") { if (gesture.current) finish(false); else if (editorVisible) hideStyle(); else {
       const openMenu = event.currentTarget.querySelector<HTMLDetailsElement>("details[open]");
       if (openMenu) { openMenu.open = false; openMenu.querySelector("summary")?.focus(); }
       else if (focused) setFocused(null);
@@ -207,21 +237,10 @@ export function ArmyDesktopPlayground() {
       <header className={s.armyHeader} aria-labelledby="playground-army-name">
       <div className={s.breadcrumb}><Link href="/armies/nova"><ArrowLeft size={14} />Original Army</Link><div className={s.headerControls}>
         <label className={s.viewSelect}><span className="sr-only">Interface style</span><select aria-label="Interface style" value={modern ? "modern" : "original"} onChange={(event) => setModern(event.target.value === "modern")}><option value="modern">Modern view</option><option value="original">Original view</option></select><ChevronDown size={12} aria-hidden="true" /></label>
-        <details className={s.ownerSettings}><summary><Palette size={14} />Army style<ChevronDown size={12} aria-hidden="true" /></summary><div>
-          <small className={s.demoLabel}>APPEARANCE · LOCAL PREVIEW</small>
-          <label>Room style<select aria-label="Army room style" value={owner.look} onChange={(event) => saveOwner({ ...owner, look: event.target.value as DesktopLook }, "Host appearance saved on this device. Your personal arrangement stayed put.")}><option value="black">Black</option><option value="electric">Electric leopard</option><option value="afterhours">After hours</option><option value="chrome">Chrome room</option></select></label>
-          {!modern && <label>Participation colour<select aria-label="Army participation colour" value={owner.participation} onChange={(event) => saveOwner({ ...owner, participation: event.target.value as Participation }, "Composer and chat updated together.")}><option value="mint">Mint</option><option value="pink">Pink</option><option value="yellow">Yellow</option></select></label>}
-          <div className={s.windowAppearance}>
-            <label>Window<select aria-label="Style window" value={styledWindow} onChange={(event) => setStyledWindow(event.target.value as PanelId)}>{PANEL_IDS.map((id) => <option key={id} value={id}>{names[id]}</option>)}</select></label>
-            <label>Colour<select aria-label="Window colour" value={owner.windows[styledWindow].colour} onChange={(event) => saveOwner({ ...owner, windows: { ...owner.windows, [styledWindow]: { ...owner.windows[styledWindow], colour: event.target.value as WindowColour } } }, "Window colour saved.")}><option value="mint">Mint</option><option value="pink">Pink</option><option value="blue">Blue</option><option value="yellow">Yellow</option><option value="neutral">Neutral</option></select></label>
-            <label>Panel colour<select aria-label="Panel colour" value={owner.windows[styledWindow].surface} onChange={(event) => saveOwner({ ...owner, windows: { ...owner.windows, [styledWindow]: { ...owner.windows[styledWindow], surface: event.target.value as WindowSurface } } }, "Panel colour saved.")}><option value="dark">Dark</option><option value="mint">Mint</option><option value="pink">Pink</option><option value="blue">Blue</option><option value="yellow">Acid yellow</option><option value="cream">Cream</option></select></label>
-            <label>Typeface<select aria-label="Panel typeface" value={owner.windows[styledWindow].typeface} onChange={(event) => saveOwner({ ...owner, windows: { ...owner.windows, [styledWindow]: { ...owner.windows[styledWindow], typeface: event.target.value as WindowTypeface } } }, "Panel typeface saved.")}><option value="sans">Sans</option><option value="mono">Monospace</option><option value="chunky">Chunky</option><option value="serif">Serif</option></select></label>
-            <label>Skin<select aria-label="Window skin" value={owner.windows[styledWindow].skin} onChange={(event) => saveOwner({ ...owner, windows: { ...owner.windows, [styledWindow]: { ...owner.windows[styledWindow], skin: event.target.value as WindowSkin } } }, "Window skin saved.")}><option value="solid">Solid</option><option value="leopard">Leopard</option><option value="grid">Grid</option></select></label>
-          </div>
-        </div></details>
+        <button ref={styleTrigger} className={s.styleTrigger} aria-expanded={editorVisible} onClick={() => editorVisible ? hideStyle() : openStyle()}><Palette size={14} />{draftOwner ? "Editing style" : "Army style"}<ChevronDown size={12} aria-hidden="true" /></button>
         <details className={`${s.ownerSettings} ${s.layoutSettings}`}><summary>Layout<ChevronDown size={12} aria-hidden="true" /></summary><div>
-          <button onClick={() => saveOwner({ ...owner, layout: structuredClone(layout) }, "Starting layout saved for this local host demo. Members can still make their own arrangement.")}>Use this as the starting layout <Check size={16} /></button>
-          <button className={s.resetStyle} onClick={reset}><RotateCcw size={16} />Reset layout</button>
+          <button disabled={!!draftOwner} onClick={() => saveOwner({ ...owner, layout: structuredClone(layout) }, "Starting layout saved for this local host demo. Members can still make their own arrangement.")}>Use this as the starting layout <Check size={16} /></button>
+          <button className={s.resetStyle} disabled={!!draftOwner} onClick={reset}><RotateCcw size={16} />Reset layout</button>
         </div></details>
         </div><span>LOCAL DEMO</span></div>
       <div className={s.identity}>
@@ -245,7 +264,12 @@ export function ArmyDesktopPlayground() {
           return <section key={id} ref={(element) => { frames.current[id] = element; }} hidden={hidden}
             className={`${s.window} ${active === id ? s.active : ""} ${preview?.id === id ? s.moving : ""}`}
             data-panel-id={id} data-window-colour={owner.windows[id].colour} data-window-skin={owner.windows[id].skin} data-panel-surface={owner.windows[id].surface} data-panel-typeface={owner.windows[id].typeface} data-expanded={focused === id ? "true" : undefined} aria-labelledby={`window-title-${id}`}
-            style={{ gridColumn: visiblePlacement ? `${visiblePlacement.x + 1} / span ${visiblePlacement.width}` : undefined,
+            style={{ ...(owner.windows[id].surface === "custom" ? {
+                "--surface-bg": owner.windows[id].customSurface,
+                "--surface-ink": readableColor("#f3f4f3", owner.windows[id].customSurface),
+                "--surface-muted": readableColor("#9caaa3", owner.windows[id].customSurface),
+                "--surface-rule": `color-mix(in srgb,${owner.windows[id].customSurface} 70%,${readableColor("#f3f4f3", owner.windows[id].customSurface)})`,
+              } : {}), ...(owner.windows[id].colour === "custom" ? { "--accent": owner.windows[id].customAccent } : {}), gridColumn: visiblePlacement ? `${visiblePlacement.x + 1} / span ${visiblePlacement.width}` : undefined,
               gridRow: visiblePlacement ? `${visiblePlacement.y + 1} / span ${visiblePlacement.height}` : undefined,
               "--window-height": `${size.height * DESKTOP_ROW + (size.height - 1) * DESKTOP_GAP}px` } as CSSProperties}
             onFocusCapture={() => setActive(id)} onPointerDownCapture={() => setActive(id)}>
@@ -257,6 +281,7 @@ export function ArmyDesktopPlayground() {
                 onKeyDown={(event) => keys(event, id)} title="Drag to move · arrow keys to reorder">
                 <GripVertical className={s.grip} size={15} /><Icon size={17} /><span className={s.windowTitle}>{names[id]}</span>
               </button>
+              {draftOwner && <button className={s.windowControl} aria-label={`Edit ${names[id]} style`} title="Edit this panel" onClick={() => openStyle(id)}><Palette size={14} /></button>}
               <details className={s.windowMenu} onKeyDown={(event) => {
                 if (event.key === "Escape") { event.stopPropagation(); event.currentTarget.open = false; event.currentTarget.querySelector("summary")?.focus(); }
               }}>
@@ -299,5 +324,6 @@ export function ArmyDesktopPlayground() {
       })}</nav>}
 
     </div>
+    {draftOwner && <ArmyStyleEditor initial={committedOwner} visible={editorVisible} scope={styleScope} section={styleSection} onScope={setStyleScope} onSection={setStyleSection} onPreview={setDraftOwner} onHide={hideStyle} onCancel={cancelStyle} onSave={commitStyle} />}
   </main>;
 }
