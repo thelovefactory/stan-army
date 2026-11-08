@@ -8,13 +8,15 @@ import {
   useSyncExternalStore,
 } from "react";
 import type { CSSProperties } from "react";
-import { ArrowUpRight, Globe2, Instagram, Settings2, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Instagram, Settings2, X } from "lucide-react";
 import { useProfileTheme } from "./profile-theme";
 import { readableColor } from "@/lib/theme";
 import {
   parseSocialConfig,
   socialAccount,
   socialStorageKey,
+  socialPost,
+  MAX_SOCIAL_POSTS,
 } from "@/lib/social-channels";
 import type { SocialAccount, SocialConfig } from "@/lib/social-channels";
 
@@ -30,11 +32,8 @@ function subscribe(callback: () => void) {
 type XWidget = {
   ready: (callback: () => void) => void;
   widgets: {
-    createTimeline: (
-      source: { sourceType: "profile"; screenName: string },
-      element: HTMLElement,
-      options: Record<string, string | number | boolean>,
-    ) => Promise<HTMLElement | undefined>;
+    createTweet: (id: string, element: HTMLElement, options: Record<string, string | number | boolean>) => Promise<HTMLElement | undefined>;
+
   };
 };
 declare global {
@@ -73,7 +72,7 @@ function loadX() {
   });
   return xScript;
 }
-function XPreview({ handle, dark }: { handle: string; dark: boolean }) {
+function XPreview({ dark, post }: { dark: boolean; post: string }) {
   const host = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState("Loading X preview…");
   useEffect(() => {
@@ -84,23 +83,14 @@ function XPreview({ handle, dark }: { handle: string; dark: boolean }) {
       stopped = true;
       container.replaceChildren();
       setStatus(
-        "X hasn’t provided a preview. Open the profile instead, or close and try again.",
+        "Preview unavailable.",
       );
     }, 20000);
     loadX()
       .then(async (x) => {
         if (stopped) return;
-        const frame = await x.widgets.createTimeline(
-          { sourceType: "profile", screenName: handle },
-          container,
-          {
-            height: 280,
-            theme: dark ? "dark" : "light",
-            chrome: "noheader nofooter noborders",
-            dnt: true,
-            ariaPolite: "polite",
-          },
-        );
+        const options = { theme: dark ? "dark" : "light", dnt: true, conversation: "none" };
+        const frame = await x.widgets.createTweet(post.split("/").at(-1)!, container, options);
         if (stopped) {
           container.replaceChildren();
           return;
@@ -108,15 +98,15 @@ function XPreview({ handle, dark }: { handle: string; dark: boolean }) {
         window.clearTimeout(timer);
         setStatus(
           frame
-            ? "Provider preview. Availability and post order are controlled by X."
-            : "X hasn’t provided a preview. Open the profile instead.",
+            ? ""
+            : "Preview unavailable.",
         );
       })
       .catch(() => {
         if (stopped) return;
         window.clearTimeout(timer);
         setStatus(
-          "X preview unavailable. Open the profile instead, or close and try again.",
+          "Preview unavailable.",
         );
       });
     return () => {
@@ -124,45 +114,48 @@ function XPreview({ handle, dark }: { handle: string; dark: boolean }) {
       window.clearTimeout(timer);
       container.replaceChildren();
     };
-  }, [handle, dark]);
+  }, [dark, post]);
   return (
     <>
       <div ref={host} className="outside-widget" />
-      <p className="outside-hint" role="status">
-        {status}
-      </p>
+      {status && <p className="outside-hint" role="status">{status}</p>}
     </>
   );
 }
-function InstagramPreview({ account }: { account: SocialAccount }) {
+function InstagramPreview({ account, post }: { account: SocialAccount; post: string }) {
   const [failed, setFailed] = useState(false);
+  const [height, setHeight] = useState(560);
+  const frame = useRef<HTMLIFrameElement>(null);
   const timer = useRef<number | null>(null);
   useEffect(() => {
     timer.current = window.setTimeout(() => setFailed(true), 15000);
+    // Instagram's embed measurement is accepted only from this exact frame.
+    function measure(event: MessageEvent) {
+      if (event.origin !== "https://www.instagram.com" || event.source !== frame.current?.contentWindow) return;
+      try {
+        const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+        const next = Number(data?.details?.height);
+        if (data?.type === "MEASURE" && Number.isFinite(next) && next > 0) {
+          setHeight(Math.min(1200, Math.max(320, next)));
+        }
+      } catch { /* Ignore unrelated provider messages. */ }
+    }
+    window.addEventListener("message", measure);
     return () => {
       if (timer.current !== null) window.clearTimeout(timer.current);
+      window.removeEventListener("message", measure);
     };
   }, []);
-  // The official profile iframe works for the supplied account even though
-  // Meta's oEmbed endpoint rejects that same URL. Do not use oEmbed as a gate.
-  // An iframe load event does not prove that its cross-origin posts are visible.
   return failed ? (
-    <p className="outside-hint" role="status">
-      Instagram hasn’t provided a preview. Open the profile instead, or close
-      and try again.
-    </p>
+    <p className="outside-hint" role="status">Preview unavailable.</p>
   ) : (
-    <iframe
-      className="outside-instagram"
-      title={`Instagram profile preview: @${account.handle}`}
-      src={`${account.url}embed/`}
-      loading="lazy"
-      referrerPolicy="strict-origin-when-cross-origin"
-      onLoad={() => {
-        if (timer.current !== null) window.clearTimeout(timer.current);
-      }}
-      onError={() => setFailed(true)}
-    />
+    <iframe ref={frame} className="outside-instagram"
+      style={{ height }}
+      title={`Instagram post preview: @${account.handle}`}
+      src={`${post}embed/captioned/`}
+      loading="lazy" referrerPolicy="strict-origin-when-cross-origin"
+      onLoad={() => { if (timer.current !== null) window.clearTimeout(timer.current); }}
+      onError={() => setFailed(true)} />
   );
 }
 function Channel({
@@ -176,53 +169,49 @@ function Channel({
 }) {
   const { theme } = useProfileTheme();
   const name = account.platform === "instagram" ? "Instagram" : "X";
+  const [index, setIndex] = useState(0);
+  const posts = account.posts ?? [];
+  const position = Math.min(index, Math.max(0, posts.length - 1));
+  const post = posts[position];
   return (
-    <article
-      className="outside-channel"
-      aria-label={`${name} channel @${account.handle}`}
-    >
-      <div className="outside-source">
-        <span>
-          {account.platform === "instagram" ? (
-            <Instagram size={16} />
-          ) : (
-            <span aria-hidden="true">𝕏</span>
-          )}
-          <b>{name}</b>
-        </span>
-        <a href={account.url} target="_blank" rel="noreferrer">
-          @{account.handle}
-          <ArrowUpRight size={14} />
-        </a>
+    <article className="outside-channel" aria-label={`${name} channel @${account.handle}`}>
+      <div className="outside-media">
+        {!post ? (
+          <div className="outside-empty">
+            {account.platform === "instagram" ? <Instagram size={28} /> : <span aria-hidden="true">𝕏</span>}
+            <p>No post previews yet.</p>
+            <a href={account.url} target="_blank" rel="noreferrer">View on {name} <ArrowUpRight size={14} /></a>
+          </div>
+        ) : !loaded ? (
+          <div className="outside-empty">
+            <button type="button" className="outside-load" onClick={onToggle}>
+              {account.platform === "instagram" ? <Instagram size={28} /> : <span aria-hidden="true">𝕏</span>}
+              Load {name} post
+            </button>
+            <p className="outside-hint">Loads {name} content · may use cookies</p>
+          </div>
+        ) : account.platform === "x" ? (
+          <XPreview key={post} post={post}
+            dark={readableColor("#ffffff", theme.panels.color) === "#ffffff"} />
+        ) : <InstagramPreview key={post} account={account} post={post} />}
       </div>
-      {!loaded ? (
-        <button type="button" className="outside-load" onClick={onToggle}>
-          Load {name} preview
-        </button>
-      ) : (
-        <>
-          {account.platform === "x" ? (
-            <XPreview
-              handle={account.handle}
-              dark={readableColor("#ffffff", theme.panels.color) === "#ffffff"}
-            />
-          ) : (
-            <>
-              <InstagramPreview account={account} />
-              <p className="outside-hint">
-                Instagram controls this preview. If it’s unavailable or asks you
-                to sign in, use the profile link above.
-              </p>
-            </>
-          )}
-          <button type="button" className="outside-close" onClick={onToggle}>
-            Close {name} preview
-          </button>
-        </>
+      {post && (
+        <nav className="outside-tools" aria-label={`${name} preview navigation`}>
+          <button type="button" aria-label="Previous post" title="Previous post"
+            disabled={position === 0} onClick={() => setIndex(position - 1)}><ArrowLeft size={17} /></button>
+          <span aria-live="polite">{position + 1} / {posts.length}</span>
+          <button type="button" aria-label="Next post" title="Next post"
+            disabled={position === posts.length - 1} onClick={() => setIndex(position + 1)}><ArrowRight size={17} /></button>
+          <a className="outside-original" href={post} target="_blank" rel="noreferrer"
+            aria-label={`Open original ${name} post`} title="Open original"><ArrowUpRight size={17} /></a>
+          {loaded && <button type="button" className="outside-close" onClick={onToggle}
+            aria-label="Close preview" title="Close preview"><X size={16} /></button>}
+        </nav>
       )}
     </article>
   );
 }
+
 export function OutsideArmy({ armyId }: { armyId: string }) {
   const { theme, canEditCommunity } = useProfileTheme();
   const raw = useSyncExternalStore(
@@ -238,6 +227,8 @@ export function OutsideArmy({ armyId }: { armyId: string }) {
   );
   const config = useMemo(() => parseSocialConfig(raw, armyId), [raw, armyId]);
   const [url, setUrl] = useState("");
+  const [postUrls, setPostUrls] = useState("");
+  const [selected, setSelected] = useState<string | null>(null);
   const [active, setActive] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
@@ -271,6 +262,13 @@ export function OutsideArmy({ armyId }: { armyId: string }) {
       );
       return;
     }
+    const lines = postUrls.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    const posts = lines.map((line) => socialPost(line, account));
+    if (lines.length > MAX_SOCIAL_POSTS || posts.some((post) => !post)) {
+      setError(`Add up to ${MAX_SOCIAL_POSTS} valid post links from the selected platform, one per line. X links must match the account. Remove tracking query parameters.`);
+      return;
+    }
+    account.posts = [...new Set(posts as string[])];
     if (
       save({
         schemaVersion: 1,
@@ -279,51 +277,57 @@ export function OutsideArmy({ armyId }: { armyId: string }) {
           account,
         ],
       })
-    )
+    ) {
       setUrl("");
+      setPostUrls("");
+    }
   }
   const accent = readableColor(
     theme.outsideArmy.accent ?? theme.colors.accent,
     theme.panels.color,
   );
+  const selectedAccount = config.accounts.find((account) => account.url === selected) ?? config.accounts[0];
+  if (!config.accounts.length && !canEditCommunity) return null;
   return (
     <section
-      className={`panel outside-army outside-${theme.outsideArmy.treatment}`}
+      className={`panel outside-army outside-${theme.outsideArmy.treatment} ${canEditCommunity ? "outside-has-manager" : ""}`}
       style={{ "--outside-accent": accent } as CSSProperties}
       aria-labelledby={`outside-heading-${armyId}`}
     >
-      <header className="outside-header">
-        <h2 id={`outside-heading-${armyId}`}>
-          <Globe2 size={18} />
-          Outside the Army
-        </h2>
-        <span>PUBLIC PREVIEWS</span>
-      </header>
-      <p className="outside-intro">A little window into elsewhere.</p>
+      <h2 className="sr-only" id={`outside-heading-${armyId}`}>Outside the Army</h2>
+      <div className="outside-toolbar">
+        {selectedAccount && <a className="outside-account" href={selectedAccount.url} target="_blank" rel="noreferrer">
+          @{selectedAccount.handle}
+        </a>}
+        {!!config.accounts.length && (
+          <div className="outside-tabs" role="group" aria-label="Social channels">
+            {config.accounts.map((account) => (
+              <button type="button" key={account.url}
+                aria-label={account.platform === "instagram" ? "Instagram" : "X"}
+                title={account.platform === "instagram" ? "Instagram" : "X"}
+                aria-pressed={selectedAccount?.url === account.url}
+                onClick={() => { setSelected(account.url); setActive(null); }}>
+                {account.platform === "instagram" ? <Instagram size={17} /> : <span aria-hidden="true">𝕏</span>}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
       <div className="outside-channels">
-        {config.accounts.map((account) => (
-          <Channel
-            key={account.url}
-            account={account}
-            loaded={active === account.url}
-            onToggle={() =>
-              setActive(active === account.url ? null : account.url)
-            }
-          />
-        ))}
+        {selectedAccount && (
+          <Channel key={selectedAccount.url} account={selectedAccount}
+            loaded={active === selectedAccount.url}
+            onToggle={() => setActive(active === selectedAccount.url ? null : selectedAccount.url)} />
+        )}
       </div>
       {!config.accounts.length && (
         <p className="outside-hint">No outside channels added yet.</p>
       )}
-      <p className="outside-hint">
-        Loads from Instagram or X only when you click. Providers may use cookies
-        or require sign-in. Profile links aren’t verified affiliations.
-      </p>
       {canEditCommunity && (
         <details className="outside-manage">
-          <summary>
-            <Settings2 size={15} />
-            Manage channels
+          <summary aria-label="Manage channels" title="Manage channels">
+            <Settings2 size={17} />
+            <span className="sr-only">Manage channels</span>
           </summary>
           <p className="outside-hint">
             Demo settings saved on this device. One profile per platform; saving
@@ -336,6 +340,8 @@ export function OutsideArmy({ armyId }: { armyId: string }) {
                   {account.platform === "x" ? "X" : "Instagram"} · @
                   {account.handle}
                 </span>
+                <button type="button" className="outside-edit" aria-label={`Edit ${account.platform} previews`}
+                  onClick={() => { setUrl(account.url); setPostUrls((account.posts ?? []).join("\n")); }}>Edit</button>
                 <button
                   type="button"
                   aria-label={`Remove ${account.platform} account ${account.handle}`}
@@ -371,6 +377,11 @@ export function OutsideArmy({ armyId }: { armyId: string }) {
                 setNotice("");
               }}
             />
+            <label htmlFor={`outside-posts-${armyId}`}>Post links (optional, newest first)</label>
+            <textarea id={`outside-posts-${armyId}`} rows={3} maxLength={3000}
+              value={postUrls} onChange={(event) => setPostUrls(event.target.value)}
+              placeholder="One public post URL per line" />
+            <p className="outside-hint">Up to 12 selected previews. Instagram links must belong to this account. These do not update automatically. Leave blank to show a profile link without a post preview.</p>
             <button type="submit">Save channel</button>
           </form>
           <p className="outside-hint">

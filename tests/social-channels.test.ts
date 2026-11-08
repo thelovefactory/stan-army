@@ -5,6 +5,8 @@ import {
   parseSocialConfig,
   socialAccount,
   socialStorageKey,
+  socialPost,
+  MAX_SOCIAL_POSTS,
 } from "../src/lib/social-channels";
 import { defaultTheme, validateTheme, parseTheme } from "../src/lib/theme";
 
@@ -121,4 +123,41 @@ test("Outside the Army is additive to v1 themes and survives clean/reset-compati
   });
   assert.equal(unsafe.outsideArmy.accent, defaultTheme.colors.accent);
   assert.equal(unsafe.outsideArmy.treatment, "panel");
+});
+
+
+test("selected previews validate source URLs and account ownership where encoded", () => {
+  const instagram = socialAccount("https://instagram.com/stan/")!;
+  const x = socialAccount("https://x.com/stan")!;
+  assert.equal(socialPost("https://instagram.com/p/Abc_123/", instagram), "https://www.instagram.com/p/Abc_123/");
+  assert.equal(socialPost("https://www.instagram.com/reel/Abc-123/", instagram), "https://www.instagram.com/reel/Abc-123/");
+  assert.equal(socialPost("https://twitter.com/STAN/status/12345", x), "https://x.com/stan/status/12345");
+  for (const url of ["https://x.com/other/status/123", "https://x.com/stan/status/123?tracking=1", "https://x.com/stan/status/abc", "https://x.com/stan", "https://x.com.evil.test/stan/status/123", "javascript:alert(1)", "https://user:pass@x.com/stan/status/123", "https://instagram.com/p/abc/"]) {
+    assert.equal(socialPost(url, x), null, url);
+  }
+  assert.equal(socialPost("https://instagram.com/p/abc/?tracking=1", instagram), null);
+  assert.equal(socialPost("https://instagram.com/stan/", instagram), null);
+  assert.equal(socialPost("https://evil.test/p/abc/", instagram), null);
+});
+
+test("selected post links survive refresh, are bounded and never restore arbitrary embed data", () => {
+  const raw = JSON.stringify({schemaVersion: 1, accounts: [{url: "https://x.com/stan", posts: ["https://x.com/stan/status/1", "https://x.com/stan/status/1", "https://evil.test/", "https://x.com/other/status/2"], html: "<script>bad</script>"}]});
+  const config = parseSocialConfig(raw, "army-nova");
+  assert.deepEqual(config.accounts[0].posts, ["https://x.com/stan/status/1"]);
+  assert.deepEqual(parseSocialConfig(JSON.stringify(config), "army-nova"), config);
+  assert.equal(JSON.stringify(config).includes("<script>"), false);
+  const many = parseSocialConfig(JSON.stringify({schemaVersion: 1, accounts: [{url: "https://x.com/stan", posts: Array.from({length: 30}, (_, i) => `https://x.com/stan/status/${i + 1}`)}]}), "army-nova");
+  assert.equal(many.accounts[0].posts?.length, MAX_SOCIAL_POSTS);
+});
+
+test("Nova's old test-profile links receive individual previews without overriding explicit choices", () => {
+  const legacy = JSON.stringify({schemaVersion: 1, accounts: [{url: "https://instagram.com/aaaaaaarmii/"}]});
+  const restored = parseSocialConfig(legacy, "army-nova");
+  assert.equal(restored.accounts[0].posts?.length, 2);
+  assert.deepEqual(restored.accounts[0].posts, defaultSocialConfig("army-nova").accounts[0].posts);
+  const cleared = JSON.stringify({schemaVersion: 1, accounts: [{url: "https://instagram.com/aaaaaaarmii/", posts: []}]});
+  assert.deepEqual(parseSocialConfig(cleared, "army-nova").accounts[0].posts, []);
+  const other = JSON.stringify({schemaVersion: 1, accounts: [{url: "https://instagram.com/brie/"}]});
+  assert.equal(parseSocialConfig(other, "army-nova").accounts[0].posts, undefined);
+  assert.equal(parseSocialConfig(legacy, "army-brie").accounts[0].posts, undefined);
 });

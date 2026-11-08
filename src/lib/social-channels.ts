@@ -1,9 +1,11 @@
-/** Public profile links only. No tokens, post bodies or provider HTML are stored. */
+/** Public profile and selected-post links only. No tokens, post bodies or provider HTML are stored. */
 export type SocialPlatform = "instagram" | "x";
 export type SocialAccount = {
   platform: SocialPlatform;
   handle: string;
   url: string;
+  /** Owner-selected public post URLs, newest first; never fetched post bodies. */
+  posts?: string[];
 };
 export type SocialConfig = { schemaVersion: 1; accounts: SocialAccount[] };
 export const MAX_SOCIAL_ACCOUNTS = 2;
@@ -72,13 +74,41 @@ export function socialAccount(value: unknown): SocialAccount | null {
     return null;
   }
 }
+/** Canonical, bounded public-post links only; no embed HTML or tracking queries. */
+export function socialPost(value: unknown, account: SocialAccount): string | null {
+  if (typeof value !== "string" || value.length > 240) return null;
+  try {
+    const url = new URL(value.trim());
+    if (url.protocol !== "https:" || url.username || url.password || url.port || url.search || url.hash) return null;
+    if (account.platform === "instagram") {
+      if (!["instagram.com", "www.instagram.com"].includes(url.hostname)) return null;
+      const match = url.pathname.match(/^\/(p|reel)\/([A-Za-z0-9_-]{1,80})\/?$/);
+      return match ? `https://www.instagram.com/${match[1]}/${match[2]}/` : null;
+    }
+    if (!["x.com", "www.x.com", "twitter.com", "www.twitter.com"].includes(url.hostname)) return null;
+    const match = url.pathname.match(/^\/([A-Za-z0-9_]{1,15})\/status\/([0-9]{1,25})\/?$/);
+    return match && match[1].toLowerCase() === account.handle
+      ? `https://x.com/${account.handle}/status/${match[2]}` : null;
+  } catch {
+    return null;
+  }
+}
+export const MAX_SOCIAL_POSTS = 12;
+// Manually selected from the supplied public profile embed; not a synchronised feed.
+const novaInstagramPosts = [
+  "https://www.instagram.com/p/DfH7u8RqpCh/",
+  "https://www.instagram.com/p/DdjE56sq0Qy/",
+];
 export function defaultSocialConfig(armyId: string): SocialConfig {
   return {
     schemaVersion: 1,
     accounts:
       armyId === "army-nova"
         ? [
-            socialAccount("https://www.instagram.com/aaaaaaarmii/")!,
+            {
+              ...socialAccount("https://www.instagram.com/aaaaaaarmii/")!,
+              posts: [...novaInstagramPosts],
+            },
             socialAccount("https://x.com/indiscowetrust")!,
           ]
         : [],
@@ -96,8 +126,17 @@ export function parseSocialConfig(
     const accounts: SocialAccount[] = [];
     for (const item of value.accounts.slice(0, 20)) {
       const account = socialAccount(item?.url);
-      if (account && !accounts.some((a) => a.platform === account.platform))
+      if (account && !accounts.some((a) => a.platform === account.platform)) {
+        if (item.posts === undefined && armyId === "army-nova" && account.url === "https://www.instagram.com/aaaaaaarmii/") {
+          account.posts = [...novaInstagramPosts];
+        }
+        if (Array.isArray(item.posts)) {
+          account.posts = [...new Set<string>(item.posts.slice(0, MAX_SOCIAL_POSTS)
+            .map((post: unknown) => socialPost(post, account))
+            .filter((post: string | null): post is string => post !== null))];
+        }
         accounts.push(account);
+      }
     }
     return {
       schemaVersion: 1,

@@ -1,182 +1,145 @@
-/* External previews have their own compact surface, never fan-feed styling. */
+/* One external post, with a quiet toolbar. Every rule stays inside this module. */
 .profile-canvas .profile-content .outside-army {
+  position: relative;
   width: 100%;
   min-width: 0;
-  padding: var(--army-inset, 24px);
-  border: var(--theme-border-width, 1px) var(--theme-border-style, solid)
-    var(--theme-border, #45434d);
+  padding: 0;
+  border: var(--theme-border-width, 1px) var(--theme-border-style, solid) var(--theme-border, #45434d);
   border-radius: var(--theme-radius, 15px);
   background: var(--theme-panel, #161619);
   color: var(--theme-text, #f7f7f4);
-  font:
-    400 13px/1.6 Arial,
-    Helvetica,
-    sans-serif;
+  font: 400 13px/1.6 Arial, Helvetica, sans-serif;
 }
 .profile-canvas .profile-content .outside-army.outside-outline {
   border: 2px solid var(--outside-accent);
 }
-.outside-header,
-.outside-header h2,
-.outside-source,
-.outside-source > span,
-.outside-source a {
+.profile-canvas .profile-content .outside-army > h2.sr-only {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+}
+.outside-army .outside-toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
+  min-height: 48px;
+  padding: 2px 10px 2px 14px;
 }
-.profile-canvas .profile-content .outside-army .outside-header {
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 8px 16px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid var(--outside-accent);
+.outside-army.outside-has-manager .outside-toolbar { padding-right: 54px; }
+.outside-army .outside-account {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font: 600 12px/1.4 Arial, sans-serif;
 }
-.profile-canvas .profile-content .outside-army .outside-header h2 {
-  margin: 0;
-  padding: 0;
+.outside-army .outside-tabs { display: flex; flex-shrink: 0; }
+.profile-canvas .profile-content .outside-army :is(.outside-tabs button, .outside-tools button, .outside-tools a) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  border: 0;
+  border-radius: 6px;
   background: transparent;
   color: inherit;
-  font:
-    700 18px/1.35 Arial,
-    Helvetica,
-    sans-serif;
-  letter-spacing: -0.02em;
+  font: 600 15px/1 Arial, sans-serif;
 }
-.outside-header h2 svg {
+.profile-canvas .profile-content .outside-army .outside-tabs button[aria-pressed="true"] {
   color: var(--outside-accent);
-  flex-shrink: 0;
+  box-shadow: inset 0 -2px var(--outside-accent);
 }
-.outside-header > span {
-  font-size: 9px;
-  letter-spacing: 0.08em;
+.outside-army .outside-channel { min-width: 0; }
+.outside-army .outside-media {
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 0 0 var(--theme-radius, 15px) var(--theme-radius, 15px);
 }
+.outside-army .outside-media:has(+ .outside-tools) { border-radius: 0; }
+.outside-army .outside-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 260px;
+  padding: 24px;
+  text-align: center;
+  background: color-mix(in srgb, var(--theme-text, #fff) 4%, transparent);
+}
+.outside-army .outside-empty > a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
 .profile-canvas .profile-content .outside-army :is(p, label, li, summary) {
   background: transparent;
   color: inherit;
 }
-.outside-intro {
-  margin-top: 12px;
-  font-size: 13px;
-}
-.outside-channel {
-  padding-block: 12px;
-  border-bottom: 1px solid var(--theme-control-border, #888);
-  min-width: 0;
-}
-.outside-source {
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 4px 12px;
-  font-size: 12px;
-}
-.outside-source > span {
-  color: var(--outside-accent);
-}
-.profile-canvas .profile-content .outside-army .outside-source a {
-  color: var(--theme-link, #a0f4cc);
-  min-height: 36px;
-  overflow-wrap: anywhere;
-}
-.outside-source a:hover {
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-.profile-canvas
-  .profile-content
-  .outside-army
-  :is(.outside-load, .outside-close) {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 8px 0;
-  border: 0;
-  border-radius: 2px;
-  background: transparent;
-  color: var(--theme-link, #a0f4cc);
-  font:
-    600 12px/1.6 Arial,
-    Helvetica,
-    sans-serif;
-  text-align: left;
-}
-.outside-load:hover,
-.outside-close:hover {
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-.profile-canvas .profile-content .outside-army .outside-hint {
-  display: block;
-  margin: 12px 0 0;
-  font:
-    400 11px/1.65 Arial,
-    Helvetica,
-    sans-serif;
-}
-.outside-instagram {
-  display: block;
-  width: 100%;
-  height: 280px;
-  border: 0;
-  border-radius: 10px;
-  background: #fff;
-  margin-top: 12px;
-}
-.outside-widget {
-  max-height: 280px;
-  overflow: auto;
-  margin-top: 12px;
-  border-radius: 10px;
-}
-.outside-widget:empty {
-  margin: 0;
-}
-.outside-widget iframe {
-  max-width: 100%;
-}
-.outside-manage {
-  margin-top: 12px;
-}
-.outside-manage summary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-}
-.outside-manage ul {
-  list-style: none;
-  margin: 12px 0;
-  padding: 0;
-}
-.outside-manage li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  overflow-wrap: anywhere;
-}
-.profile-canvas .profile-content .outside-army .outside-manage li button {
-  width: 44px;
-  min-width: 44px;
-  height: 44px;
-  padding: 12px;
-  background: transparent;
-  border: 1px solid currentColor;
-  border-radius: 10px;
-  color: inherit;
-}
-.outside-manage form {
+.profile-canvas .profile-content .outside-army .outside-load {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 80px;
+  padding: 12px;
+  background: transparent;
+  color: inherit;
+  border: 0;
+  font: 600 13px/1.5 Arial, sans-serif;
 }
-.outside-manage label {
-  font-size: 12px;
+.profile-canvas .profile-content .outside-army .outside-hint {
+  margin: 0;
+  font: 400 11px/1.6 Arial, sans-serif;
 }
-.profile-canvas .profile-content .outside-army input {
+.outside-army .outside-media > .outside-hint { padding: 16px; }
+.outside-army .outside-instagram {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: #fff;
+}
+.outside-army .outside-widget { overflow: auto; overscroll-behavior: contain; }
+.outside-army .outside-widget iframe { max-width: 100%; }
+.outside-army .outside-tools { display: flex; align-items: center; gap: 2px; padding: 2px 8px; }
+.outside-army .outside-tools > span { font-size: 11px; min-width: 30px; text-align: center; }
+.outside-army .outside-tools .outside-original { margin-left: auto; }
+.outside-army .outside-tools button:disabled { opacity: 0.35; cursor: default; }
+.outside-army :is(button, a, textarea, input, summary):focus-visible { outline: 2px solid currentColor; outline-offset: -3px; }
+.outside-army :is(button:not(:disabled), a, summary):hover { text-decoration: underline; text-underline-offset: 4px; }
+.outside-army .outside-manage > summary {
+  position: absolute;
+  top: 2px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  list-style: none;
+}
+.outside-army .outside-manage > summary::-webkit-details-marker { display: none; }
+.outside-army .outside-manage[open] { padding: 16px; border-top: 1px solid var(--theme-control-border, #888); }
+.outside-army .outside-manage ul { list-style: none; margin: 12px 0; padding: 0; }
+.outside-army .outside-manage li { display: flex; align-items: center; gap: 8px; overflow-wrap: anywhere; }
+.outside-army .outside-manage li > span { min-width: 0; }
+.profile-canvas .profile-content .outside-army .outside-manage li button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: inherit;
+  font: 600 12px/1.4 Arial, sans-serif;
+}
+.outside-army .outside-manage li .outside-edit { margin-left: auto; }
+.outside-army .outside-manage form { display: flex; flex-direction: column; gap: 10px; margin-block: 16px; }
+.outside-army .outside-manage label { font-size: 12px; }
+.profile-canvas .profile-content .outside-army :is(input, textarea) {
   width: 100%;
   min-width: 0;
   min-height: 44px;
@@ -185,15 +148,10 @@
   border-radius: 10px;
   background: var(--theme-panel, #161619);
   color: var(--theme-text, #f7f7f4);
-  font:
-    400 13px/1.6 Arial,
-    Helvetica,
-    sans-serif;
+  font: 400 13px/1.6 Arial, sans-serif;
+  resize: vertical;
 }
-.profile-canvas .profile-content .outside-army input::placeholder {
-  color: var(--theme-text, #f7f7f4);
-  opacity: 1;
-}
+.profile-canvas .profile-content .outside-army input::placeholder { color: inherit; opacity: 1; }
 .profile-canvas .profile-content .outside-army form button {
   align-self: flex-start;
   min-height: 44px;
@@ -202,36 +160,6 @@
   color: var(--theme-button-text, #fff);
   border: 1px solid currentColor;
   border-radius: 10px;
-  font:
-    700 13px/1.4 Arial,
-    Helvetica,
-    sans-serif;
+  font: 700 13px/1.4 Arial, sans-serif;
 }
-.outside-status {
-  margin-top: 12px;
-  font-size: 12px;
-  font-weight: 600;
-}
-.outside-manage button:hover {
-  filter: brightness(0.94);
-}
-
-.outside-channel {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0 8px;
-}
-.outside-source {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0;
-  min-width: 0;
-}
-.outside-channel
-  > :is(.outside-instagram, .outside-widget, .outside-hint, .outside-close) {
-  grid-column: 1 / -1;
-}
-.outside-channel .outside-load {
-  justify-self: end;
-}
+.outside-army > :is(.outside-status, .outside-hint) { margin: 0; padding: 12px 16px; font-size: 12px; }

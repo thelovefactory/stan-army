@@ -1,51 +1,41 @@
-# Outside the Army — prototype and feasibility
+# Outside the Army
 
-Reviewed 2026-11-07. This is a small external-content window below Army Chat, not a second posting feed. Nova is seeded with the two user-supplied profile links: Instagram `aaaaaaarmii` and X `indiscowetrust`. They are test links, not verified affiliations with the fictional Army. Other Armies start with no social accounts. No posts, timestamps, captions or engagement numbers are fabricated.
+Updated 2026-11-08. An optional external-post window below Army Chat. Only this module changes; the surrounding Army layout, other modules and theme controls remain unchanged.
 
-## What is implemented
+## Single-post tile
 
-- Enabled/hidden using **Customise → Tools for your Army → Outside the Army**. This remains independent of chat, music and other modules. If chat is hidden, the social window still works in the sidebar.
-- **Manage channels** is available only to the existing simulated founding-stan/community-admin roles. A verified artist, representative, moderator or visitor does not acquire configuration rights.
-- One Instagram and one X profile per Army. Enter a supported HTTPS profile URL to add or explicitly replace that platform's entry; remove either entry individually. Handles and canonical URLs are validated, including after storage restore. Credentials, arbitrary embeds, post HTML and unsupported domains cannot be submitted.
-- Links save independently to `stan-army:social:v1:<army-id>` on this device. Removal (including removing all channels) survives refresh. Failed writes leave the existing configuration unchanged. The UI explains that links are not authenticated account connections.
-- Presentation uses the existing theme editor: inherited Army accent or a separate validated accent, panel/outline treatment, existing theme corners and guarded text colours. Text is Arial like the other interface controls. The module uses an opaque panel surface for readable external links even on wild wallpaper; post artwork is untouched.
-- Instagram and X request no provider resources until a visitor chooses **Load … preview**. Only one preview is open at once, with a 280px viewing area. Close removes its embedded content; providers' scripts, cookies and prior requests cannot be undone by closing, and the loaded X library may remain until reload.
-- A source profile link is always available, including after failure. Official previews keep their platform attribution and original post links. Any visible post text, image, order and timestamp come from the provider; Stan Army does not extract or repackage them.
+- One Instagram or X post is visible at a time. No profile grids or profile timelines.
+- Compact account link and platform-icon selectors above the post. Previous/Next arrows, position, original-post link and close control below it. No visible module heading, subtitle, divider stack, duplicate attribution, or explanatory copy around loaded content. The module retains its accessible name.
+- Instagram uses its individual captioned post embed. Both artwork and caption come from Instagram. The iframe accepts bounded height measurements only from its exact window and Instagram origin. X uses its individual-post widget. Native attribution, controls, sign-in restrictions and availability remain provider-owned; Stan Army cannot freely restyle or remove them.
+- External resources load only after **Load … post**, with a short cookie notice before loading. Switching channels or closing removes the displayed embed. Prior requests/cookies cannot be undone; the X library may remain until reload.
+- Unavailable posts show a short status and retain the original link. Channels with no selected posts show a profile link, without loading a grid or timeline. No posts, captions, timestamps or engagement data are invented.
+- With no channels the module is hidden for visitors. Owners retain setup access. The existing Customise module toggle and accent/panel/outline settings still work.
 
-## Supported routes and authentication boundaries
+## Owner controls and persistence
 
-| Route | What it can do | What it cannot establish here |
-| --- | --- | --- |
-| Instagram public profile embed | Display Instagram's own profile card/post thumbnails when the account allows embedding | Guaranteed availability, arbitrary personal/private-account retrieval, chronological ordering, all captions or timestamps |
-| Instagram oEmbed | Generate a frontend embed for supported public content; current official documentation lists profile URLs | An enumerable latest-posts API; the supplied profile's oEmbed rejection must not be treated as proof the direct profile embed fails |
-| X official profile timeline | Request the public timeline using `widgets.js` and `twttr.widgets.createTimeline`, with documented sizing/chrome options | Guaranteed posts for this account/session, server-side post data, consistent chronology or a Stan Army refresh guarantee |
-| Instagram API with Instagram Login (future) | Read authorised professional account media under the appropriate permissions | A general authenticated feed for any personal account simply from its username |
-| X API user-posts endpoint (future) | Retrieve structured user posts with bearer-token/API access | Free/unrestricted access or access without a developer configuration and applicable product entitlement |
+A small settings icon opens **Manage channels**. Only simulated founding-stan/community-admin roles can manage it. Official identity does not grant management permissions.
 
-The profile embeds need no Stan Army authentication or backend credentials. Meta announced tokenless public oEmbed access on 2026-06-15; do not use old guidance that universally requires an app token/App Review for those embed calls. Authorised account-media retrieval is a separate integration. No paid plan, OAuth connection, developer app, credential, migration or endpoint was created.
+One supported HTTPS Instagram and one X profile per Army, with up to 12 public post URLs each, newest first. Add, Edit, replace or remove channels; edit the list to change or clear selected previews. X post URLs must match the configured handle. Instagram post URLs do not encode the author, so the owner must confirm ownership; the actual embed supplies attribution. No arbitrary iframe HTML, credentials, external domains or tracking query parameters are accepted.
 
-## What can update
+Configuration remains local to this device under `stan-army:social:v1:<army-id>`. Legacy links and theme settings are preserved. Failed writes do not overwrite existing configuration. This is not OAuth or a production permissions system.
 
-Reopening a preview requests the provider's current response. Stan Army does not poll, cache, synchronise or promise latest/live posts. Refresh behaviour inside an official widget is provider-controlled. X documents special fixed-post-count embeds as not polling; this implementation uses a bounded-height profile timeline, not that fixed-count mode. A future curated feed with predictable refresh, own card rendering and reliable timestamps needs an API-specific design, authorisation, rate/billing limits, caching/deletion rules and server-side secrets.
+Nova's supplied Instagram profile `aaaaaaarmii` has two manually selected public image-post links (`DfH7u8RqpCh`, `DdjE56sq0Qy`), identified in that profile's official embed. These are sample selections, not an automatically refreshed feed. Old Nova settings for that exact profile inherit them only when the `posts` field is absent; an explicitly cleared list is respected. X `indiscowetrust` remains a supplied test profile with no invented post links. Other Armies start with no channels.
 
-## Direct findings from the supplied accounts
+## Automatic feeds remain a separate integration
 
-- Instagram `/aaaaaaarmii/embed/`: HTTP 200. A real Chromium probe, using the cloud proxy's supplied CA, displayed the profile identity and actual post thumbnails. [Review screenshot](screenshots/outside-army-instagram.png). This is provider content, not demo fixture content.
-- Meta's v26.0 oEmbed call for the same profile returned error code 100/subcode 2207047 (“not embeddable media”). Consequently oEmbed is **not** used as a runtime gate; the direct, working profile embed is retained. No inference about private-account status is made from that error.
-- X publish/oEmbed recognised the supplied profile and returned timeline markup. The real browser loaded the official widget and timeline resources with HTTP 200, but `createTimeline` yielded no visible timeline. The UI displayed its unavailable state and retained the profile link. **No real X posts or timestamps were verified.** This may vary by provider/account/session; HTTP success alone does not prove content availability.
-- The first browser probe failed the environment proxy CA trust check. It was repeated through the configured proxy, trusting only the supplied CA's SPKI, before making the observations above. No TLS exceptions are added to the application.
+Individual public embeds require no Stan Army API credentials. Automatic Instagram media retrieval requires an authorised Business/Creator account, appropriate permissions and approval where required. Automatic X retrieval requires developer/API access with applicable costs and limits. Neither integration is implemented. No scraper, unofficial API, automated account login, server-side post cache, or paid provider was introduced.
 
-## Terms and content handling
+Older/Next browsing currently traverses the owner's selected links, not an unlimited historical archive. Caption and media presentation remain native; rendering our own image-and-caption cards requires approved API access.
 
-Official provider embeds are the feasible initial path, subject to platform terms, public-account/embed settings and provider availability. No scraper, private API, third-party feed service, automated login or access-control workaround is included. Provider HTML is not accepted from owners, injected through `dangerouslySetInnerHTML`, or stored. No social post contents are persisted or used for analytics. This is an implementation boundary, not a blanket legal clearance for all future uses. Official widget internals remain provider-owned and cannot be freely restyled to mimic a Stan Army post.
+## Sources
 
-## Official sources
+- [Instagram oEmbed](https://developers.facebook.com/docs/instagram-platform/oembed/)
+- [Instagram API with Instagram Login](https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/)
+- [X individual post widgets](https://developer.x.com/en/docs/twitter-for-websites/embedded-tweets/overview)
+- [X user posts API](https://docs.x.com/x-api/users/get-posts)
 
-- [Instagram oEmbed documentation](https://developers.facebook.com/docs/instagram-platform/oembed/) — fetched directly with the workspace HTTP client; public content and embed restrictions, profile URL formats and frontend-only use.
-- [Meta: Tokenless Access to Meta oEmbed APIs](https://developers.facebook.com/blog/post/2026/06/15/tokenless-access-to-meta-oembed-apis/) — current authentication change confirmed from the official page.
-- [Instagram API with Instagram Login](https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/) — professional accounts and `instagram_business_basic` permission; distinct from public embeds.
-- [X embedded timelines](https://docs.x.com/x-for-websites/timelines/overview) — profile timelines, sizing/chrome options, attribution and refresh limitations.
-- [X widget initialisation](https://docs.x.com/x-for-websites/javascript-api/guides/scripting-loading-and-initialization) — dynamic page initialisation.
-- [X user posts API](https://docs.x.com/x-api/users/get-posts) — bearer-token structured retrieval.
+## Validation
 
-Some Meta pages were throttled through web search; the official pages above were successfully fetched by the workspace HTTP client. No unofficial mirror is treated as authoritative.
+Unit tests cover safe URLs, bounded lists, persistence, theme compatibility and non-destructive legacy migration. Browser checks cover one-post rendering, channel switching, next/previous boundaries, source links, saving/reloading, role-restricted settings, empty-channel visibility and narrow layouts. Browser fixture tests are isolated from shipped content; live provider probes are reported separately because availability can vary.
+
+Latest validation: all 36 tests, lint, TypeScript and production build passed. Chromium passed single-frame navigation, source links, refresh, permissions, empty-state and 320/390/800/1440px layout checks. A separate live browser probe confirmed both selected Instagram images and their actual captions render, with provider height measurement working. Instagram's native header, engagement links and comment-link field remain visible within its embed; this limitation is not represented as a fully custom image-only renderer. X still has no verified test-post content and is not presented as a live feed.
