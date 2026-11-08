@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { CSSProperties, KeyboardEvent, PointerEvent } from "react";
-import { ArrowDown, ArrowLeft, ArrowUpRight, Check, GripVertical, Maximize2, MessageCircle, MessageSquare, Minus, Music2, Newspaper, Palette, Plus, RotateCcw, Scan } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUpRight, Check, ChevronDown, GripVertical, Maximize2, MessageCircle, MessageSquare, Minus, Music2, Newspaper, Palette, Plus, RotateCcw, Scan } from "lucide-react";
 import { useDemo } from "./demo-provider";
 import { fanNotes } from "@/lib/fan-space";
 import { DesktopChat, DesktopComposer, DesktopDiscussions, DesktopMusic, DesktopPost } from "./nova-layout-study";
@@ -115,6 +115,16 @@ export function ArmyDesktopPlayground() {
     if (commit && current && next) save(next, `${names[current.id]} ${current.kind === "move" ? "moved" : "resized"}. Your arrangement is saved on this device.`);
   }
   useEffect(() => {
+    const dismiss = (event: globalThis.PointerEvent) => {
+      for (const menu of document.querySelectorAll<HTMLDetailsElement>("[data-desktop-playground] details[open]")) {
+        if (!menu.contains(event.target as Node)) menu.open = false;
+      }
+    };
+    document.addEventListener("pointerdown", dismiss);
+    return () => document.removeEventListener("pointerdown", dismiss);
+  }, []);
+
+  useEffect(() => {
     const cancel = () => {
       const current = gesture.current;
       if (!current) return;
@@ -188,9 +198,16 @@ export function ArmyDesktopPlayground() {
 
   return <main id="main" className={`${s.desktop} ${s[!modern && owner.look === "black" ? "electric" : owner.look]}`} data-desktop-playground data-interface={modern ? "modern" : "original"} data-room-style={owner.look}
     style={{ "--participation": { mint: "#e1f5eb", pink: "#fce8f3", yellow: "#fff6d5" }[owner.participation] } as CSSProperties}
-    onKeyDown={(event) => { if (event.key === "Escape") { if (gesture.current) finish(false); else if (focused) setFocused(null); } }}>
+    onKeyDown={(event) => { if (event.key === "Escape") { if (gesture.current) finish(false); else {
+      const openMenu = event.currentTarget.querySelector<HTMLDetailsElement>("details[open]");
+      if (openMenu) { openMenu.open = false; openMenu.querySelector("summary")?.focus(); }
+      else if (focused) setFocused(null);
+    } } }}>
     <div className={s.wrap}>
-      <div className={s.breadcrumb}><Link href="/armies/nova"><ArrowLeft size={14} />Original Army</Link><div className={s.viewSwitch} role="group" aria-label="Interface style"><button aria-pressed={modern} onClick={() => setModern(true)}>Modern</button><button aria-pressed={!modern} onClick={() => setModern(false)}>Original</button></div>        <details className={s.ownerSettings}><summary><Palette size={16} />Army style</summary><div>
+      <header className={s.armyHeader} aria-labelledby="playground-army-name">
+      <div className={s.breadcrumb}><Link href="/armies/nova"><ArrowLeft size={14} />Original Army</Link><div className={s.headerControls}>
+        <label className={s.viewSelect}><span className="sr-only">Interface style</span><select aria-label="Interface style" value={modern ? "modern" : "original"} onChange={(event) => setModern(event.target.value === "modern")}><option value="modern">Modern view</option><option value="original">Original view</option></select><ChevronDown size={12} aria-hidden="true" /></label>
+        <details className={s.ownerSettings}><summary><Palette size={14} />Army style<ChevronDown size={12} aria-hidden="true" /></summary><div>
           <small className={s.demoLabel}>APPEARANCE · LOCAL PREVIEW</small>
           <label>Room style<select aria-label="Army room style" value={owner.look} onChange={(event) => saveOwner({ ...owner, look: event.target.value as DesktopLook }, "Host appearance saved on this device. Your personal arrangement stayed put.")}><option value="black">Black</option><option value="electric">Electric leopard</option><option value="afterhours">After hours</option><option value="chrome">Chrome room</option></select></label>
           {!modern && <label>Participation colour<select aria-label="Army participation colour" value={owner.participation} onChange={(event) => saveOwner({ ...owner, participation: event.target.value as Participation }, "Composer and chat updated together.")}><option value="mint">Mint</option><option value="pink">Pink</option><option value="yellow">Yellow</option></select></label>}
@@ -201,13 +218,17 @@ export function ArmyDesktopPlayground() {
             <label>Typeface<select aria-label="Panel typeface" value={owner.windows[styledWindow].typeface} onChange={(event) => saveOwner({ ...owner, windows: { ...owner.windows, [styledWindow]: { ...owner.windows[styledWindow], typeface: event.target.value as WindowTypeface } } }, "Panel typeface saved.")}><option value="sans">Sans</option><option value="mono">Monospace</option><option value="chunky">Chunky</option><option value="serif">Serif</option></select></label>
             <label>Skin<select aria-label="Window skin" value={owner.windows[styledWindow].skin} onChange={(event) => saveOwner({ ...owner, windows: { ...owner.windows, [styledWindow]: { ...owner.windows[styledWindow], skin: event.target.value as WindowSkin } } }, "Window skin saved.")}><option value="solid">Solid</option><option value="leopard">Leopard</option><option value="grid">Grid</option></select></label>
           </div>
+        </div></details>
+        <details className={`${s.ownerSettings} ${s.layoutSettings}`}><summary>Layout<ChevronDown size={12} aria-hidden="true" /></summary><div>
           <button onClick={() => saveOwner({ ...owner, layout: structuredClone(layout) }, "Starting layout saved for this local host demo. Members can still make their own arrangement.")}>Use this as the starting layout <Check size={16} /></button>
           <button className={s.resetStyle} onClick={reset}><RotateCcw size={16} />Reset layout</button>
-        </div></details><span>LOCAL DEMO</span></div>
-      <header className={s.identity}>
+        </div></details>
+        </div><span>LOCAL DEMO</span></div>
+      <div className={s.identity}>
         <Image src="/images/artist.jpg" alt="Nova Reign" width={66} height={66} priority />
-        <div><span className={s.eyebrow}>s/nova · FAN-RUN · ALTERNATIVE R&B</span><h1>Nova Reign’s Army <StanStarIcon size={30} /></h1><p>The music brought you here. Make yourself at home.</p><small>Hosted by <Link href="/fans/jess-wav">@jess.wav</Link> · 2,408 demo stans</small></div>
+        <div><span className={s.eyebrow}>s/nova · FAN-RUN · ALTERNATIVE R&B</span><h1 id="playground-army-name">Nova Reign’s Army <StanStarIcon size={30} /></h1><p>The music brought you here. Make yourself at home.</p><small>Hosted by <Link href="/fans/jess-wav">@jess.wav</Link> · 2,408 demo stans</small></div>
         <button className={s.join} aria-pressed={joined} onClick={() => demo.toggle("army-nova")}>{joined ? <Check size={17} /> : <Plus size={17} />}{joined ? "Joined" : "Join this Army"}</button>
+      </div>
       </header>
 
       <p className={warning ? s.status : "sr-only"} role="status" aria-live="polite">{notice}</p>
