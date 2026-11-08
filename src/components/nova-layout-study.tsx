@@ -110,14 +110,14 @@ function Composer({ joined, join }: { joined: boolean; join: () => void }) {
   </section>;
 }
 
-function Chat({ joined, join }: { joined: boolean; join: () => void }) {
+function Chat({ joined, join, windowed = false }: { joined: boolean; join: () => void; windowed?: boolean }) {
   const { messages, send } = useDemo();
   const [draft, setDraft] = useState("");
   const [status, setStatus] = useState("");
   const log = useRef<HTMLDivElement>(null);
-  return <section id="study-chat" className={s.chat} aria-labelledby="study-chat-heading">
-    <header className={s.chatHeader}><h2 id="study-chat-heading"><MessageCircle size={19} />Army Chat</h2><span className={s.smallTag}>DEMO ROOM</span></header>
-    <p className={s.chatIntro}>Pull up a seat. You’re among your people.</p>
+  return <section id="study-chat" data-window-body={windowed ? "chat" : undefined} className={s.chat} aria-label={windowed ? "Army Chat" : undefined} aria-labelledby={windowed ? undefined : "study-chat-heading"}>
+    {!windowed && <><header className={s.chatHeader}><h2 id="study-chat-heading"><MessageCircle size={19} />Army Chat</h2><span className={s.smallTag}>DEMO ROOM</span></header>
+    <p className={s.chatIntro}>Pull up a seat. You’re among your people.</p></>}
     <div className={s.chatLog} ref={log} role="log" aria-label="Sample Army conversation" aria-live="polite">
       <p className={s.chatDate}>SAMPLE CONVERSATION</p>
       {sampleChat.map((message, index) => <div className={s.chatMessage} key={message.name}>
@@ -145,7 +145,7 @@ function Music() {
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState(false);
-  return <section className={s.music} aria-label="Army stereo">
+  return <section className={s.music} data-window-body="music" aria-label="Army stereo">
     <div className={s.musicDisc}><Music2 size={23} /></div>
     <div className={s.musicCopy}><span className={s.tinyLabel}>ON THE ARMY STEREO</span><h3>Window seat</h3><p>Sample instrumental · original audio</p></div>
     <button className={s.musicButton} aria-label={playing ? "Pause music" : "Play music"} onClick={async () => {
@@ -162,7 +162,7 @@ function Music() {
   </section>;
 }
 
-function Discussions() {
+function Discussions({ windowed = false }: { windowed?: boolean }) {
   const demo = useDemo();
   const joined = demo.enlisted.includes(view.army.id);
   const boards = useBoards();
@@ -177,13 +177,14 @@ function Discussions() {
   const [reply, setReply] = useState("");
   const results = threads.filter((thread) => `${thread.title} ${thread.body}`.toLowerCase().includes(query.toLowerCase()));
   const ordered = sort === "top" ? [...results].sort((a, b) => b.score + (votes[b.id] ?? 0) - a.score - (votes[a.id] ?? 0)) : results;
-  return <section className={s.discussions} aria-labelledby="study-discussion-title">
-    <header className={s.sectionHeader}><div><span className={s.tinyLabel}>GO A LITTLE DEEPER</span><h2 id="study-discussion-title">The conversations.</h2></div>
+  return <section className={s.discussions} data-window-body={windowed ? "board" : undefined} aria-labelledby="study-discussion-title">
+    <header className={s.sectionHeader} data-board-header>
+      {windowed ? <h2 id="study-discussion-title" className="sr-only">Nova discussions</h2> : <div><span className={s.tinyLabel}>GO A LITTLE DEEPER</span><h2 id="study-discussion-title">The conversations.</h2></div>}
       <button className={s.textAction} onClick={() => setComposing(!composing)} aria-expanded={composing}><Plus size={16} />Start a discussion</button>
     </header>
-    <div className={s.boardActions}>
+    <div className={s.boardActions} data-board-actions>
       <div className={s.sortGroup}><button aria-pressed={sort === "top"} onClick={() => setSort("top")}>Top</button><button aria-pressed={sort === "new"} onClick={() => setSort("new")}>New</button></div>
-      <label className={s.search}><Search size={16} /><span className="sr-only">Search discussions</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Find a conversation…" /></label>
+      <label className={s.search} data-board-search><Search size={16} /><span className="sr-only">Search discussions</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Find a conversation…" /></label>
       <button className={s.iconButton} aria-label="Save Nova board" aria-pressed={boards.favourites.includes(board.id)} onClick={() => boards.toggleFavourite(board.id)}><Bookmark size={18} fill={boards.favourites.includes(board.id) ? "currentColor" : "none"} /></button>
     </div>
     {boards.bookmarkStatus && <p className={s.smallStatus} role="status">{boards.bookmarkStatus}</p>}
@@ -281,3 +282,6 @@ export function NovaLayoutStudy() {
     </div>
   </main>;
 }
+
+// Shared content, with opt-in window chrome suppression. The original study is unchanged.
+export { Post as DesktopPost, Composer as DesktopComposer, Chat as DesktopChat, Music as DesktopMusic, Discussions as DesktopDiscussions };
