@@ -85,7 +85,7 @@ test("owner appearance and personal layout are separate, versioned and cannot su
   assert.deepEqual(parseOwnerDesktop(JSON.stringify(owner)), owner);
   assert.equal(JSON.stringify(owner).includes("role"), false);
   const unsafe = parseOwnerDesktop('{"version":1,"look":"url(evil)","participation":"<script>"}');
-  assert.equal(unsafe.look, "electric"); assert.equal(unsafe.participation, "mint");
+  assert.equal(unsafe.look, "black"); assert.equal(unsafe.participation, "mint");
 });
 
 
@@ -139,8 +139,15 @@ test("per-window skins are validated separately from geometry and old owner pref
   const old=parseOwnerDesktop(JSON.stringify({version:1,look:"chrome",participation:"pink",layout:DEFAULT_DESKTOP}));
   assert.equal(old.look,"chrome"); assert.equal(old.windows.chat.skin,"solid");
   const next=parseOwnerDesktop(JSON.stringify({...old,windows:{chat:{skin:"leopard",colour:"blue"},feed:{skin:"url(evil)",colour:"<script>"}}}));
-  assert.deepEqual(next.windows.chat,{skin:"leopard",colour:"blue"});
+  assert.deepEqual(next.windows.chat,{skin:"leopard",colour:"blue",surface:"dark",typeface:"sans"});
   assert.equal(next.windows.feed.skin,"solid");
   assert.equal(JSON.stringify(next).includes("evil"),false);
   assert.deepEqual(next.layout,old.layout);
+  const styled=parseOwnerDesktop(JSON.stringify({...next,windows:{chat:{colour:"pink",skin:"grid",surface:"mint",typeface:"chunky"},feed:{surface:"url(evil)",typeface:"<style>"}}}));
+  assert.equal(styled.windows.chat.surface,"mint");
+  assert.equal(styled.windows.chat.typeface,"chunky");
+  assert.equal(styled.windows.feed.surface,"dark");
+  assert.equal(styled.windows.feed.typeface,"sans");
+  assert.equal(parseOwnerDesktop(null).look,"black");
+  assert.deepEqual(styled.layout,next.layout);
 });

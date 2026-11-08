@@ -19,7 +19,7 @@ export const PERSONAL_DESKTOP_KEY = "stan-army:desktop:personal:v1:army-nova";
 export const OWNER_DESKTOP_KEY = "stan-army:desktop:owner:v1:army-nova";
 export const DEFAULT_DESKTOP: DesktopLayout = {
   version: 1, order: [...PANEL_IDS], minimized: [],
-  sizes: { feed: { width: 8, height: 7 }, chat: { width: 4, height: 4 }, music: { width: 4, height: 3 }, board: { width: 12, height: 3 } },
+  sizes: { feed: { width: 8, height: 7 }, chat: { width: 4, height: 4 }, music: { width: 4, height: 3 }, board: { width: 12, height: 5 } },
 };
 const isPanel = (value: unknown): value is PanelId => PANEL_IDS.includes(value as PanelId);
 const record = (value: unknown): Record<string, unknown> => value && typeof value === "object" ? value as Record<string, unknown> : {};
@@ -154,15 +154,17 @@ export function setPanelMinimized(layout: DesktopLayout, id: PanelId, minimized:
 export function chatFirstDesktop(): DesktopLayout {
   return validateDesktop({ ...DEFAULT_DESKTOP, order: ["chat", "board", "feed", "music"], sizes: { chat: { width: 8, height: 5 }, board: { width: 4, height: 5 }, feed: { width: 8, height: 6 }, music: { width: 4, height: 3 } } });
 }
-export type DesktopLook = "electric" | "afterhours" | "chrome";
+export type DesktopLook = "black" | "electric" | "afterhours" | "chrome";
 export type Participation = "mint" | "pink" | "yellow";
 export type WindowColour = "mint" | "pink" | "blue" | "yellow" | "neutral";
 export type WindowSkin = "solid" | "leopard" | "grid";
-export type WindowAppearance = { colour: WindowColour; skin: WindowSkin };
+export type WindowSurface = "dark" | "mint" | "pink" | "blue" | "yellow" | "cream";
+export type WindowTypeface = "sans" | "mono" | "chunky" | "serif";
+export type WindowAppearance = { colour: WindowColour; skin: WindowSkin; surface: WindowSurface; typeface: WindowTypeface };
 export type OwnerDesktop = { version: 1; look: DesktopLook; participation: Participation; layout: DesktopLayout; windows: Record<PanelId, WindowAppearance> };
-const defaultWindows: Record<PanelId, WindowAppearance> = { feed: {colour: "mint", skin: "solid"}, chat: {colour: "pink", skin: "solid"}, board: {colour: "blue", skin: "solid"}, music: {colour: "yellow", skin: "solid"} };
+const defaultWindows: Record<PanelId, WindowAppearance> = { feed: {colour: "mint", skin: "solid", surface: "dark", typeface: "sans"}, chat: {colour: "pink", skin: "solid", surface: "dark", typeface: "sans"}, board: {colour: "blue", skin: "solid", surface: "dark", typeface: "sans"}, music: {colour: "yellow", skin: "solid", surface: "dark", typeface: "sans"} };
 export function parseOwnerDesktop(raw: string | null): OwnerDesktop {
-  const fallback: OwnerDesktop = { version: 1, look: "electric", participation: "mint", layout: structuredClone(DEFAULT_DESKTOP), windows: structuredClone(defaultWindows) };
+  const fallback: OwnerDesktop = { version: 1, look: "black", participation: "mint", layout: structuredClone(DEFAULT_DESKTOP), windows: structuredClone(defaultWindows) };
   if (!raw || raw.length > 10000) return fallback;
   try {
     const value = record(JSON.parse(raw)); if (value.version !== 1) return fallback;
@@ -170,10 +172,12 @@ export function parseOwnerDesktop(raw: string | null): OwnerDesktop {
     for (const id of PANEL_IDS) {
       const item = record(record(value.windows)[id]);
       if (["mint", "pink", "blue", "yellow", "neutral"].includes(String(item.colour))) windows[id].colour = item.colour as WindowColour;
+      if (["dark", "mint", "pink", "blue", "yellow", "cream"].includes(String(item.surface))) windows[id].surface = item.surface as WindowSurface;
+      if (["sans", "mono", "chunky", "serif"].includes(String(item.typeface))) windows[id].typeface = item.typeface as WindowTypeface;
       if (["solid", "leopard", "grid"].includes(String(item.skin))) windows[id].skin = item.skin as WindowSkin;
     }
     return { version: 1,
-      look: ["electric", "afterhours", "chrome"].includes(String(value.look)) ? value.look as DesktopLook : fallback.look,
+      look: ["black", "electric", "afterhours", "chrome"].includes(String(value.look)) ? value.look as DesktopLook : fallback.look,
       participation: ["mint", "pink", "yellow"].includes(String(value.participation)) ? value.participation as Participation : fallback.participation,
       layout: validateDesktop(value.layout), windows,
     };

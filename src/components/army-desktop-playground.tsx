@@ -11,9 +11,9 @@ import { DesktopChat, DesktopComposer, DesktopDiscussions, DesktopMusic, Desktop
 import { StanStarIcon } from "./stan-icons";
 import {
   DESKTOP_COLUMNS, DESKTOP_GAP, DESKTOP_ROW, OWNER_DESKTOP_KEY, PANEL_IDS, PERSONAL_DESKTOP_KEY,
-  chatFirstDesktop, movePanel, packDesktop, parseDesktop, parseOwnerDesktop, placePanel, resizePanel, setPanelMinimized, swapPanelSlots,
+  movePanel, packDesktop, parseDesktop, parseOwnerDesktop, placePanel, resizePanel, setPanelMinimized, swapPanelSlots,
 } from "@/lib/army-desktop";
-import type { DesktopLayout, DesktopLook, OwnerDesktop, PanelId, Participation, WindowColour, WindowSkin } from "@/lib/army-desktop";
+import type { DesktopLayout, DesktopLook, OwnerDesktop, PanelId, Participation, WindowColour, WindowSkin, WindowSurface, WindowTypeface } from "@/lib/army-desktop";
 import s from "./army-desktop-playground.module.css";
 
 const names: Record<PanelId, string> = { feed: "The Army", chat: "Army Chat", board: "Discussions", music: "Army Stereo" };
@@ -52,7 +52,7 @@ export function ArmyDesktopPlayground() {
   const [unsavedLayout, setUnsavedLayout] = useState<DesktopLayout | null>(null);
   const layout = unsavedLayout ?? savedLayout;
   const desktop = useSyncExternalStore(subscribeDesktop, desktopSnapshot, () => false);
-  const [role, setRole] = useState("visitor");
+  const [modern, setModern] = useState(true);
   const [styledWindow, setStyledWindow] = useState<PanelId>("chat");
   const [warning, setWarning] = useState(false);
   const [active, setActive] = useState<PanelId>("chat");
@@ -80,7 +80,6 @@ export function ArmyDesktopPlayground() {
     }
   }
   function saveOwner(next: OwnerDesktop, message: string) {
-    if (role !== "host") return;
     try {
       localStorage.setItem(OWNER_DESKTOP_KEY, JSON.stringify(next)); setUnsavedOwner(null); setWarning(false);
       window.dispatchEvent(new Event(eventName)); setNotice(message);
@@ -187,32 +186,30 @@ export function ArmyDesktopPlayground() {
     } else move(id, layout.order.indexOf(id) + direction);
   }
 
-  return <main id="main" className={`${s.desktop} ${s[owner.look]}`} data-desktop-playground
+  return <main id="main" className={`${s.desktop} ${s[!modern && owner.look === "black" ? "electric" : owner.look]}`} data-desktop-playground data-interface={modern ? "modern" : "original"} data-room-style={owner.look}
     style={{ "--participation": { mint: "#e1f5eb", pink: "#fce8f3", yellow: "#fff6d5" }[owner.participation] } as CSSProperties}
     onKeyDown={(event) => { if (event.key === "Escape") { if (gesture.current) finish(false); else if (focused) setFocused(null); } }}>
     <div className={s.wrap}>
-      <div className={s.breadcrumb}><Link href="/armies/nova"><ArrowLeft size={14} />Original Army</Link><span>DESKTOP PLAYGROUND · LOCAL DEMO</span></div>
+      <div className={s.breadcrumb}><Link href="/armies/nova"><ArrowLeft size={14} />Original Army</Link><div className={s.viewSwitch} role="group" aria-label="Interface style"><button aria-pressed={modern} onClick={() => setModern(true)}>Modern</button><button aria-pressed={!modern} onClick={() => setModern(false)}>Original</button></div>        <details className={s.ownerSettings}><summary><Palette size={16} />Army style</summary><div>
+          <small className={s.demoLabel}>APPEARANCE · LOCAL PREVIEW</small>
+          <label>Room style<select aria-label="Army room style" value={owner.look} onChange={(event) => saveOwner({ ...owner, look: event.target.value as DesktopLook }, "Host appearance saved on this device. Your personal arrangement stayed put.")}><option value="black">Black</option><option value="electric">Electric leopard</option><option value="afterhours">After hours</option><option value="chrome">Chrome room</option></select></label>
+          {!modern && <label>Participation colour<select aria-label="Army participation colour" value={owner.participation} onChange={(event) => saveOwner({ ...owner, participation: event.target.value as Participation }, "Composer and chat updated together.")}><option value="mint">Mint</option><option value="pink">Pink</option><option value="yellow">Yellow</option></select></label>}
+          <div className={s.windowAppearance}>
+            <label>Window<select aria-label="Style window" value={styledWindow} onChange={(event) => setStyledWindow(event.target.value as PanelId)}>{PANEL_IDS.map((id) => <option key={id} value={id}>{names[id]}</option>)}</select></label>
+            <label>Colour<select aria-label="Window colour" value={owner.windows[styledWindow].colour} onChange={(event) => saveOwner({ ...owner, windows: { ...owner.windows, [styledWindow]: { ...owner.windows[styledWindow], colour: event.target.value as WindowColour } } }, "Window colour saved.")}><option value="mint">Mint</option><option value="pink">Pink</option><option value="blue">Blue</option><option value="yellow">Yellow</option><option value="neutral">Neutral</option></select></label>
+            <label>Panel colour<select aria-label="Panel colour" value={owner.windows[styledWindow].surface} onChange={(event) => saveOwner({ ...owner, windows: { ...owner.windows, [styledWindow]: { ...owner.windows[styledWindow], surface: event.target.value as WindowSurface } } }, "Panel colour saved.")}><option value="dark">Dark</option><option value="mint">Mint</option><option value="pink">Pink</option><option value="blue">Blue</option><option value="yellow">Acid yellow</option><option value="cream">Cream</option></select></label>
+            <label>Typeface<select aria-label="Panel typeface" value={owner.windows[styledWindow].typeface} onChange={(event) => saveOwner({ ...owner, windows: { ...owner.windows, [styledWindow]: { ...owner.windows[styledWindow], typeface: event.target.value as WindowTypeface } } }, "Panel typeface saved.")}><option value="sans">Sans</option><option value="mono">Monospace</option><option value="chunky">Chunky</option><option value="serif">Serif</option></select></label>
+            <label>Skin<select aria-label="Window skin" value={owner.windows[styledWindow].skin} onChange={(event) => saveOwner({ ...owner, windows: { ...owner.windows, [styledWindow]: { ...owner.windows[styledWindow], skin: event.target.value as WindowSkin } } }, "Window skin saved.")}><option value="solid">Solid</option><option value="leopard">Leopard</option><option value="grid">Grid</option></select></label>
+          </div>
+          <button onClick={() => saveOwner({ ...owner, layout: structuredClone(layout) }, "Starting layout saved for this local host demo. Members can still make their own arrangement.")}>Use this as the starting layout <Check size={16} /></button>
+          <button className={s.resetStyle} onClick={reset}><RotateCcw size={16} />Reset layout</button>
+        </div></details><span>LOCAL DEMO</span></div>
       <header className={s.identity}>
         <Image src="/images/artist.jpg" alt="Nova Reign" width={66} height={66} priority />
         <div><span className={s.eyebrow}>s/nova · FAN-RUN · ALTERNATIVE R&B</span><h1>Nova Reign’s Army <StanStarIcon size={30} /></h1><p>The music brought you here. Make yourself at home.</p><small>Hosted by <Link href="/fans/jess-wav">@jess.wav</Link> · 2,408 demo stans</small></div>
         <button className={s.join} aria-pressed={joined} onClick={() => demo.toggle("army-nova")}>{joined ? <Check size={17} /> : <Plus size={17} />}{joined ? "Joined" : "Join this Army"}</button>
       </header>
-      <div className={s.tools}>
-        <button onClick={() => { setFocused(null); save(chatFirstDesktop(), "Chat has the big space. Discussions take the smaller window. This is just your view."); }}><MessageCircle size={16} />Chat first</button>
-        <button onClick={reset}><RotateCcw size={16} />Reset to Army layout</button>
-        <label className={s.role}><span>Demo role</span><select aria-label="Demo role" value={role} onChange={(event) => setRole(event.target.value)}><option value="visitor">Community member</option><option value="host">Community host</option></select></label>
-        {role === "host" && <details className={s.ownerSettings}><summary><Palette size={16} />Army style</summary><div>
-          <small className={s.demoLabel}>LOCAL HOST PREVIEW</small>
-          <label>Room style<select aria-label="Army room style" value={owner.look} onChange={(event) => saveOwner({ ...owner, look: event.target.value as DesktopLook }, "Host appearance saved on this device. Your personal arrangement stayed put.")}><option value="electric">Electric leopard</option><option value="afterhours">After hours</option><option value="chrome">Chrome room</option></select></label>
-          <label>Participation colour<select aria-label="Army participation colour" value={owner.participation} onChange={(event) => saveOwner({ ...owner, participation: event.target.value as Participation }, "Composer and chat updated together.")}><option value="mint">Mint</option><option value="pink">Pink</option><option value="yellow">Yellow</option></select></label>
-          <div className={s.windowAppearance}>
-            <label>Window<select aria-label="Style window" value={styledWindow} onChange={(event) => setStyledWindow(event.target.value as PanelId)}>{PANEL_IDS.map((id) => <option key={id} value={id}>{names[id]}</option>)}</select></label>
-            <label>Colour<select aria-label="Window colour" value={owner.windows[styledWindow].colour} onChange={(event) => saveOwner({ ...owner, windows: { ...owner.windows, [styledWindow]: { ...owner.windows[styledWindow], colour: event.target.value as WindowColour } } }, "Window colour saved.")}><option value="mint">Mint</option><option value="pink">Pink</option><option value="blue">Blue</option><option value="yellow">Yellow</option><option value="neutral">Neutral</option></select></label>
-            <label>Skin<select aria-label="Window skin" value={owner.windows[styledWindow].skin} onChange={(event) => saveOwner({ ...owner, windows: { ...owner.windows, [styledWindow]: { ...owner.windows[styledWindow], skin: event.target.value as WindowSkin } } }, "Window skin saved.")}><option value="solid">Solid</option><option value="leopard">Leopard</option><option value="grid">Grid</option></select></label>
-          </div>
-          <button onClick={() => saveOwner({ ...owner, layout: structuredClone(layout) }, "Starting layout saved for this local host demo. Members can still make their own arrangement.")}>Use this as the starting layout <Check size={16} /></button>
-        </div></details>}
-      </div>
+
       <p className={warning ? s.status : "sr-only"} role="status" aria-live="polite">{notice}</p>
       <p id="desktop-key-help" className="sr-only">Drag a window onto another to exchange their spaces, or into an empty grid space. Arrow keys on a title exchange nearby window spaces. Shift plus arrows resizes it. Arrow keys on the corner resize. Escape cancels dragging. Sizing also has a menu. Mobile uses stacked windows.</p>
       {focused && <button className={s.focusReturn} onClick={() => setFocused(null)}><ArrowLeft size={16} />Restore layout</button>}
@@ -226,7 +223,7 @@ export function ArmyDesktopPlayground() {
           const visiblePlacement = placement;
           return <section key={id} ref={(element) => { frames.current[id] = element; }} hidden={hidden}
             className={`${s.window} ${active === id ? s.active : ""} ${preview?.id === id ? s.moving : ""}`}
-            data-panel-id={id} data-window-colour={owner.windows[id].colour} data-window-skin={owner.windows[id].skin} data-expanded={focused === id ? "true" : undefined} aria-labelledby={`window-title-${id}`}
+            data-panel-id={id} data-window-colour={owner.windows[id].colour} data-window-skin={owner.windows[id].skin} data-panel-surface={owner.windows[id].surface} data-panel-typeface={owner.windows[id].typeface} data-expanded={focused === id ? "true" : undefined} aria-labelledby={`window-title-${id}`}
             style={{ gridColumn: visiblePlacement ? `${visiblePlacement.x + 1} / span ${visiblePlacement.width}` : undefined,
               gridRow: visiblePlacement ? `${visiblePlacement.y + 1} / span ${visiblePlacement.height}` : undefined,
               "--window-height": `${size.height * DESKTOP_ROW + (size.height - 1) * DESKTOP_GAP}px` } as CSSProperties}
@@ -272,12 +269,14 @@ export function ArmyDesktopPlayground() {
         {ghost && <div className={s.ghost} data-drop-preview aria-hidden="true" style={{ gridColumn: `${ghost.x + 1} / span ${ghost.width}`, gridRow: `${ghost.y + 1} / span ${ghost.height}` }} /> }
         {layout.minimized.length === PANEL_IDS.length && <div className={s.empty}><StanStarIcon size={40} /><h2>Everyone’s in the dock.</h2></div>}
       </div>
-      <nav className={s.dock} aria-label="Army window dock"><span className={s.dockBrand}><StanStarIcon size={22} /><b>YOUR ARMY DESKTOP</b></span>{PANEL_IDS.map((id) => { const Icon = icons[id]; const open = !layout.minimized.includes(id);
-        return <button key={id} ref={(element) => { dockRefs.current[id] = element; }} aria-label={`Show ${names[id]}`} aria-pressed={open} onClick={() => {
-          if (layout.minimized.includes(id)) { minimize(id); setFocused(null); setActive(id); }
-          else { setFocused(null); setActive(id); requestAnimationFrame(() => frames.current[id]?.scrollIntoView({ block: "nearest", behavior: "instant" })); }
-        }}><Icon size={17} /><span>{names[id]}</span><i aria-hidden="true" /></button>;
-      })}<Link href="/create" className={s.dockCreate}>Start your own Army <ArrowUpRight size={16} /></Link></nav>
+      <section className={s.communityInvite} aria-label="Create your own Army"><StanStarIcon size={30} /><strong>MAKE SOME NOISE.</strong><Link href="/create">Start your own Army <ArrowUpRight size={17} /></Link></section>
+      {layout.minimized.length > 0 && <nav className={s.dock} aria-label="Minimized Army windows">{layout.minimized.map((id) => { const Icon = icons[id];
+        return <button key={id} ref={(element) => { dockRefs.current[id] = element; }} aria-label={`Show ${names[id]}`} onClick={() => {
+          minimize(id); setFocused(null); setActive(id);
+          requestAnimationFrame(() => frames.current[id]?.scrollIntoView({ block: "nearest", behavior: "instant" }));
+        }}><Icon size={16} /><span>{names[id]}</span><Plus size={13} /></button>;
+      })}</nav>}
+
     </div>
   </main>;
 }
