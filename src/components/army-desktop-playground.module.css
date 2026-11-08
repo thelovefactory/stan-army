@@ -168,7 +168,7 @@
 .desktop[data-interface=modern] .windowControl:hover,.desktop[data-interface=modern] .windowMenu > summary:hover { background:#ffffff0b; color:#c4fbe0; }
 .desktop[data-interface=modern] .window[data-window-skin=leopard] .titlebar { background-image:linear-gradient(#0008,#0008),url('/decorations/stan-leopard-dense.png'); background-size:auto,260px; }
 .desktop[data-interface=modern] .window[data-window-skin=grid] .titlebar { background-image:linear-gradient(90deg,#a7f3d015 1px,transparent 1px),linear-gradient(#a7f3d015 1px,transparent 1px); background-size:10px 10px; }
-.desktop[data-interface=modern] .window[data-window-skin=leopard] .dragHandle { background:#202622; }
+.desktop[data-interface=modern] .window[data-window-skin=leopard] .dragHandle { background:transparent; }
 .desktop[data-interface=modern] .windowBody { padding:16px; background:#151718; }
 .desktop[data-interface=modern] .windowBody:has(> [data-window-body=chat]),.desktop[data-interface=modern] .windowBody:has(> [data-window-body=music]) { padding:0; }
 .desktop[data-interface=modern] .windowBody > [data-window-body=chat] { background:#141a17; padding:14px; }
@@ -204,7 +204,6 @@
 .desktop[data-interface=modern][data-room-style=chrome] { background:#24262a; background-image:repeating-linear-gradient(120deg,#ffffff03 0 1px,transparent 1px 5px); }
 .desktop[data-interface=modern] .identity { margin-bottom:28px; }
 .breadcrumb .ownerSettings > summary { min-width:44px; }
-.desktop[data-interface=modern] .windowBody > [data-window-body=music] > div:first-child { background:#1f3226; color:#a7f3d0; border-color:#5d7c67; }
 @font-face { font-family:DesktopChunky; src:url('/fonts/Anton-Regular.ttf') format('truetype'); font-display:swap; }
 .window[data-panel-typeface=mono] { --panel-font:'Courier New',monospace; }
 .window[data-panel-typeface=chunky] { --panel-font:DesktopChunky,Impact,sans-serif; }
@@ -292,3 +291,33 @@
 .window[data-style-selected=true] { outline:1px solid #a7f3d0; outline-offset:3px; }
 .desktop .windowControl:hover,.desktop .windowMenu > summary:hover { background:#80808014; }
 .resizeHandle:focus-visible > span,.window:hover .resizeHandle > span { opacity:1; }
+
+/* Patterned title bars are one surface, without opaque plaques behind their labels. */
+.desktop .window[data-window-skin=leopard] .dragHandle { background:transparent; }
+.desktop[data-interface=modern] .window[data-window-skin=leopard] .titlebar { background-image:linear-gradient(90deg,#1c201ef5,#1c201ee0 50%,#1c201e80),url('/decorations/stan-leopard-dense.png'); }
+.desktop .dragHandle,.desktop .windowTitle { text-decoration:none; text-shadow:none; box-shadow:none; }
+.desktop .window:not([data-panel-typeface=sans]) .windowTitle { font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-weight:500; letter-spacing:.06em; }
+.desktop .windowBody,.desktop .windowBody [role=log] { scrollbar-color:color-mix(in srgb,var(--ink) 28%,transparent) transparent; scrollbar-width:thin; }
+.desktop .windowBody::-webkit-scrollbar,.desktop .windowBody [role=log]::-webkit-scrollbar { width:6px; height:6px; }
+.desktop .windowBody::-webkit-scrollbar-track,.desktop .windowBody [role=log]::-webkit-scrollbar-track { background:transparent; }
+.desktop .windowBody::-webkit-scrollbar-thumb,.desktop .windowBody [role=log]::-webkit-scrollbar-thumb { background:color-mix(in srgb,var(--ink) 28%,transparent); border-radius:8px; }
+.desktop .windowBody [data-chat-meta] { justify-content:flex-start; align-items:baseline; flex-wrap:wrap; gap:10px; }
+.desktop .windowBody [data-chat-meta] strong { font-size:13px; line-height:1.5; color:inherit; }
+.desktop .windowBody [data-chat-meta] time { font:400 11px/1.5 Arial,sans-serif; opacity:1; color:inherit; white-space:nowrap; }
+.desktop .windowBody [role=log] > div { max-width:76ch; }
+.desktop .windowBody [role=log] > div > div > p { font-size:15px; line-height:1.7; color:inherit; }
+.desktop .windowBody [role=log] > p { font-size:10px; opacity:1; }
+.desktop .windowBody > [data-window-body=chat] > p:last-child { font-size:11px; }
+.desktop .windowBody > [data-window-body=chat] input { font-size:13px; }
+.desktop .windowBody:has(> [data-window-body=music]) { display:block; }
+.desktop .windowBody > [data-window-body=music] { min-height:100%; padding:20px; }
+.desktop .windowBody > [data-window-body=music] > div:first-child { background:transparent; color:inherit; border:0; }
+.desktop .windowBody > [data-window-body=music] button[data-army-action] { background:var(--button-colour,#ff009d); color:var(--button-ink,#fff)!important; border-color:var(--button-colour,#ff009d); }
+.desktop .grid { overflow-anchor:none; }
+.desktop[data-interacting=true] iframe { pointer-events:none; }
+.desktop[data-interacting=true] .grid { user-select:none; }
+.desktop[data-interface] .windowBody > [data-window-body=music]:has(iframe) { padding:8px; }
+
+.desktop .windowBody,.desktop .windowBody [role=log] { overscroll-behavior-y:auto; }
+.rowMoves { display:flex; gap:8px; border-bottom:1px solid var(--rule); padding-bottom:4px; margin-bottom:4px; }
+.windowMenu .rowMoves > button { min-width:0; flex:1; justify-content:center; font-size:11px; }

@@ -14,6 +14,7 @@ export type DesktopPresetId = (typeof DESKTOP_PRESETS)[number]["id"];
 export function applyDesktopPreset(owner: OwnerDesktop, id: DesktopPresetId): OwnerDesktop {
   const next = parseOwnerDesktop(null);
   next.layout = owner.layout;
+  next.music = owner.music;
   if (id === "afterhours") {
     next.look = "afterhours"; next.header.colour = "#201929"; next.accent = "#b56ae8";
     for (const panel of PANEL_IDS) next.windows[panel] = { ...next.windows[panel], surface: "custom", customSurface: "#201a29", colour: "pink", skin: "grid" };

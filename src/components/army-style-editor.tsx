@@ -6,6 +6,7 @@ import { ArrowLeft, Check, Eye, ImagePlus, Redo2, Undo2, X } from "lucide-react"
 import { PANEL_IDS } from "@/lib/army-desktop";
 import type { DesktopLook, OwnerDesktop, PanelId, WindowAppearance, WindowTypeface } from "@/lib/army-desktop";
 import { applyDesktopPreset, changeStyle, createStyleHistory, DESKTOP_PRESETS, redoStyle, sameDesktopStyle, undoStyle } from "@/lib/army-style-editor";
+import { parseArmyMusic } from "@/lib/army-music";
 import { readImage } from "@/lib/image-upload";
 import s from "./army-style-editor.module.css";
 
@@ -107,6 +108,8 @@ export function ArmyStyleEditor({ initial, visible, scope, section, onScope, onS
       {section === "panels" && <section id="style-section-panels" role="tabpanel" aria-labelledby="style-tab-panels">
         <label className={s.field}>Editing panel<select aria-label="Style window" value={scope} onChange={(e) => onScope(e.target.value as StyleScope)}>{PANEL_IDS.map((id) => <option key={id} value={id}>{names[id]}</option>)}<option value="all">All panels together</option></select></label>
         <h3>{scope === "all" ? "Together, or totally different." : names[scope]}</h3>
+        {scope === "music" && <MusicSourceEditor key={value.music ?? "empty"} source={value.music} apply={(music) => update({...value,music})} />}
+
         <p className={s.label}>Panel colour{!same("surface") && <small>Mixed</small>}</p><div className={s.swatches}>{surfaces.map(([surface, label, colour]) => <button key={surface} aria-label={`${label} panel colour`} aria-pressed={same("surface") && first.surface === surface} title={label} style={{ "--swatch": colour } as CSSProperties} onClick={() => editPanels({ surface })}><Check size={15} /></button>)}</div>
         <Colour label="Custom panel colour" value={first.customSurface} onChange={(customSurface) => editPanels({ surface: "custom", customSurface })} />
         <p className={s.label}>Title-bar accent{!same("colour") && <small>Mixed</small>}</p><div className={s.swatches}>{accents.map(([colour, label, hex]) => <button key={colour} aria-label={`${label} title accent`} aria-pressed={same("colour") && first.colour === colour} title={label} style={{ "--swatch": hex } as CSSProperties} onClick={() => editPanels({ colour })}><Check size={15} /></button>)}</div>
@@ -126,4 +129,9 @@ function Colour({ label, value, onChange }: { label: string; value: string; onCh
 }
 function FontChoices({ value, onChange }: { value?: WindowTypeface; onChange: (value: WindowTypeface) => void }) {
   return <div className={s.fonts}>{fonts.map((font) => <button key={font.id} aria-pressed={value === font.id} style={{ fontFamily: font.family }} onClick={() => onChange(font.id)}>{font.label}<span>Aa</span></button>)}</div>;
+}
+
+function MusicSourceEditor({source,apply}:{source:string|null;apply:(music:string|null)=>void}) {
+  const [draft,setDraft] = useState(source ?? ""), [error,setError] = useState("");
+  return <div className={s.musicSource}><label className={s.field}>Playlist or artist link<input aria-label="Music source link" type="url" value={draft} placeholder="Spotify or Apple Music link" maxLength={1500} onChange={(event)=>{setDraft(event.target.value);setError("");}} /></label><div><button className={s.textButton} onClick={()=>{const music=parseArmyMusic(draft);if(!music){setError("Use a public Spotify or Apple Music artist, playlist, album or track link.");return;}apply(music.url);setDraft(music.url);setError("");}}>Use music link</button><button className={s.textButton} onClick={()=>{apply(null);setDraft("");setError("");}}>Remove music</button></div><p className={s.hint}>Playback and the queue stay with the music service.</p>{error && <p role="alert" className={s.error}>{error}</p>}<div className={s.divider} /></div>;
 }

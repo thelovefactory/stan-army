@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {
   DEFAULT_DESKTOP, DESKTOP_COLUMNS, OWNER_DESKTOP_KEY, PANEL_IDS, PERSONAL_DESKTOP_KEY,
   chatFirstDesktop, movePanel, overlaps, packDesktop, parseDesktop, parseOwnerDesktop,
-  resizePanel, validateDesktop, placePanel, setPanelMinimized, swapPanelSlots,
+  canMovePanelRow, movePanelRow, resizePanel, validateDesktop, placePanel, setPanelMinimized, swapPanelSlots,
 } from "../src/lib/army-desktop";
 import type { DesktopLayout } from "../src/lib/army-desktop";
 
@@ -150,4 +150,25 @@ test("per-window skins are validated separately from geometry and old owner pref
   assert.equal(styled.windows.feed.typeface,"sans");
   assert.equal(parseOwnerDesktop(null).look,"black");
   assert.deepEqual(styled.layout,next.layout);
+});
+
+test("row moves exchange a wide panel with both neighbours while direct swaps remain individual",()=>{
+  const layout=validateDesktop({version:1,order:["feed","board","chat","music"],minimized:[],sizes:{feed:{width:8,height:5},board:{width:4,height:5},chat:{width:12,height:6},music:{width:12,height:3}},positions:{feed:{x:0,y:0},board:{x:8,y:0},chat:{x:0,y:5},music:{x:0,y:11}}});
+  const moved=movePanelRow(layout,"chat",-1), slots=assertPacked(moved);
+  assert.deepEqual(slots.find(item=>item.id==="chat"),{id:"chat",x:0,y:0,width:12,height:6});
+  assert.equal(slots.find(item=>item.id==="feed")!.y,6);assert.equal(slots.find(item=>item.id==="board")!.y,6);
+  assert.equal(slots.find(item=>item.id==="music")!.y,11);
+  assert.deepEqual(moved.sizes,layout.sizes);
+  assert.deepEqual(packDesktop(movePanelRow(moved,"chat",1)).sort((a,b)=>a.id.localeCompare(b.id)),packDesktop(layout).sort((a,b)=>a.id.localeCompare(b.id)));
+  const swapped=swapPanelSlots(layout,"chat","feed");assert.equal(packDesktop(swapped).find(item=>item.id==="board")!.y,0);assert.equal(swapped.sizes.chat.width,8);
+});
+
+test("connected rows keep unequal-height neighbours together and safely stop at boundaries",()=>{
+  const before=packDesktop(DEFAULT_DESKTOP), moved=movePanelRow(DEFAULT_DESKTOP,"board",-1);
+  assertPacked(moved);assert.equal(canMovePanelRow(moved,"board",-1),false);
+  assert.equal(movePanelRow(moved,"board",-1),moved);
+  const restored=movePanelRow(moved,"board",1);assertPacked(restored);
+  for(const old of before)assert.deepEqual(packDesktop(restored).find(item=>item.id===old.id),old);
+  let repeated=restored;
+  for(let i=0;i<60;i++){repeated=movePanelRow(repeated,PANEL_IDS[i%4],i%2 ? -1 : 1);assertPacked(repeated);assert.equal(packDesktop(repeated).length,4);}
 });

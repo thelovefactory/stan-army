@@ -121,10 +121,10 @@ function Chat({ joined, join, windowed = false }: { joined: boolean; join: () =>
     <div className={s.chatLog} ref={log} role="log" aria-label="Sample Army conversation" aria-live="polite">
       <p className={s.chatDate}>SAMPLE CONVERSATION</p>
       {sampleChat.map((message, index) => <div className={s.chatMessage} key={message.name}>
-        <Avatar initials={message.initials} tone={index} /><div><header><strong>@{message.name}</strong><time>{message.time}</time></header><p>{message.text}</p></div>
+        <Avatar initials={message.initials} tone={index} /><div><header data-chat-meta><strong>@{message.name}</strong><time>{message.time}</time></header><p>{message.text}</p></div>
       </div>)}
       {(messages[view.army.id] ?? []).map((message, index) => <div className={s.chatMessage} key={`${index}-${message.time}`}>
-        <Avatar initials="YOU" tone={1} /><div><header><strong>@you.demo</strong><time>{message.time}</time></header><p>{message.text}</p></div>
+        <Avatar initials="YOU" tone={1} /><div><header data-chat-meta><strong>@you.demo</strong><time>{message.time}</time></header><p>{message.text}</p></div>
       </div>)}
     </div>
     {joined ? <form className={s.chatInput} onSubmit={(event) => {

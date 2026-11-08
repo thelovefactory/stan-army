@@ -1,3 +1,4 @@
+import { DEFAULT_ARMY_MUSIC, parseArmyMusic } from "./army-music";
 import { safeColor, validAsset } from "./theme";
 import type { ThemeAsset } from "./theme";
 
@@ -167,10 +168,10 @@ export type WindowAppearance = { colour: WindowColour; skin: WindowSkin; surface
 export type RoomAppearance = { colour: string; image: ThemeAsset | null; fit: "cover" | "tile"; position: "center" | "top" | "bottom"; dim: number };
 export type HeaderAppearance = { colour: string; typeface: WindowTypeface };
 export const MAX_DESKTOP_OWNER_LENGTH = 800_000;
-export type OwnerDesktop = { version: 1; look: DesktopLook; participation: Participation; layout: DesktopLayout; windows: Record<PanelId, WindowAppearance>; room: RoomAppearance; header: HeaderAppearance; corners: "soft" | "square" | "round"; frame: "minimal" | "classic"; accent: string };
+export type OwnerDesktop = { version: 1; look: DesktopLook; participation: Participation; layout: DesktopLayout; windows: Record<PanelId, WindowAppearance>; room: RoomAppearance; header: HeaderAppearance; corners: "soft" | "square" | "round"; frame: "minimal" | "classic"; accent: string; music: string | null };
 const defaultWindows: Record<PanelId, WindowAppearance> = { feed: {colour: "mint", skin: "solid", surface: "dark", typeface: "sans", customSurface: "#151718", customAccent: "#a7f3d0"}, chat: {colour: "pink", skin: "solid", surface: "dark", typeface: "sans", customSurface: "#151718", customAccent: "#a7f3d0"}, board: {colour: "blue", skin: "solid", surface: "dark", typeface: "sans", customSurface: "#151718", customAccent: "#a7f3d0"}, music: {colour: "yellow", skin: "solid", surface: "dark", typeface: "sans", customSurface: "#151718", customAccent: "#a7f3d0"} };
 export function parseOwnerDesktop(raw: string | null): OwnerDesktop {
-  const fallback: OwnerDesktop = { version: 1, look: "black", participation: "mint", layout: structuredClone(DEFAULT_DESKTOP), windows: structuredClone(defaultWindows), room: { colour: "#0b0c0d", image: null, fit: "cover", position: "center", dim: 25 }, header: { colour: "#111614", typeface: "sans" }, corners: "soft", frame: "minimal", accent: "#ff009d" };
+  const fallback: OwnerDesktop = { version: 1, look: "black", participation: "mint", layout: structuredClone(DEFAULT_DESKTOP), windows: structuredClone(defaultWindows), room: { colour: "#0b0c0d", image: null, fit: "cover", position: "center", dim: 25 }, header: { colour: "#111614", typeface: "sans" }, corners: "soft", frame: "minimal", accent: "#ff009d", music: DEFAULT_ARMY_MUSIC };
   if (!raw || raw.length > MAX_DESKTOP_OWNER_LENGTH) return fallback;
   try {
     const value = record(JSON.parse(raw)); if (value.version !== 1) return fallback;
@@ -194,6 +195,37 @@ export function parseOwnerDesktop(raw: string | null): OwnerDesktop {
       corners: value.corners === "square" || value.corners === "round" ? value.corners : "soft",
       frame: value.frame === "classic" ? "classic" : "minimal",
       accent: safeColor(value.accent, fallback.accent),
+      music: value.music === undefined ? DEFAULT_ARMY_MUSIC : parseArmyMusic(value.music)?.url ?? null,
     };
   } catch { return fallback; }
+}
+
+/** Rows are vertically connected groups: a wide window moves past a whole paired row. */
+function desktopRows(layout: DesktopLayout): Placement[][] {
+  const rows: Placement[][] = [];
+  for (const panel of packDesktop(layout).sort((a,b) => a.y-b.y || a.x-b.x)) {
+    const current = rows.at(-1);
+    const bottom = current ? Math.max(...current.map((item)=>item.y+item.height)) : -1;
+    if (current && panel.y < bottom) current.push(panel);
+    else rows.push([panel]);
+  }
+  return rows;
+}
+export function canMovePanelRow(layout: DesktopLayout, id: PanelId, direction: -1 | 1): boolean {
+  const rows = desktopRows(layout), index = rows.findIndex((row)=>row.some((item)=>item.id===id));
+  return index >= 0 && index + direction >= 0 && index + direction < rows.length;
+}
+export function movePanelRow(layout: DesktopLayout, id: PanelId, direction: -1 | 1): DesktopLayout {
+  const rows = desktopRows(layout), index = rows.findIndex((row)=>row.some((item)=>item.id===id));
+  const active = rows[index], target = rows[index + direction];
+  if (!active || !target) return layout;
+  const first = direction === -1 ? target : active, second = direction === -1 ? active : target;
+  const firstTop = Math.min(...first.map((item)=>item.y)), firstBottom = Math.max(...first.map((item)=>item.y+item.height));
+  const secondTop = Math.min(...second.map((item)=>item.y)), secondBottom = Math.max(...second.map((item)=>item.y+item.height));
+  const gap = secondTop-firstBottom;
+  const next = snapshot(layout);
+  for (const item of first) next.positions![item.id].y += secondBottom-secondTop+gap;
+  for (const item of second) next.positions![item.id].y -= firstBottom-firstTop+gap;
+  next.order = [...packDesktop(next).sort((a,b)=>a.y-b.y || a.x-b.x).map((item)=>item.id),...layout.order.filter((item)=>layout.minimized.includes(item))];
+  return next;
 }

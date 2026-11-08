@@ -75,3 +75,5 @@
 @media (prefers-reduced-motion:reduce) { .editor * { transition:none!important; animation:none!important; scroll-behavior:auto!important; } }
 .swatches button { width:44px; height:44px; }
 @media (max-width:650px) { .header > button,.history > button { min-width:40px; min-height:44px; } }
+.field input[type=url] { width:100%; min-width:0; min-height:44px; padding:10px; border:1px solid #425247; border-radius:7px; background:#222c25; color:#e8f0eb; }
+.musicSource > div:not(.divider) { display:flex; align-items:center; gap:18px; }
