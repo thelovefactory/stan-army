@@ -7,6 +7,9 @@ import {
   socialStorageKey,
   socialPost,
   MAX_SOCIAL_POSTS,
+  instagramGallerySource,
+  getGallerySource,
+  gallerySourceUrl,
 } from "../src/lib/social-channels";
 import { defaultTheme, validateTheme, parseTheme } from "../src/lib/theme";
 
@@ -160,4 +163,33 @@ test("Nova's old test-profile links receive individual previews without overridi
   const other = JSON.stringify({schemaVersion: 1, accounts: [{url: "https://instagram.com/brie/"}]});
   assert.equal(parseSocialConfig(other, "army-nova").accounts[0].posts, undefined);
   assert.equal(parseSocialConfig(legacy, "army-brie").accounts[0].posts, undefined);
+});
+
+
+test("gallery sources accept public usernames and hashtags without credentials or executable URLs", () => {
+  assert.deepEqual(instagramGallerySource("@aaaaaaarmii"), {kind: "account", value: "aaaaaaarmii"});
+  assert.deepEqual(instagramGallerySource("https://www.instagram.com/BRIE/"), {kind: "account", value: "brie"});
+  assert.deepEqual(instagramGallerySource("#Brie"), {kind: "hashtag", value: "brie"});
+  assert.deepEqual(instagramGallerySource("#café"), {kind: "hashtag", value: "café"});
+  for (const input of ["#", "#two words", "#<script>", "https://evil.test/brie/", "https://x.com/brie", "javascript:alert(1)", "#brie?token=secret", "@@brie", "https://instagram.com/brie/?token=secret"]) {
+    assert.equal(instagramGallerySource(input), null, input);
+  }
+  assert.equal(gallerySourceUrl(instagramGallerySource("#Brie")!), "https://www.instagram.com/explore/tags/brie/");
+  assert.equal(gallerySourceUrl(instagramGallerySource("@Brie")!), "https://www.instagram.com/brie/");
+});
+
+test("gallery preferences preserve legacy links and explicit removal without inventing a connected feed", () => {
+  const legacy = defaultSocialConfig("army-nova");
+  assert.deepEqual(getGallerySource(legacy), {kind: "account", value: "aaaaaaarmii"});
+  const saved = parseSocialConfig(JSON.stringify({...legacy, gallerySource: {kind: "hashtag", value: "Brie", token: "secret", connected: true}}), "army-nova");
+  assert.deepEqual(getGallerySource(saved), {kind: "hashtag", value: "brie"});
+  assert.deepEqual(saved.accounts, legacy.accounts);
+  assert.equal(JSON.stringify(saved).includes("secret"), false);
+  assert.equal(JSON.stringify(saved).includes("connected"), false);
+  assert.deepEqual(parseSocialConfig(JSON.stringify(saved), "army-nova"), saved);
+  const removed = parseSocialConfig(JSON.stringify({...legacy, gallerySource: null}), "army-nova");
+  assert.equal(getGallerySource(removed), null);
+  assert.deepEqual(removed.accounts, legacy.accounts);
+  assert.equal(getGallerySource(defaultSocialConfig("army-brie")), null);
+  assert.equal(getGallerySource(parseSocialConfig(JSON.stringify({...legacy, gallerySource: {kind: "hashtag", value: "<script>"}}), "army-nova")), null);
 });

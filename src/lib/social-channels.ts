@@ -7,7 +7,41 @@ export type SocialAccount = {
   /** Owner-selected public post URLs, newest first; never fetched post bodies. */
   posts?: string[];
 };
-export type SocialConfig = { schemaVersion: 1; accounts: SocialAccount[] };
+export type InstagramGallerySource =
+  | { kind: "account"; value: string }
+  | { kind: "hashtag"; value: string };
+export type SocialConfig = {
+  schemaVersion: 1;
+  accounts: SocialAccount[];
+  /** A source preference, not proof of a live provider connection. */
+  gallerySource?: InstagramGallerySource | null;
+};
+
+export function instagramGallerySource(input: unknown): InstagramGallerySource | null {
+  if (typeof input !== "string" || input.length > 240) return null;
+  const value = input.trim().normalize("NFC");
+  if (value.startsWith("#")) {
+    const tag = value.slice(1);
+    return /^[\p{L}\p{N}_]{1,100}$/u.test(tag)
+      ? { kind: "hashtag", value: tag.toLowerCase() } : null;
+  }
+  const account = socialAccount(value.startsWith("https://")
+    ? value : `https://www.instagram.com/${value.replace(/^@/, "")}/`);
+  return account?.platform === "instagram"
+    ? { kind: "account", value: account.handle } : null;
+}
+
+export function getGallerySource(config: SocialConfig): InstagramGallerySource | null {
+  if (config.gallerySource !== undefined) return config.gallerySource;
+  const account = config.accounts.find((item) => item.platform === "instagram");
+  return account ? { kind: "account", value: account.handle } : null;
+}
+
+export function gallerySourceUrl(source: InstagramGallerySource): string {
+  return source.kind === "account"
+    ? `https://www.instagram.com/${encodeURIComponent(source.value)}/`
+    : `https://www.instagram.com/explore/tags/${encodeURIComponent(source.value)}/`;
+}
 export const MAX_SOCIAL_ACCOUNTS = 2;
 export function socialAccount(value: unknown): SocialAccount | null {
   if (typeof value !== "string" || value.length > 240) return null;
@@ -138,9 +172,15 @@ export function parseSocialConfig(
         accounts.push(account);
       }
     }
+    const source = value.gallerySource === null ? null
+      : value.gallerySource?.kind === "account" && typeof value.gallerySource.value === "string"
+        ? instagramGallerySource(`@${value.gallerySource.value}`)
+        : value.gallerySource?.kind === "hashtag" && typeof value.gallerySource.value === "string"
+          ? instagramGallerySource(`#${value.gallerySource.value}`) : undefined;
     return {
       schemaVersion: 1,
       accounts: accounts.slice(0, MAX_SOCIAL_ACCOUNTS),
+      ...(source !== undefined ? { gallerySource: source } : {}),
     };
   } catch {
     return { schemaVersion: 1, accounts: [] };
