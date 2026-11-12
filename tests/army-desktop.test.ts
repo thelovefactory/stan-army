@@ -20,7 +20,7 @@ function assertPacked(layout: DesktopLayout) {
 
 test("desktop starts with a larger feed, usable chat, stereo and a separate board without overlaps", () => {
   const packed = assertPacked(DEFAULT_DESKTOP);
-  assert.deepEqual(packed.map(({id, x, y}) => [id, x, y]), [["feed", 0, 0], ["chat", 8, 0], ["music", 8, 4], ["board", 0, 7]]);
+  assert.deepEqual(packed.map(({id, x, y}) => [id, x, y]), [["feed", 0, 0], ["chat", 8, 0], ["music", 8, 4], ["board", 0, 7], ["stancam", 8, 7]]);
   assert.deepEqual(packDesktop(DEFAULT_DESKTOP), packed);
 });
 
@@ -54,7 +54,7 @@ test("stored layouts reject foreign IDs, styling, forged roles and unsafe geomet
   const layout = validateDesktop({version: 1, order: ["chat", "chat", "<script>", "bogus"], minimized: ["music", "music", "bogus"], role: "host", css: "url(evil)", sizes: {
     chat: {width: -100, height: 9000}, feed: {width: "100%", height: NaN}, music: {width: Infinity, height: 2.3}, board: {width: 100000, height: -30},
   }});
-  assert.deepEqual(layout.order, ["chat", "feed", "music", "board"]);
+  assert.deepEqual(layout.order, ["chat", "feed", "music", "board", "stancam"]);
   assert.deepEqual(layout.minimized, ["music"]);
   assert.deepEqual(layout.sizes.chat, {width: 4, height: 8});
   assert.deepEqual(layout.sizes.feed, DEFAULT_DESKTOP.sizes.feed);
@@ -70,7 +70,7 @@ test("stored layouts reject foreign IDs, styling, forged roles and unsafe geomet
 test("many width/height combinations remain bounded and collision-free after reordering", () => {
   for (let index = 0; index < 180; index++) {
     const sizes = Object.fromEntries(PANEL_IDS.map((id, n) => [id, {width: 4 + (index * 7 + n * 3) % 9, height: 2 + (index * 5 + n) % 7}]));
-    const order = PANEL_IDS.map((_, n) => PANEL_IDS[(n + index) % 4]);
+    const order = PANEL_IDS.map((_, n) => PANEL_IDS[(n + index) % PANEL_IDS.length]);
     assertPacked(validateDesktop({version: 1, order, sizes, minimized: []}));
   }
 });
@@ -120,18 +120,18 @@ test("minimising preserves neighbour positions and restoring into an occupied sp
   assert.deepEqual(before.find((item)=>item.id==="feed"),packDesktop(DEFAULT_DESKTOP).find((item)=>item.id==="feed"));
   const filled = placePanel(hidden,"music",{x:8,y:0},{width:4,height:3});
   const restored = setPanelMinimized(filled,"chat",false);
-  assert.equal(assertPacked(restored).length,4);
+  assert.equal(assertPacked(restored).length,PANEL_IDS.length);
   assert.deepEqual(packDesktop(restored).find((item)=>item.id==="music"),packDesktop(filled).find((item)=>item.id==="music"));
 });
 
 test("repeated spatial swaps and resizes never lose panels or create collisions", () => {
   let layout=structuredClone(DEFAULT_DESKTOP);
   for(let i=0;i<100;i++) {
-    layout=swapPanelSlots(layout,PANEL_IDS[i%4],PANEL_IDS[(i+1)%4]);
-    layout=resizePanel(layout,PANEL_IDS[i%4],{width:4+(i*3)%9,height:3+i%6},i%2===0);
+    layout=swapPanelSlots(layout,PANEL_IDS[i%PANEL_IDS.length],PANEL_IDS[(i+1)%PANEL_IDS.length]);
+    layout=resizePanel(layout,PANEL_IDS[i%PANEL_IDS.length],{width:4+(i*3)%9,height:3+i%6},i%2===0);
     assertPacked(layout);
     layout=parseDesktop(JSON.stringify(layout));
-    assert.equal(assertPacked(layout).length,4);
+    assert.equal(assertPacked(layout).length,PANEL_IDS.length);
   }
 });
 
@@ -170,5 +170,5 @@ test("connected rows keep unequal-height neighbours together and safely stop at 
   const restored=movePanelRow(moved,"board",1);assertPacked(restored);
   for(const old of before)assert.deepEqual(packDesktop(restored).find(item=>item.id===old.id),old);
   let repeated=restored;
-  for(let i=0;i<60;i++){repeated=movePanelRow(repeated,PANEL_IDS[i%4],i%2 ? -1 : 1);assertPacked(repeated);assert.equal(packDesktop(repeated).length,4);}
+  for(let i=0;i<60;i++){repeated=movePanelRow(repeated,PANEL_IDS[i%PANEL_IDS.length],i%2 ? -1 : 1);assertPacked(repeated);assert.equal(packDesktop(repeated).length,PANEL_IDS.length);}
 });

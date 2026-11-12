@@ -32,7 +32,7 @@ This adds no authentication, database, publishing, arbitrary CSS, third-party em
 
 ## Validation
 
-57 automated tests cover existing behaviour and desktop packing, validation, legacy migration, slot swaps, shared-divider resizing, minimising/restoring occupied slots, repeated spatial edits, skin enums, appearance history, preset/layout independence, custom colour validation, raster migration and separate owner/personal storage. Lint, type checking and the production build are checked separately.
+60 automated tests cover existing behaviour and desktop packing, validation, legacy migration, slot swaps, shared-divider resizing, minimising/restoring occupied slots, repeated spatial edits, skin enums, appearance history, preset/layout independence, custom colour validation, raster migration and separate owner/personal storage. Lint, type checking and the production build are checked separately.
 
 Browser checks exercise pointer swaps and live previews, small in-slot drags, Escape cancellation, left-corner resizing, keyboard control, refresh persistence, minimum-height chat inputs, drafts, embedded-player DOM continuity, panel colours/typefaces, appearance switching, minimised tray restoration, all-minimised recovery, blocked storage and layouts from 320–1440px. Runtime/hydration errors and panel/page overflow are checked. These are prototype interaction checks, not cross-browser certification.
 
@@ -41,3 +41,11 @@ Browser checks exercise pointer swaps and live previews, small in-slot drags, Es
 Title-bar patterns blend across a single surface; opaque label plaques are removed, and window chrome uses a consistent UI font independently of panel content fonts. Chat messages have a 15px minimum, readable metadata, and timestamps beside their authors in wide panels. Conversation lines have a comfortable maximum width. Thin themed scrollbars replace bright native tracks, and wheel scrolling chains to the page when a panel reaches its end. Panel scroll positions remain intact when rearranged rather than resetting a reader midway through a discussion.
 
 The playground stereo is now an external-service module; the older local instrumental in the separate layout study is not the playground's playback model. See [external music behaviour](ARMY_EXTERNAL_MUSIC.md).
+
+## StanCam
+
+StanCam adds a fifth movable/customisable panel beneath the player in the new starting layout. It is an edge-to-edge photo with Upload your own, previous/next and shuffle overlays. It has no likes, comment counts, caption form or advertising controls. Existing local assets are explicitly described as examples. Uploads reuse raster validation and remain only for this demo visit; the post-upload status says so. The prototype does not publish photos to other users or persist them on refresh. Invalid files leave the selected photo intact. Snaps survive rearranging and minimising while mounted.
+
+Migration preserves the original four windows' positions, sizes and minimised state, finding an available space for StanCam near the stereo. If necessary it uses a shorter available gap or the nearest free space. Fresh layouts give discussions eight columns, with StanCam occupying the four-column space beside it. The packing search now accommodates all five tools at maximum size.
+
+See ARMY_TOOLBOX_DIRECTION.md for the proposed longer-term plug-and-play direction. A catalogue of tools is not implemented yet.

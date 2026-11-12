@@ -3,7 +3,7 @@ import { safeColor, validAsset } from "./theme";
 import type { ThemeAsset } from "./theme";
 
 /** Bounded, versioned layout data only; never CSS, content or permissions. */
-export const PANEL_IDS = ["feed", "chat", "music", "board"] as const;
+export const PANEL_IDS = ["feed", "chat", "music", "board", "stancam"] as const;
 export type PanelId = (typeof PANEL_IDS)[number];
 export type PanelSize = { width: number; height: number };
 export type GridPosition = { x: number; y: number };
@@ -23,7 +23,7 @@ export const PERSONAL_DESKTOP_KEY = "stan-army:desktop:personal:v1:army-nova";
 export const OWNER_DESKTOP_KEY = "stan-army:desktop:owner:v1:army-nova";
 export const DEFAULT_DESKTOP: DesktopLayout = {
   version: 1, order: [...PANEL_IDS], minimized: [],
-  sizes: { feed: { width: 8, height: 7 }, chat: { width: 4, height: 4 }, music: { width: 4, height: 3 }, board: { width: 12, height: 5 } },
+  sizes: { feed: { width: 8, height: 7 }, chat: { width: 4, height: 4 }, music: { width: 4, height: 3 }, board: { width: 8, height: 5 }, stancam: { width: 4, height: 5 } },
 };
 const isPanel = (value: unknown): value is PanelId => PANEL_IDS.includes(value as PanelId);
 const record = (value: unknown): Record<string, unknown> => value && typeof value === "object" ? value as Record<string, unknown> : {};
@@ -37,14 +37,14 @@ function nearestSlot(item: Placement, placed: Placement[]): Placement {
     const score = Math.abs(y - item.y) * 12 + Math.abs(x - item.x) + (y < item.y ? .5 : 0);
     if (score < cost) { best = next; cost = score; }
   }
-  // Four windows, each at most eight rows, always fit in this search area.
+  // All registered windows, each at most eight rows, fit within this search area.
   return best!;
 }
 function legacySlots(layout: DesktopLayout): Placement[] {
   const placed: Placement[] = [];
   for (const id of layout.order) {
     let next: Placement | undefined;
-    for (let y = 0; y < 32 && !next; y++) for (let x = 0; x <= 12 - layout.sizes[id].width; x++) {
+    for (let y = 0; y < 64 && !next; y++) for (let x = 0; x <= 12 - layout.sizes[id].width; x++) {
       const candidate = { id, ...layout.sizes[id], x, y };
       if (placed.every((other) => !overlaps(candidate, other))) { next = candidate; break; }
     }
@@ -80,7 +80,25 @@ export function validateDesktop(value: unknown, fallback = DEFAULT_DESKTOP): Des
     positions[id] = { x: bounded(pos.x, 0, 12 - sizes[id].width, 0), y: bounded(pos.y, 0, 48, 0) };
   }
   const result: DesktopLayout = { version: 1, order, sizes, minimized: Array.isArray(raw.minimized) ? [...new Set(raw.minimized.filter(isPanel))] : [] };
-  if (raw.positions && PANEL_IDS.every((id) => record(raw.positions)[id])) {
+  const isNewCamera = !Array.isArray(raw.order) || !raw.order.includes("stancam");
+  if (isNewCamera || raw.positions && PANEL_IDS.every((id) => record(raw.positions)[id])) {
+    // Preserve the original windows' exact saved spaces before adding the new module.
+    const existing = isNewCamera ? order.filter((id) => id !== "stancam") : order;
+    const previous: DesktopLayout = { ...result, order: existing };
+    if (raw.positions && existing.every((id)=>record(raw.positions)[id])) previous.positions = positions;
+    const placed = allSlots(previous).reduce<Placement[]>((list,item)=>[...list,list.some((other)=>overlaps(item,other)) ? nearestSlot(item,list) : item],[]);
+    for (const item of placed) positions[item.id] = {x:item.x,y:item.y};
+    if (isNewCamera) {
+      const music = placed.find((item)=>item.id === "music");
+      const wanted: Placement = {id:"stancam",...sizes.stancam,x:Math.min(music?.x ?? 8,12-sizes.stancam.width),y:music ? music.y+music.height : 0};
+      let camera: Placement | undefined;
+      for (let height=wanted.height;height>=3;height--) {
+        const candidate={...wanted,height};
+        if (placed.every((item)=>!overlaps(candidate,item))) {camera=candidate;break;}
+      }
+      camera ??= nearestSlot(wanted,placed);
+      positions.stancam={x:camera.x,y:camera.y};sizes.stancam={width:camera.width,height:camera.height};
+    }
     result.positions = positions;
     for (const item of packDesktop(result)) positions[item.id] = { x: item.x, y: item.y };
   }
@@ -169,7 +187,7 @@ export type RoomAppearance = { colour: string; image: ThemeAsset | null; fit: "c
 export type HeaderAppearance = { colour: string; typeface: WindowTypeface };
 export const MAX_DESKTOP_OWNER_LENGTH = 800_000;
 export type OwnerDesktop = { version: 1; look: DesktopLook; participation: Participation; layout: DesktopLayout; windows: Record<PanelId, WindowAppearance>; room: RoomAppearance; header: HeaderAppearance; corners: "soft" | "square" | "round"; frame: "minimal" | "classic"; accent: string; music: string | null };
-const defaultWindows: Record<PanelId, WindowAppearance> = { feed: {colour: "mint", skin: "solid", surface: "dark", typeface: "sans", customSurface: "#151718", customAccent: "#a7f3d0"}, chat: {colour: "pink", skin: "solid", surface: "dark", typeface: "sans", customSurface: "#151718", customAccent: "#a7f3d0"}, board: {colour: "blue", skin: "solid", surface: "dark", typeface: "sans", customSurface: "#151718", customAccent: "#a7f3d0"}, music: {colour: "yellow", skin: "solid", surface: "dark", typeface: "sans", customSurface: "#151718", customAccent: "#a7f3d0"} };
+const defaultWindows: Record<PanelId, WindowAppearance> = { feed: {colour: "mint", skin: "solid", surface: "dark", typeface: "sans", customSurface: "#151718", customAccent: "#a7f3d0"}, chat: {colour: "pink", skin: "solid", surface: "dark", typeface: "sans", customSurface: "#151718", customAccent: "#a7f3d0"}, board: {colour: "blue", skin: "solid", surface: "dark", typeface: "sans", customSurface: "#151718", customAccent: "#a7f3d0"}, stancam: {colour: "pink", skin: "solid", surface: "dark", typeface: "sans", customSurface: "#151718", customAccent: "#a7f3d0"}, music: {colour: "yellow", skin: "solid", surface: "dark", typeface: "sans", customSurface: "#151718", customAccent: "#a7f3d0"} };
 export function parseOwnerDesktop(raw: string | null): OwnerDesktop {
   const fallback: OwnerDesktop = { version: 1, look: "black", participation: "mint", layout: structuredClone(DEFAULT_DESKTOP), windows: structuredClone(defaultWindows), room: { colour: "#0b0c0d", image: null, fit: "cover", position: "center", dim: 25 }, header: { colour: "#111614", typeface: "sans" }, corners: "soft", frame: "minimal", accent: "#ff009d", music: DEFAULT_ARMY_MUSIC };
   if (!raw || raw.length > MAX_DESKTOP_OWNER_LENGTH) return fallback;

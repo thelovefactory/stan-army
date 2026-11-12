@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { CSSProperties, KeyboardEvent, PointerEvent } from "react";
-import { ArrowDown, ArrowLeft, ArrowUp, ArrowUpRight, Check, ChevronDown, GripVertical, Maximize2, MessageCircle, MessageSquare, Minus, Music2, MoreHorizontal, Newspaper, Palette, Plus, RotateCcw } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, ArrowUpRight, Camera, Check, ChevronDown, GripVertical, Maximize2, MessageCircle, MessageSquare, Minus, Music2, MoreHorizontal, Newspaper, Palette, Plus, RotateCcw } from "lucide-react";
 import { useDemo } from "./demo-provider";
 import { fanNotes } from "@/lib/fan-space";
 import { DesktopChat, DesktopComposer, DesktopDiscussions, DesktopPost } from "./nova-layout-study";
@@ -14,14 +14,15 @@ import {
   canMovePanelRow, movePanelRow, movePanel, packDesktop, parseDesktop, parseOwnerDesktop, resizePanel, setPanelMinimized, swapPanelSlots,
 } from "@/lib/army-desktop";
 import type { DesktopLayout, OwnerDesktop, PanelId } from "@/lib/army-desktop";
+import { StanCam } from "./stan-cam";
 import { ArmyStreamPlayer } from "./army-stream-player";
 import { ArmyStyleEditor } from "./army-style-editor";
 import type { StyleScope, StyleSection } from "./army-style-editor";
 import { readableDesktopColour as readableColor } from "@/lib/army-style-editor";
 import s from "./army-desktop-playground.module.css";
 
-const names: Record<PanelId, string> = { feed: "The Army", chat: "Army Chat", board: "Discussions", music: "Army Stereo" };
-const icons = { feed: Newspaper, chat: MessageCircle, board: MessageSquare, music: Music2 };
+const names: Record<PanelId, string> = { feed: "The Army", chat: "Army Chat", board: "Discussions", music: "Army Stereo", stancam: "StanCam" };
+const icons = { feed: Newspaper, chat: MessageCircle, board: MessageSquare, music: Music2, stancam: Camera };
 const eventName = "stan-army:desktop-updated";
 const serverSnapshot = () => null;
 function read(key: string) { try { return window.localStorage.getItem(key); } catch { return null; } }
@@ -319,6 +320,7 @@ export function ArmyDesktopPlayground() {
               {id === "chat" && <DesktopChat joined={joined} join={join} windowed />}
               {id === "music" && <ArmyStreamPlayer key={owner.music ?? "empty"} source={owner.music} edit={() => openStyle("music")} />}
               {id === "board" && <DesktopDiscussions windowed />}
+              {id === "stancam" && <StanCam />}
             </div>
             {!focused && <button className={`${s.resizeHandle} ${s.resizeLeft}`} aria-label={`Resize ${names[id]} from left`} aria-describedby="desktop-key-help" title="Drag left to make this window wider"
               onPointerDown={(event) => start(event, id, "resize-left")} onPointerMove={track}

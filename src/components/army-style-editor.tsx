@@ -12,7 +12,7 @@ import s from "./army-style-editor.module.css";
 
 export type StyleScope = PanelId | "all";
 export type StyleSection = "themes" | "room" | "panels";
-const names = { feed: "The Army", chat: "Army Chat", music: "Army Stereo", board: "Discussions" };
+const names = { feed: "The Army", chat: "Army Chat", music: "Army Stereo", board: "Discussions", stancam: "StanCam" };
 const fonts: { id: WindowTypeface; label: string; family: string }[] = [
   { id: "sans", label: "Clean", family: "Arial,sans-serif" },
   { id: "mono", label: "Terminal", family: "'Courier New',monospace" },

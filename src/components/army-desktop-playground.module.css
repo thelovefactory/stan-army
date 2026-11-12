@@ -321,3 +321,6 @@
 .desktop .windowBody,.desktop .windowBody [role=log] { overscroll-behavior-y:auto; }
 .rowMoves { display:flex; gap:8px; border-bottom:1px solid var(--rule); padding-bottom:4px; margin-bottom:4px; }
 .windowMenu .rowMoves > button { min-width:0; flex:1; justify-content:center; font-size:11px; }
+/* StanCam is the photograph itself; navigation floats over its lower edge. */
+.desktop .windowBody:has(> [data-window-body=stancam]) { padding:0; overflow:hidden; }
+.desktop .windowBody > [data-window-body=stancam] { border-radius:0 0 8px 8px; }
