@@ -1,0 +1,59 @@
+# My Army, My Rules — shared Army/fan presentation engine
+
+## Current scope
+Fan community administrators control Army appearance. A verified artist/representative identity grants no editor access. Fan profile owners independently customise their own profile. One `Theme` schema, shared `ThemeEditor`, `ThemePresetPicker` and `ProfileTheme` canvas serve both. The fan-led wizard reuses the preset picker and canvas for a non-persistent preview. No duplicate theme system was introduced.
+
+## Structured v1 contract
+- Background: six-digit hex, optional inline raster, cover/contain/tile/natural sizing, centre/top/bottom/left/right, fixed/scroll attachment.
+- Colours: text, links, buttons, borders, accent.
+- Font: Original, Comic chaos, Terminal kid, Drama club, Scene headline, Typewriter diary, mapped to fixed system stacks.
+- Panels: hex colour, 0–100 opacity, solid/dashed/dotted/double, original/square/round/wonky corners.
+- Decorations: none/hearts/stars/flames/butterflies/pixels, glitter, animation setting.
+- Images: banner and avatar using the same asset contract as background.
+- Player skin: Classic desktop / Bubblegum Y2K / Quiet hours / Toxic chrome, mapped from a fixed enum with a safe missing-field default.
+
+Six presets remain: Blank Canvas, Glitter Bomb, Scene Queen, Burning Desire, Digital Dream and Cyber Trash. Defaults are cloned; unknown fields, unsafe CSS/HTML, unapproved enums and unsupported schema versions never enter the style pipeline. Content and authority are not stored in themes.
+
+## Raster boundary
+JPG/PNG/WebP/GIF only, 512 KiB per image, 1 MiB combined, up to 4096×4096. FileReader reads locally, browser decoding checks dimensions, and validation matches MIME/signature/base64 and actual byte length. No SVG, external URLs, CSS text or arbitrary HTML/JS. GIFs are treated as animated; PNG `acTL` and WebP `ANIM` markers are conservatively checked. Full server media parsing/processing is future work before public uploads. The built-in original pixel-heart GIF is unchanged.
+
+## Backward-compatible persistence
+Army profile ID: `army:<stableArmyId>`. For Nova, key `stan-army:theme:v1:army:army-nova`. The explicit legacy fallback is `stan-army:theme:v1:artist:nova-reign`. Fan key `stan-army:theme:v1:fan:jess-wav` is unchanged.
+
+The storage snapshot prefers any new-key value. Only when absent does it read the mapped old key. Rendering never writes/deletes storage. Restored settings are validated. A later Save writes the new key and retains the old key; denied/quota-failed writes preserve the old data and leave the editor open. Reset then Save creates an explicit new-key default, preventing an old theme from resurfacing. This read-through/lazy-write migration preserves existing customisations without an automatic destructive migration.
+
+No community messages/memberships or roles are persisted with the presentation. Cross-tab storage updates and local save notifications use `useSyncExternalStore`; server rendering starts from safe defaults. Browser storage is per device/origin and can be cleared or fill up across profiles. Future public subdomains require database-backed themes; localStorage will not cross origins.
+
+## Live editing and safeguards
+Customise clones saved settings; controls update the real profile tree, preserving underlying chat/enlistment state. Save commits validated settings. Cancel/Escape restores saved presentation and returns focus; Reset previews the original design until Save. Choosing a preset replaces the draft, including uploads.
+
+All personal CSS is scoped to `.profile-canvas.profile-custom`. Header/footer, role controls and editor are outside it. Only known CSS variables, fixed property values and inline raster sources are applied. Core music/chat/controls retain opaque readable surfaces and interface fonts. Decorative panels may be transparent; text rows use solid backplates. Text/link/button colour resolution protects contrast, and essential control borders/focus use readable fallbacks.
+
+Clean view removes custom presentation and images without replacing the content tree; custom view restores it. Animation pause and reduced motion freeze CSS and hide animated raster uploads. Static images stay visible. Reduced motion cannot be overridden by the play control. Original decorations are pointer-inert and below content. Advanced CSS remains a read-only token preview with disabled textarea.
+
+## Permissions are simulated here
+Founder/admin modes expose Army editing; moderator, official artist, official representative and visitor modes do not. Official Nova role simulation exposes only its separately labelled official-announcement composer. Role selection is not authentication. Future server/data policies must independently verify community membership and artist relationship scopes. Nothing in the theme JSON or a successful payment authorizes either.
+
+## Future persistence
+Keep the presentation schema separate from its target/authorization envelope. Authenticated repositories and RLS should own writes to Army/user theme records. Replace data URLs with processed storage references, add revision/rollback, and use explicit schema converters. No backend, service or migration is created. See `DATABASE_SCHEMA.md`.
+
+## Verification limits
+Unit tests cover all six presets, unsafe inputs, asset budgets, contrast, independent keys, save/load/reset/failures and legacy-to-Army fallback precedence. Actual browser refresh/file-picking/GIF playback, keyboard journeys and mobile rail/sheet behaviour remain outstanding because managed browser tooling is unavailable. See `VALIDATION.md`.
+
+## Living fan contributions
+The saved presentation schema and all localStorage keys are unchanged. `ProfileTheme` exposes clean-view/motion state so note treatments and gallery framing can respond without remounting content or overwriting the Army theme. Clean view neutralises contribution backgrounds/fonts/rotations and decorative ornaments while retaining text, replies, photographs and original artwork. Original art content is not a background theme to discard. Notes choose only fixed local style tokens; no author HTML/CSS/JS runs.
+
+Local video studies never autoplay; looping requires explicit Repeat in the Army Player. The pause/reduced-motion state pauses currently playing local videos when it switches off; a deliberate native Play action remains available for user-controlled media. Existing GIF hiding and CSS animation controls remain. Native dialog and note/reply controls use fixed readable interaction styling. Authored note data is separate from theme configuration and resets on refresh.
+
+## Additive Army Player setting
+`Theme.playerSkin` accepts only `desktop`, `y2k`, `minimal` or `toxic`. It remains schema v1 because this is an additive setting with a safe missing-field fallback; legacy fields/keys and raster limits are unchanged. Existing v1 JSON without a player field preserves colours, backgrounds, typography, panels, decorations and imagery. Validation supplies `desktop` in memory; visiting does not rewrite old storage. Saving writes the usual target key and retains legacy data.
+
+The shared editor's player select previews live. The player skin button opens/focuses the same editor and does not replace an already-open unsaved draft. Founder/admin simulation may edit; official-only/visitor modes cannot. Clean view temporarily selects `minimal` without saving. Existing full-profile presets can suggest corresponding player skins, but old saved records do not silently adopt a different preset skin.
+
+All player palettes/structures are original fixed CSS, not imported .wsz archives or arbitrary CSS/HTML. Buttons/displays keep explicit contrast independent of user-selected page colours. Optional decorative pixels stop with local pause/buffering, disabled visualization or reduced-motion settings. Audio may continue under motion pause; video pauses when the motion preference switches off. There is no actual audio EQ/analyzer, autoplay or cross-user playback feature.
+
+## Optional tools in v1 configuration
+`modules` is an additive fixed-key boolean map: feed, playlist, videos, gallery, chat, announcements, events and discussions. All default true for older saved configurations, preserving the existing prototype. Invalid/unknown values cannot inject content or CSS; missing fields receive safe defaults. Save/Cancel/refresh use the existing profile storage contract. Presets keep module selections; clean view preserves them while clearing custom visual treatments; Reset appearance restores visual defaults while preserving current module visibility. The Army editor shows toggles only within existing authorised customisation roles. Fan profile styling continues to share the schema without displaying Army module controls. This map controls visibility, not private access to resources or standalone boards.
+
+## Participation and predictable scope
+Version-1 themes now include validated `participationColor`, defaulting missing/invalid values to the saved panel colour for backward compatibility. The schema/key remain v1; no automatic rewrite occurs. ProfileTheme computes separate participation ink/link/accent/border colours and scopes them to composer/chat through local CSS variables. Other panels and primary-button colours remain independent. Shared frame styles and stable interaction fonts are applied after earlier styles in participation.css. See CUSTOMISATION_AUDIT.md for the complete control map, context restrictions, provider/font/motion limits and reset semantics.

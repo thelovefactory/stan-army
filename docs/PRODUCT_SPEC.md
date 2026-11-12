@@ -1,0 +1,140 @@
+# Stan Army — fan-led product specification
+
+## Authority
+`STAN_ARMY_PRODUCT_PIVOT.md` and the user's approved follow-up supersede conflicting ownership, identity and monetization assumptions in the original master brief and Addendum 01. Those source documents remain intact. Existing visual identity and working functionality are retained, with purposeful hierarchy changes; no wholesale reskin.
+
+## The proposition
+Stan Army is fan-led, fan-owned, fan-funded and fan-promoted. Every artist needs an army. Fans establish and steward the community; the artist is who they rally around. The artist need not sign up, approve or pay before an Army exists. "Fan-owned" means administrative stewardship within platform rules, not ownership of an artist's name, music, trademarks or other IP.
+
+One canonical Army per artist is the initial model. Artist identity, founding fan identity, Army address, verification and payment are separate concepts. Official artist/representative participation never automatically grants community ownership, theme editing or moderation.
+
+## Implemented local prototype
+| Route | Purpose | Working local behaviour |
+| --- | --- | --- |
+| `/` | Fan-led proposition with existing Stan Army visual identity | Navigation, demo Army cards, creation CTA |
+| `/discover` | Seeded fan-run communities | Combined search/genre/city filters, organic ranking, favourites, reset, no-match creation CTA with artist-name prefill |
+| `/armies/nova` | Main exceptional demo Army for fictional artist Nova Reign | Compact artist/Army identity, prominent shared Music/Video player, fan content, chat, distinct publishing areas, enlistment, events/links and warm founder credit |
+| `/armies/nova/room` | Wider fan listening room | Shared session chat/enlistment and saved Army theme |
+| `/create` | Fan-led four-step onboarding | Find/select/add an artist; prevent seeded duplicates; validate Army address; choose image/preset, write welcome and optionally add a safe public music link; complete editable local preview and copy explicitly non-live invite text |
+| `/official-access?army=nova` | Artist/representative request explanation | Local validation and request preview; no submission, verification or permission change |
+| `/fans/jess-wav` | Founding fan's own expressive profile | Independent theme, artist favourites and session-local enlisted Armies |
+| `/artists/[legacySlug]` and `/room` | Compatibility | Permanent redirects to corresponding Army routes |
+
+Five other original Army fixtures remain for discovery/filtering and old-link compatibility; no new generic community pages were added. Echo Valentine is a catalogue identity without an Army, useful for exercising onboarding.
+
+## The three visible identities
+- Artist: Nova Reign, artist reference `@novareign` (fictional demo).
+- Founding stan: Jess.wav, separate fan handle `@jess.wav`.
+- Army: stable `army-nova`, intended address `nova.stan.army`, actual local route `/armies/nova`.
+
+Public subdomains are illustrative and not provisioned. Copying the main Army link copies a working local route. No verified badge/status about a real person is claimed; the official participation fixture is conspicuously fictional.
+
+## Two distinct announcement areas
+**From the Army:** fan-administrator-controlled community welcome and announcements. Founder/admin simulation exposes its local composer; verified identity alone does not.
+
+**From the Artist:** labelled official artist/authorised representative announcements. Only the corresponding fictional verified-role simulation exposes its local composer. Founder/admin status alone does not. Nova includes a clearly labelled sample artist message; other retained fixtures need no official participant.
+
+New announcement text is React-escaped, limited to 500 characters, and page-local. Role attribution is captured when posted. Changing demo roles cannot turn an existing community post into an official post. No server authorization or moderation system is claimed.
+
+## Customisation preserved
+One versioned JSON theme schema and shared editor serve fan profiles and fan-run Armies. All six presets, raster/GIF selection, backgrounds, colours, retro font stacks, panel treatments, decorations and banner/avatar customisation remain. Only founder/admin simulation opens the Army editor. Moderator, official artist, official representative and visitor modes do not inherit editing rights. Clean/custom viewing and motion controls remain available to everyone.
+
+Old `artist:<slug>` theme keys remain readable for their corresponding Army; a new Army-key save takes priority without deleting the old value. Fan keys are unchanged. Community content is separate from themes. No arbitrary HTML/JS/CSS or remote asset URL executes. See `THEME_ENGINE.md`.
+
+## Creation and identity integrity
+The creator acts as a fictional fan, never as the artist. Existing canonical matches lead to Visit & Enlist rather than a second Army. Adding an unlisted artist requires distinguishing details and carries a future conflict-review explanation. Address checks cover DNS syntax, reserved platform names, seeded conflicts and misleading official/verified claims. They are local demonstrations, not public uniqueness guarantees or reservations.
+
+Official-access requests require a separate fan handle, public HTTPS evidence link and explanatory details. A real workflow will need identity/authority verification, reserved sensitive handles, disputes, expiry/revocation and auditable scoped grants. The prototype neither sends evidence nor grants status.
+
+## Stewardship policy — approved boundaries
+Inactivity is not automatically abandonment. Assessment must consider active moderators, continuing community care and reasonable absences. Notice, platform review, community continuity and an appeal route precede any involuntary stewardship change. The suggested 90-day/30-day periods remain provisional policy examples, not timers or implemented thresholds. No automatic ownership transfer is implemented.
+
+Voluntary transfer requires explicit owner consent, recipient acceptance and a supported audited process. Founder attribution remains historical even if administration changes later. Verification, upgrades and promotional spend never transfer control.
+
+## Funding and music
+Army creation and enlistment are free. PRO $19/month and ELITE $59/month remain provisional Army upgrade concepts, optionally fan-funded; exact entitlements and collective funding rules are undecided. Professional tools may be paid separately, without buying ownership or identity.
+
+FAN. THE FLAMES. is a future voluntary, transparent promotional-campaign concept. Paid inventory must be clearly labelled and separate from organic discovery. Moderation/approval, budgets, reporting, responsible payment handling and refunds are future requirements. No fake engagement, ranking manipulation or guaranteed streams. The prototype displays the concept only, with no payment UI or fabricated performance figures.
+
+Music uses consented, permitted third-party playback with a fallback. The NPR sample is not Nova's catalogue. No copyrighted media is hosted, no synchronized playback is claimed, and verification does not establish media licensing rights.
+
+## Remaining simulated / out of scope
+All people, identities, counts, posts, conversations and events are fictional. Roles are an explicit UI simulation. Community activity and creation/request previews are in memory; only successful visual-theme saves persist locally. No accounts, database, global duplicate detection, DNS, real official access, moderation enforcement, transfers, payments, campaigns, ad delivery, exclusive-media hosting or deployment. Desktop/mobile browser journeys and screenshots remain unverified because managed browser tooling is unavailable.
+
+## Living Fan Space — latest approved creative direction
+The source `STAN_ARMY_LIVING_FAN_SPACE.md` and subsequent user clarification guide this revision: it need not look ugly or manufacture a crowd. A single stan should be able to leave a visible personal mark. Research links, original period screenshot and evidence/interpretation distinctions live in `research/MYSPACE_2003_2008.md`.
+
+Nova remains the recognisable artist identity. An oversized founder panel no longer interrupts the artist-to-community hierarchy. The prominent fan feed has distinct fictional personalities and controlled note/photo/notebook/after-hours treatments, local composition, hearts and threaded replies. The sample-conversation switch supports a first-stan feed without sample hearts/replies on its sole founding note. Root-provider state keeps local contributions through client navigation; refresh clears them.
+
+The compact communal shoebox/video previews lead to `/armies/nova/gallery` and `/armies/nova/videos`. Gallery filtering, original CSS print/keepsake visuals, stock photo provenance, native-dialog detail navigation and session-only saving work locally. Two real, original six-second silent typography videos play manually; they are not described as actual fan concert/cover footage. No real upload infrastructure or media hosting rights claims are introduced.
+
+From the Army and From the Artist stay separate in an expandable notes area with their existing role simulation. Chat, music, events, membership/identity, all themes and preferences, clean view, pause and FAN. THE FLAMES. remain. Founder recognition is a warm bottom credit linking to Jess's own profile. Fan decorative treatments also respect clean view; actual authored artwork remains content rather than being erased. Fictional participation is labelled; no fake live activity or presence indicator is added.
+
+## Turn up the music — current arrival hierarchy
+The user source `STAN_ARMY_TURN_UP_THE_MUSIC.md` supersedes the oversized Nova artist-hero treatment. Keep the artist recognisable in a compact name/avatar/Army/count/enlistment area, then show THE ARMY PLAYER immediately, then participation. Remove the promotional FEEL IT TOGETHER banner from Nova. Saved custom banner assets are retained and may decorate the compact identity safely; no theme data is deleted.
+
+One player supports local original audio, local original video and a consented approved provider example. MUSIC/VIDEO change mode on the same page; the video surface grows naturally, and compact/expanded and queue controls remain in the same component. Original synthesized sketches are not Nova tracks or commercial releases. Previous/next select within the mode; playback begins only by explicit Play. Local play/pause/stop/seek/volume/mute/repeat are bound to native media. Third-party playback remains governed by the loaded provider controls with a source fallback.
+
+Four safe player skins use the existing live theme editor and save lifecycle: Classic desktop, Bubblegum Y2K, Quiet hours, Toxic chrome. `playerSkin` is an additive validated v1 enum; old preferences and key mappings survive. Clean view uses the restrained skin. Decorative pixels are labelled non-analytical, never a fake EQ or streaming statistic. There is no autoplay, production streaming, licensing platform, recommendations/voting, billing or new backend. All living fan-space features and ownership boundaries remain.
+
+## Feed, stereo and s/Nova board — November 7 review
+Nova’s main page now places fan posts in the left column and the supplied Spotify playlist above Army Chat on the right. Mobile places the compact stereo before the feed. The large introductory heading and its standalone fictional-content disclaimer have been removed; concise local-demo labels remain on actual interactions. The composer offers text, one image/GIF attachment, optional post style and Post. The member count opens the existing fictional fan directory rather than reserving a sidebar panel for it.
+
+`s/Nova` is the chosen display name for a Reddit-inspired discussion board at the bottom of the Army page, with topic tags, expandable replies, Top/New sorting, vote toggles and local thread creation. The name is a product convention for this prototype, not a separate public route. Sample threads are fictional; user threads, votes and replies reset on refresh. No moderation or identity permission is inferred from voting or creating content.
+
+### Composer clarification
+The fan composer now follows familiar contemporary posting conventions: “What’s happening?”, separate labelled Photo and GIF upload buttons, an attachment preview/removal control, character count and Post. Presentation choices (Plain/Notebook/After hours) are removed from composing; new posts use the default note style. Existing seeded post designs and saved profile themes remain intact. No nonfunctional poll, scheduling or audience controls are displayed.
+
+### Polls and theme-aware composing
+The composer additionally offers Poll with 2–4 distinct choices (up to 80 characters each); the main text becomes the question. Polls and image attachments are alternatives. Posted polls accept one local choice, allow changing it, and show percentages for that local vote only. No fabricated aggregate results or live closing times are shown. All poll content and voting are demonstrations that reset on refresh; votes also reset if the poll component is remounted.
+
+Composer background, entered text, caret, placeholder, labels, attachment controls and Post use the profile’s validated colour pairs. The editing panel stays opaque so readable contrast is maintained over patterned/GIF backgrounds even when other decorative panels are translucent. Saved customisations are unchanged.
+
+## Artist discussions, communities and My Boards
+The current canonical artist board naming is lowercase `s/<army-slug>` (for example `s/nova` at `/s/nova`). Each seeded Army has its own artist board, embedded in its Army page and available as a separate discussion page with a link back to the Army. Wider music communities are independent `com/` boards: `/com/popmusic`, `/com/disco`, `/com/2000s`, `/com/musicvideos`. Artist discussions use mint, communities use pink; both use the same thread creation, topic labels, sorting, reply and vote experience. Armies, Army Chat and boards remain distinct.
+
+`/boards` is the shared exploration and My Boards page, linked in desktop/mobile navigation. Users can save/remove either kind from board headers or cards, and revisit favourites via My Boards links on board pages. My Boards persists on this browser/device; it is not an authenticated account collection. Threads/replies/votes are scoped by board, survive client navigation, and reset on refresh. These changes supersede earlier documentation describing s/Nova as display-only or all non-theme settings as nonpersistent. The guiding principle is “Your Army is where you belong. Your boards are where you explore.”
+
+The feed poll now has a visible ×, Cancel poll and Escape dismissal; all preserve the post text even when choices are blank. GIF opens an inline GIF/emoji picker instead of a file dialogue. Emoji inserts at the text cursor. Two original demo GIFs can be searched/attached; still previews respect motion preferences. Searching on GIPHY is an explicitly external link, not an integrated results feed or GIF import. Photos retain the file picker. Polls and image/GIF attachments remain alternative post types.
+
+## Direction clarification: whatever you stan for
+Confirmed direction is recorded in ../STAN_ARMY_PRODUCT_DIRECTION.md and supersedes artist-only assumptions in earlier briefs. Armies can be about any subject; music remains the initial discovery/examples/marketing focus. The platform uses one flexible Army structure, not separate category templates. No unrelated category catalogue was added.
+
+Practical M1 changes: Customise exposes independent Fan posts, Music/Spotify, Videos, Gallery, Chat, Announcements, Events/links and embedded Discussion board toggles. All default to enabled, preserving Nova. Authorised community customisers use the existing Save/Cancel/Reset contract. Appearance presets and clean view retain visibility choices; Reset appearance restores visual defaults while keeping module visibility. Hiding a module unmounts it, stops its media and removes its corresponding Army navigation link where applicable, without deleting stored themes or submitted in-memory content. This is visibility configuration, not access control: standalone discussion boards remain separate from their Army embed, and hidden gallery/video routes display a friendly module-hidden notice.
+
+Creation now asks who/what you stan, with neutral identifying details for unlisted subjects. A Brie cheese Army can complete a local preview without any artist biography, genre, discography or media link. Spotify remains optional and available across seeded Armies; no topic qualification is imposed. Seeded artist data and music-first examples remain unchanged. Legacy internal draft names are compatibility details, not a requirement that a subject be an artist.
+
+## Army layout refinement
+The UI uses consistent spacing and aligned outer card frames so personalised backgrounds can be expressive without making navigation/content geometry messy. Desktop panel gutters/insets use a 24px scale; mobile uses 18px insets and 20px gutters, with 32–40px separation for larger sections. There is a clear gap below Army identity instead of touching composer/player edges. Outer post/gallery frames stay straight; paper textures, stickers and theme choices remain. Surface radii follow the selected panel-corner setting, with smaller radii on controls/information strips and flat separators within content. Unrelated panels retain natural content height rather than artificial equal-height padding. The mobile members dropdown aligns to the action row so it stays within small viewports.
+
+## Latest seven posts and all-posts collection
+Nova’s main feed shows at most seven newest posts. “View all posts” opens `/armies/nova/posts`, which renders the full shared feed, including the newest seven and everything older. Older content is not deleted or moved to a different store; the main page is simply a capped view. The full page reuses the existing post/reply/reaction rendering without a second composer, with a clear return to the Army. Posted text, attachments and polls use the same in-memory demo data. Navigation retains content; refresh resets local contributions as before.
+
+The communal shoebox/gallery preview and its large video tile no longer appear on the Army page. A small independent Videos text link preserves access to the existing shelf and its optional module. The legacy gallery demo route remains compatible but is not the all-posts collection. Discover is already available in the main header (including mobile navigation), so the duplicate top breadcrumb/banner is removed. The large bottom founder credit is replaced by “Army by @creator” in the Army identity header, keeping the fan founder separate from the subject and the s/ board name. A compact Demo Army label retains disclosure after removing the old banner.
+
+## Customise the atmosphere, not the usability
+The editor now names each control’s scope, separates Participation Colour (composer/chat) from secondary-panel colour, and hides contextually redundant tools. Shared interaction fields/buttons use stable fonts and geometry; expressive fonts, stickers, backgrounds, colour combinations and panel frames remain available. Board-header actions are aligned text actions with visible focus/hover instead of filled buttons; primary submit/join actions remain prominent. Existing themes migrate Participation Colour from their panel colour without being rewritten. Appearance reset preserves modules. The full inventory and remaining deliberate limits are in CUSTOMISATION_AUDIT.md.
+
+## Landing-page culture welcome
+The hero now reads “Stan for the things you love.”, followed by “The culture brings us together.” and “The stans keep us fed.” Its actions are Create your Army (creation preview) and Find your Army (discovery). The avatar-stack copy is “For the stans. Built by the stans.” and “A first look at a new kind of community.” The previous Nova portrait/overlay composition is replaced by an original reference-led Brie/pop-music/sneaker collage, approved as a visual direction by the user. The intentional cheese juxtaposition conveys that any subject can belong without explanatory visitor copy. Artwork labels are s/brie, s/popmusic and s/sneaks; this does not alter the current s/ versus com/ route model or create new communities. Existing discovery and lower landing sections remain in place.
+
+### Landing community copy follow-up
+The ticker now reads Find your people / Back your obsessions / Make some noise, with star separators; all three remain visible on mobile. Discovery introduces “DIFFERENT OBSESSIONS. STAN ENERGY.” and “There's an Army for that.” The belonging section uses “LESS ABOUT ME. MORE ABOUT US.”, “It's not my space. It's ours.”, and the supplied community paragraph plus Make it yours / Find your people / Keep the internet weird feature copy. Its Create your army action goes to `/create`. The collage and other page sections are preserved.
+
+### Homepage final polish — Stan for something
+Latest approved homepage narrative: “Stan for something.” with “Unapologetically human. Slightly obsessive. Utterly yours.” and a single Build your Army today CTA. Existing hero collage, mint ticker, community image and two-line MySpace-nod heading are preserved. Trending uses “02 / TRENDING” / “The troops are gathering.” and Nova, Brie and Sneakers, with explicit sample/non-live indicators. Nova opens the working demo; Brie and Sneakers remain labelled concept Armies linking to the existing creation wizard, not additional working communities or reserved discussion routes. Their `s/` labels are conceptual illustrations, not claims that the boards exist. Community CTAs provide Build / Find actions and the supplied pop-stars/pop-tarts copy.
+
+The final campaign is “MAKE SOME NOISE.” / “Rally the troops” (creation), with four original photo-style widescreen scenes and discrete 1.4-second cuts. The headline and CTA do not animate. Pause/resume and a static reduced-motion view are provided. CSS animation has no timers or media service dependency; below-fold images are lazy loaded via Next Image. See ASSET_SOURCES.md for explicit generated-image provenance. Shared footer wording now includes any obsession. The requested replacement header logo remains blocked because the Mac-local PNG is not mounted; the original supplied logo image has not been redrawn or replaced.
+
+Homepage visual follow-up supersedes the initial campaign presentation: slim temporary looping montage with overlaid MAKE SOME NOISE and Rally the troops, no visible playback controls, viewport-triggered playback and static reduced-motion fallback. Hover/focus holds animation. Final user-created widescreen media is pending; recommended original 2480×416px. Hero subline scales to remain one line. Filled landing CTAs are fuchsia (#ff36b6) with dark text, scoped away from saved Army themes.
+
+## Outside the Army — optional external social window
+Added under chat without changing the Army feed, chat or discussions. Nova starts with the supplied Instagram/X test links; owner/admin demo roles can add/replace/remove supported public accounts. Configuration persists locally and separately from presentation. Module visibility and inherited/custom accent plus panel/outline treatment use Customise with existing save/cancel/reset semantics. Only one official preview opens at a time, on visitor request; its provider controls actual posts and timestamps. Source links and truthful fallback states remain available. Instagram profile/post-thumbnail rendering was observed; X returned no visible timeline in the real provider check. No fake social content, verified affiliation, OAuth, paid service, scraper or live-feed claim. See OUTSIDE_THE_ARMY.md for research and limits.
+
+Campaign framing follow-up: five one-second frames now include an original fictional-friends hug/smile scene. Existing image assets remain unchanged; per-image desktop/mobile focal points and a mobile dog zoom keep key subjects visible. Mobile headline/CTA placement leaves a central window for faces. The slim dimensions, continuous loop, hover/focus hold, reduced-motion still, headline and CTA are preserved.
+
+## Beta registration screen — design only
+`/beta` is a separate design-review route retaining the landing hero headline/subline, original collage, two faces plus mint asterisk circle, and static chunky mint strip. It introduces the supplied copy: “We’re bringing back the glory days of communal internet. Help shape the future of stan.army.” The only field is email, with a hot-pink REGISTER FOR BETA action. A compact beta header links back to the prototype.
+The form uses native email validation and a truthful design-preview message. No email is read into application state, submitted, stored or added to a list. There is no registration endpoint, authentication, provider integration or false success confirmation. Future collection and delivery are deferred. Choosing a separate `/beta` route is an implementation assumption for review; the existing homepage creation action is preserved.
+
+Army pages are entry points: the homepage introduces Stan Army; the Armies grow it. The existing closing strip now says MAKE SOME NOISE. with a restrained Start your own Army action to `/create`, using stable platform typography and existing theme colours. This replaces the old artist/music-specific copy without adding another module or changing the page order.

@@ -1,0 +1,588 @@
+/* Personalise the atmosphere; keep the mechanics and hit areas familiar. */
+.profile-canvas .profile-content :is(.simple-composer, .army-chat) {
+  --theme-panel: var(--participation-colour, #161619);
+  --theme-text: var(--participation-text, #f7f7f4);
+  --theme-link: var(--participation-link, #a0f4cc);
+  --theme-accent: var(--participation-accent, #a0f4cc);
+  --theme-border: var(--participation-border, #888888);
+  --theme-control-border: var(--participation-border, #888888);
+  background: var(--participation-colour, #161619);
+  color: var(--participation-text, #f7f7f4);
+  border-color: var(--participation-border, #888888);
+}
+.profile-canvas
+  .profile-content
+  :is(.simple-composer, .army-chat)
+  :is(
+    p,
+    h2,
+    h3,
+    small,
+    label,
+    input,
+    textarea,
+    .composer-actions > span,
+    .message-meta time,
+    .chat-compose-meta,
+    .chat-status
+  ) {
+  color: var(--participation-text, #f7f7f4);
+}
+.profile-canvas
+  .profile-content
+  :is(.simple-composer, .army-chat)
+  :is(input, textarea, .reaction-picker, .poll-editor, .pinned-message) {
+  background: var(--participation-colour, #161619);
+  color: var(--participation-text, #f7f7f4);
+  caret-color: var(--participation-text, #f7f7f4);
+  border-color: var(--participation-border, #888888);
+}
+.profile-canvas
+  .profile-content
+  :is(.simple-composer, .army-chat)
+  :is(input, textarea)::placeholder {
+  color: var(--participation-text, #f7f7f4);
+  opacity: 1;
+}
+.profile-canvas
+  .profile-content
+  :is(.simple-composer, .army-chat)
+  :is(
+    .composer-attach,
+    .message-meta b,
+    .pinned-message > svg,
+    .pinned-message span
+  ) {
+  color: var(--participation-link, #a0f4cc);
+}
+.profile-canvas
+  .profile-content
+  :is(
+    button,
+    input,
+    textarea,
+    select,
+    .identity-meta,
+    .army-creator-credit,
+    .feed-more-links,
+    .board-toolbar,
+    .thread-meta,
+    .thread-comments
+  ) {
+  font-family: Arial, Helvetica, sans-serif;
+  letter-spacing: normal;
+}
+.profile-canvas
+  .profile-content
+  :is(
+    .composer-actions > button,
+    .chat-compose > button,
+    .identity-actions > .button,
+    .note-replies form > button,
+    .board-compose button[type="submit"],
+    .thread-expanded form button[type="submit"],
+    .voice-panel form > button
+  ) {
+  background: var(--theme-button, #305bff);
+  color: var(--theme-button-text, #fff);
+  font-weight: 700;
+  border-radius: 10px;
+  border: 1px solid currentColor;
+  min-height: 40px;
+}
+.profile-canvas
+  .profile-content
+  :is(button, a, input, textarea, select, summary):focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px #111;
+}
+.profile-canvas .profile-content button:not(:disabled):hover {
+  filter: brightness(0.94);
+}
+.profile-canvas
+  .profile-content
+  :is(
+    .artist-identity,
+    .fan-profile-header,
+    .events-panel,
+    .army-voices-fold,
+    .voice-panel,
+    .discussion-board,
+    .simple-composer,
+    .army-chat,
+    .sidebar-playlist,
+    .fan-note
+  ) {
+  border-color: var(--theme-border, #45434d);
+  border-style: var(--theme-border-style, solid);
+  border-width: var(--theme-border-width, 1px);
+  border-radius: var(--theme-radius, 15px);
+}
+.profile-canvas
+  .profile-content
+  :is(.events-panel, .army-voices-fold, .voice-panel) {
+  background: var(--theme-panel-fill, #161619);
+}
+.profile-canvas .profile-content .voice-panel :is(p, h2, h3, form) {
+  color: var(--theme-text, #f7f7f4);
+  background: var(--theme-panel, #161619);
+}
+.profile-canvas .profile-content .fan-note.note-note {
+  background: var(--theme-panel, #161619);
+  color: var(--theme-text, #f7f7f4);
+}
+.profile-canvas .profile-content .discussion-board,
+.profile-canvas
+  .profile-content
+  .discussion-board
+  :is(
+    .board-header,
+    .board-toolbar,
+    .board-thread,
+    .board-status,
+    .board-compose
+  ) {
+  background: var(--theme-panel, #161b22);
+  color: var(--theme-text, #f4f4f4);
+}
+.profile-canvas
+  .profile-content
+  .discussion-board
+  :is(
+    .board-header p,
+    .board-header h2,
+    .thread-excerpt,
+    .board-reply p,
+    .thread-meta,
+    .board-toolbar small,
+    .thread-comments
+  ) {
+  color: var(--theme-text, #f4f4f4);
+  background: transparent;
+}
+.profile-canvas
+  .profile-content
+  .discussion-board
+  :is(.board-header h2 span, .thread-tag, .board-reply b) {
+  color: var(--theme-accent, #a0f4cc);
+}
+.profile-canvas
+  .profile-content
+  .discussion-board
+  :is(input, textarea, select) {
+  background: var(--theme-panel, #161b22);
+  color: var(--theme-text, #f4f4f4);
+  caret-color: var(--theme-text, #f4f4f4);
+  border: 1px solid var(--theme-control-border, #888);
+}
+.profile-canvas
+  .profile-content
+  .discussion-board
+  :is(input, textarea)::placeholder {
+  color: var(--theme-text, #f4f4f4);
+  opacity: 1;
+}
+.profile-canvas
+  .profile-content
+  .discussion-board
+  .board-toolbar
+  button[aria-pressed="true"] {
+  background: var(--theme-button, #a0f4cc);
+  color: var(--theme-button-text, #14271b);
+}
+.board-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: flex-end;
+  column-gap: 22px;
+  row-gap: 4px;
+}
+.board-header-actions :is(.board-text-action, a) {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+  padding: 10px 0;
+  margin: 0;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  box-shadow: none;
+  font:
+    400 13px/24px Arial,
+    Helvetica,
+    sans-serif;
+  letter-spacing: normal;
+  text-decoration: none;
+  color: var(--theme-link, #f4f4f4);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.board-header-actions .board-start-action {
+  font-weight: 600;
+}
+.board-header-actions :is(.board-text-action, a):hover,
+.board-header-actions .board-text-action[aria-pressed="true"] {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+.board-header-actions :is(.board-text-action, a):focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px #111;
+}
+.board-card > button {
+  background: transparent;
+  border: 0;
+  padding: 10px 0;
+  min-height: 44px;
+  color: inherit;
+  text-underline-offset: 5px;
+}
+.board-card > button:hover {
+  text-decoration: underline;
+}
+.participation-colour-control {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #49454f;
+}
+.sidebar-playlist.playlist-desktop > header {
+  padding-bottom: 12px;
+  border-bottom: 2px solid #65798b;
+}
+.sidebar-playlist.playlist-y2k > header {
+  padding-bottom: 12px;
+  border-bottom: 2px dotted #e8a2fa;
+}
+.sidebar-playlist.playlist-toxic > header {
+  padding-bottom: 12px;
+  border-bottom: 2px solid #b3ff4b;
+}
+.sidebar-playlist.playlist-minimal > header {
+  padding-bottom: 12px;
+  border-bottom: 2px solid transparent;
+}
+@media (max-width: 800px) {
+  .board-header-actions {
+    justify-content: flex-start;
+    column-gap: 20px;
+    width: 100%;
+  }
+}
+
+.profile-canvas .profile-content .army-chat .chat-compose-meta > span {
+  color: var(--participation-text, #f7f7f4);
+}
+.profile-canvas .living-army .has-custom-banner .identity-left > div:last-child,
+.profile-canvas .living-army .has-custom-banner .identity-actions {
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+.advanced-section > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  min-height: 40px;
+}
+
+.profile-canvas .profile-content .army-chat .mint-text {
+  color: var(--participation-accent, #a0f4cc);
+}
+.board-card > button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px #111;
+}
+
+.profile-canvas .profile-content .identity-star,
+.profile-canvas .profile-content .artist-identity .eyebrow .mint-text {
+  color: var(--theme-page-accent, #a0f4cc);
+}
+
+.profile-canvas .profile-content .army-chat .panel-title h2 > svg {
+  color: var(--participation-text, #f7f7f4);
+}
+.profile-canvas .profile-content .army-chat .panel-title h2 > .mint-text > svg {
+  color: var(--participation-accent, #a0f4cc);
+}
+.identity-star,
+.board-header h2 > span {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+
+/* Army participation hierarchy: themes own the atmosphere, controls keep their shape.
+   No theme values are written or replaced here. */
+.profile-canvas .profile-content .artist-page :is(
+  .identity-actions > .button,
+  .composer-actions > button[type="submit"],
+  .chat-compose > button,
+  .playlist-placeholder .button,
+  .note-replies form > button,
+  .board-compose button[type="submit"],
+  .thread-expanded form button[type="submit"],
+  .voice-panel form > button
+) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 11px 16px;
+  border: 1px solid currentColor;
+  border-radius: 10px;
+  background: var(--theme-button, #305bff);
+  color: var(--theme-button-text, #fff);
+  font: 700 13px/1.4 Arial, Helvetica, sans-serif;
+  letter-spacing: normal;
+  text-align: center;
+}
+.profile-canvas .profile-content .artist-page :is(
+  .identity-actions > .button,
+  .composer-actions > button[type="submit"],
+  .chat-compose > button,
+  .playlist-placeholder .button
+) > svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.profile-canvas .profile-content .artist-page .identity-actions > .button[aria-pressed="true"] {
+  box-shadow: inset 0 0 0 1px currentColor;
+}
+.profile-canvas .profile-content .artist-page .chat-compose > button {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  padding: 0;
+  flex-shrink: 0;
+}
+.profile-canvas .profile-content .artist-page .share-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: auto;
+  min-height: 44px;
+  padding: 11px 16px;
+  border: 1px solid currentColor;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  font: 600 13px/1.4 Arial, Helvetica, sans-serif;
+}
+.profile-canvas .profile-content .artist-page .share-button > svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.profile-canvas .profile-content .artist-page :is(
+  .composer-attach, .attachment-preview .icon-button, .poll-close,
+  .fan-note > footer > button
+) {
+  min-height: 44px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.profile-canvas .profile-content .artist-page :is(
+  .attachment-preview .icon-button, .poll-close
+) {
+  min-width: 44px;
+}
+.profile-canvas .profile-content .artist-page .composer-attach {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 8px;
+  border-radius: 10px;
+}
+.profile-canvas .profile-content .artist-page :is(
+  .composer-attach, .share-button
+):not(:disabled):hover {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+.profile-canvas .profile-content .artist-page :is(
+  .playlist-unload, .sidebar-playlist footer a, .artist-links > a
+) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  font: 400 12px/1.6 Arial, Helvetica, sans-serif;
+  text-underline-offset: 4px;
+}
+.profile-canvas .profile-content .artist-page :is(
+  .playlist-unload, .sidebar-playlist footer a, .artist-links > a
+):hover {
+  text-decoration: underline;
+}
+.profile-canvas .profile-content .artist-page .playlist-unload {
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+.profile-canvas .profile-content .living-army :is(
+  .sidebar-playlist > header, .army-chat > .panel-title,
+  .events-panel > .panel-title, .voice-panel > .panel-title
+) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin: 0;
+  background: transparent;
+}
+.profile-canvas .profile-content .living-army :is(
+  .sidebar-playlist > header h2, .army-chat > .panel-title h2,
+  .events-panel > .panel-title h2, .voice-panel > .panel-title h2
+) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font: 700 18px/1.35 Arial, Helvetica, sans-serif;
+  letter-spacing: -.02em;
+}
+.profile-canvas .profile-content .living-army :is(
+  .sidebar-playlist > header h2, .army-chat > .panel-title h2,
+  .events-panel > .panel-title h2, .voice-panel > .panel-title h2
+) > svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.profile-canvas .profile-content .living-army .chat-intro {
+  margin: 8px 0 20px;
+  font: 400 13px/1.6 Arial, Helvetica, sans-serif;
+}
+.profile-canvas .profile-content .living-army .playlist-placeholder {
+  align-items: flex-start;
+  padding-block: 20px;
+}
+.profile-canvas .profile-content .living-army .playlist-placeholder > div {
+  min-width: 0;
+}
+.profile-canvas .profile-content .living-army .playlist-placeholder b {
+  font: 700 14px/1.5 Arial, Helvetica, sans-serif;
+}
+.profile-canvas .profile-content .living-army .playlist-placeholder p {
+  margin: 6px 0 16px;
+  font: 400 13px/1.6 Arial, Helvetica, sans-serif;
+}
+.profile-canvas .profile-content .living-army .sidebar-playlist > footer {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+}
+.profile-canvas .profile-content .living-army :is(
+  .sidebar-playlist > small, .composer-local-note, .chat-status,
+  .chat-compose-meta, .announcement-status
+) {
+  display: block;
+  margin-top: 12px;
+  font: 400 11px/1.65 Arial, Helvetica, sans-serif;
+  letter-spacing: normal;
+}
+.profile-canvas .profile-content .living-army .chat-compose-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  justify-content: space-between;
+}
+.profile-canvas .profile-content .living-army .chat-message > div {
+  flex: 1;
+  min-width: 0;
+}
+.profile-canvas .profile-content .living-army .message-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  font: 400 11px/1.6 Arial, Helvetica, sans-serif;
+}
+.profile-canvas .profile-content .living-army .message-meta > time {
+  margin-left: auto;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.profile-canvas .profile-content .living-army .message-meta > b {
+  font-size: 12px;
+}
+.profile-canvas .profile-content .living-army .chat-compose {
+  align-items: center;
+  border-radius: 10px;
+}
+.profile-canvas .profile-content .living-army .chat-compose > input {
+  min-width: 0;
+  min-height: 44px;
+  font: 400 13px/1.6 Arial, Helvetica, sans-serif;
+}
+.profile-canvas .profile-content .living-army .compose-row > textarea {
+  font: 400 14px/1.7 Arial, Helvetica, sans-serif;
+}
+.profile-canvas .profile-content .living-army :is(
+  .fan-note > header, .fan-note > footer
+) {
+  font-family: Arial, Helvetica, sans-serif;
+  letter-spacing: normal;
+}
+.profile-canvas .profile-content .living-army .fan-note > footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+}
+.profile-canvas .profile-content .living-army .fan-note > header strong {
+  font-size: 13px;
+}
+.profile-canvas .profile-content .living-army .board-header {
+  padding: var(--army-inset);
+}
+.profile-canvas .profile-content .living-army .board-thread {
+  padding: var(--army-inset);
+}
+.profile-canvas .profile-content .living-army :is(
+  .feed-more-links, .army-voices-fold
+) {
+  padding-inline: var(--army-inset);
+}
+.profile-canvas .profile-content .living-army :is(
+  .army-voices-fold, .voice-panel, .sidebar-playlist, .army-chat,
+  .events-panel, .discussion-board
+) {
+  border-radius: var(--theme-radius, 15px);
+}
+@media (max-width: 600px) {
+  .profile-canvas .profile-content .living-army .nova-identity-compact .identity-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+  .profile-canvas .profile-content .living-army .identity-actions .member-dropdown {
+    flex-basis: 100%;
+  }
+  .profile-canvas .profile-content .living-army .member-dropdown .enlist-count {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+  .profile-canvas .profile-content .living-army .board-header-actions {
+    column-gap: 16px;
+    row-gap: 4px;
+  }
+}

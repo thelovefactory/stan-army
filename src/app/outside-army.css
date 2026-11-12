@@ -1,0 +1,160 @@
+/* Instagram-first media gallery. All styles are scoped to Outside the Army. */
+.profile-canvas .profile-content .outside-army {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: var(--theme-border-width, 1px) var(--theme-border-style, solid) var(--theme-border, #45434d);
+  border-radius: var(--theme-radius, 15px);
+  background: var(--theme-panel, #161619);
+  color: var(--theme-text, #f7f7f4);
+  font: 400 13px/1.6 Arial, Helvetica, sans-serif;
+}
+.profile-canvas .profile-content .outside-army.outside-outline { border: 2px solid var(--outside-accent); }
+.profile-canvas .profile-content .outside-army > h2.sr-only { width: 1px; height: 1px; padding: 0; margin: -1px; }
+.outside-army .outside-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 2px 14px;
+  color: var(--outside-accent);
+}
+.outside-army.outside-has-manager .outside-toolbar { padding-right: 58px; }
+.outside-army .outside-account {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 44px;
+  overflow-wrap: anywhere;
+  font: 600 12px/1.4 Arial, sans-serif;
+}
+.outside-army .outside-toolbar > svg { flex-shrink: 0; }
+.outside-army .outside-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 3px;
+  isolation: isolate;
+}
+.outside-army .outside-tile {
+  position: relative;
+  display: block;
+  min-width: 0;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--theme-text, #f7f7f4);
+}
+.outside-army .outside-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 180ms ease;
+}
+.outside-army .outside-tile:hover img { transform: scale(1.04); }
+.outside-army .outside-video,
+.outside-army .outside-tile-open {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgb(0 0 0 / 70%);
+  color: #fff;
+  border-radius: 50%;
+}
+.outside-army .outside-video { top: 7px; right: 7px; }
+.outside-army .outside-tile-open { bottom: 7px; right: 7px; opacity: 0; transition: opacity 180ms ease; }
+.outside-army .outside-tile:is(:hover, :focus-visible) .outside-tile-open { opacity: 1; }
+.outside-army .outside-tools,
+.outside-army .outside-tools nav { display: flex; align-items: center; gap: 2px; }
+.outside-army .outside-tools { justify-content: space-between; gap: 4px; padding: 2px 8px 2px 14px; }
+.outside-army .outside-tools > span { font: 400 10px/1.5 Arial, sans-serif; }
+.outside-army .outside-tools .outside-page { min-width: 26px; text-align: center; font: 400 11px/1.5 Arial, sans-serif; }
+.profile-canvas .profile-content .outside-army .outside-tools button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+}
+.outside-army .outside-tools button:disabled { opacity: 0.35; cursor: default; }
+.outside-army :is(button, a, input, summary):focus-visible { outline: 2px solid currentColor; outline-offset: -3px; }
+.outside-army .outside-tile:focus-visible { outline: 3px solid #fff; outline-offset: -4px; }
+.outside-army :is(button:not(:disabled), a:not(.outside-tile), summary):hover { text-decoration: underline; text-underline-offset: 4px; }
+.profile-canvas .profile-content .outside-army :is(p, label, summary) { color: inherit; background: transparent; }
+.outside-army .outside-empty { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 16px 16px; }
+.outside-army .outside-empty p { margin: 0; font: 400 12px/1.6 Arial, sans-serif; }
+.outside-army .outside-empty a,
+.outside-army .outside-x-link,
+.outside-army .outside-saved-link a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 12px; }
+.outside-army .outside-x-link { padding: 0 16px 8px; }
+.outside-army .outside-manage > summary {
+  position: absolute;
+  top: 2px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  list-style: none;
+}
+.outside-army .outside-manage > summary::-webkit-details-marker { display: none; }
+.outside-army .outside-manage[open] { padding: 16px; border-top: 1px solid var(--theme-control-border, #888); }
+.outside-army .outside-manage form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.outside-army .outside-manage label { font-size: 12px; }
+.profile-canvas .profile-content .outside-army input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--theme-control-border, #888);
+  border-radius: 10px;
+  background: var(--theme-panel, #161619);
+  color: var(--theme-text, #f7f7f4);
+  font: 400 13px/1.6 Arial, sans-serif;
+}
+.profile-canvas .profile-content .outside-army input::placeholder { color: inherit; opacity: 1; }
+.profile-canvas .profile-content .outside-army .outside-hint { margin: 0; font: 400 11px/1.6 Arial, sans-serif; }
+.profile-canvas .profile-content .outside-army form button {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 11px 16px;
+  background: var(--theme-button, #305bff);
+  color: var(--theme-button-text, #fff);
+  border: 1px solid currentColor;
+  border-radius: 10px;
+  font: 700 13px/1.4 Arial, sans-serif;
+}
+.outside-army .outside-manage-actions { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-block: 8px; }
+.profile-canvas .profile-content .outside-army :is(.outside-manage-actions button, .outside-empty button, .outside-saved-link button) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: 600 12px/1.4 Arial, sans-serif;
+}
+.outside-army .outside-saved-link { display: flex; align-items: center; justify-content: space-between; gap: 8px; overflow-wrap: anywhere; }
+.outside-army > .outside-status { margin: 0; padding: 12px 16px; font-size: 12px; }
+@media (prefers-reduced-motion: reduce) {
+  .outside-army .outside-tile img,
+  .outside-army .outside-tile-open { transition: none; }
+  .outside-army .outside-tile:hover img { transform: none; }
+}
+.theme-still .outside-army .outside-tile img,
+.theme-still .outside-army .outside-tile-open { transition: none; }
+.theme-still .outside-army .outside-tile:hover img { transform: none; }

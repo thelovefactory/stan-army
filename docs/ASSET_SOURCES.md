@@ -1,0 +1,98 @@
+# Asset sources
+
+## User-supplied originals
+The three supplied images are preserved byte-for-byte under `public/brand/`:
+- `stan-army-logo.png`: original `1000084232.png`. The logo is displayed through an image element; CSS inversion and a clipped container adapt its white background for the dark header. The source file is unchanged. No logo was redrawn or generated.
+- `artist-reference.png`: original `1000084226.png`, design reference only. Its portrait and music UI were not reused as licensed product content.
+- `space-reference.jpg`: original `1000084229.jpg`, secondary tone and message reference.
+
+## Photography
+Downloaded on 2026-11-06 from Unsplash’s image service. Used under the [Unsplash License](https://unsplash.com/license), which permits downloading and use without mandatory attribution. Images are local, not hotlinked. No endorsement or connection to the fictional artist identities is implied. These are photographs, not generated artwork. The URLs below identify the exact source image and downloaded rendition; no photographer attribution is invented where it was not verified.
+
+| Local file | Exact downloaded source | Use |
+| --- | --- | --- |
+| `public/images/artist.jpg` | https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1600&q=85 | Stock portrait; illustrative Nova Reign photo |
+| `public/images/crowd.jpg` | https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1600&q=85 | Festival crowd, artist banner and community section |
+| `public/images/sienna.jpg` | https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=700&q=85 | Stock portrait; illustrative Sienna Blue and fan face |
+| `public/images/atlas.jpg` | https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=700&q=85 | Stock portrait; illustrative Atlas Noir/Milo June and fan face |
+| `public/images/room.jpg` | https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1000&q=85 | Concert lighting; player art, post and discovery card |
+
+## Media
+The YouTube example `https://www.youtube.com/watch?v=ferZnZ0_rSM` is an NPR Music Tiny Desk performance used solely as a public provider playback example through YouTube’s official iframe mechanism. This is not a claim to music rights or affiliation. No recording is downloaded, copied or hosted. The iframe loads only on request and can be unloaded; provider restrictions may prevent playback. Confirm owner embed availability in the user’s browser before relying on it for a demonstration. YouTube is the fallback destination.
+
+## Other
+Lucide React icons: ISC license, installed package. System Arial/Helvetica/sans-serif font stack. All stickers and abstract graphic shapes are CSS/text, not artist artwork.
+
+## Addendum 01 original decoration assets
+`public/decorations/pixel-heart.gif` is an original 64×64, four-frame pixel heart constructed locally from a hand-specified 8×7 bitmap using Pillow. It has a slow 1.6-second cycle and an 809-byte file size. `src/lib/demo-heart.json` embeds that same GIF for instant local preview and persistence without a remote request. No third-party artwork or generated artist imagery is used. All other theme decorations (hearts, stars, butterfly-like glyphs, CSS flame silhouettes, pixel bits, glitter, checkerboards, chrome and soft gradients) are original CSS or Unicode text using installed fonts. They are pointer-inert, scoped and covered by motion controls.
+
+## Living Fan Space assets and provenance
+- Existing stock photographs are reused only as clearly labelled illustration of fictional fan memories. They are not represented as actual Nova concert photography or real fan uploads. Original Unsplash source/license records above are unchanged.
+- `MemoryVisual` renders original typographic desk prints (B-side people / You can sit with us), a fictional non-admission ticket, and a cassette with local CSS/text. No artist portrait, lyrics, record sleeve or third-party fan artwork was copied/generated.
+- `public/videos/leave-your-mark.mp4` and `public/videos/bside-people.mp4` are original six-second, 800×450, H.264 silent typography studies made locally with FFmpeg colour/drawbox/drawtext filters and installed DejaVu Sans fonts. No recording, artist performance, likeness or borrowed footage is embedded. They are labelled as demo studies, not genuine submitted concert clips or covers.
+- `docs/research/myspace-2007-slide-23.png` is a faithful research rendering of page 23 in Peter Godwin's [2007 INFORUM presentation](https://www.inforum.cz/pdf/2007/godwin-peter1.pdf#page=23). It is historical evidence with third-party profile/advertising imagery; no reusable licence is claimed. It stays in research documentation and is not a product asset. No original MySpace branding/layout/code is copied into Stan Army.
+
+## Army Player audio and skins
+- `public/audio/midnight-circuit.mp3` and `public/audio/window-seat.mp3` are original 24-second instrumental sketches synthesized from mathematical oscillators, envelopes and pulse patterns in `scripts/create-demo-audio.py`, then encoded locally with FFmpeg/libmp3lame. No recordings, vocals, samples, commercial tracks or artist imitations were used. These are prototype audio, not Nova Reign releases. Runtime needs no generator or external service.
+- Four original CSS skins (Classic desktop, Bubblegum Y2K, Quiet hours, Toxic chrome) reinterpret tactile player conventions. No Winamp/Webamp code, bitmap skin, logo or artist art is imported. Skins are fixed enum choices, not arbitrary uploaded archives.
+- `docs/research/webamp-equalizer-reference.png` is the inspected [Webamp documentation image](https://docs.webamp.org/assets/images/equalizer-skin-664931adc37bb602f20904b3e91e6fa1.png), retained solely as a research quotation. It is not a product asset and no reusable skin-art licence is claimed. See `research/ARMY_PLAYER_REFERENCES.md` for distinctions between current documentation, preservation and retrospective evidence.
+- The existing NPR/YouTube performance remains an explicit click-to-load provider example, never represented as Nova's catalogue. The two existing silent original MP4 studies are reused in the unified player. No copyrighted performance is copied into local files.
+
+## Supplied Spotify playlist
+The user supplied https://open.spotify.com/playlist/0EO3CxjNLb1gFi9QuPT6YE for this iteration. The compact, fixed Spotify embed at https://open.spotify.com/embed/playlist/0EO3CxjNLb1gFi9QuPT6YE?theme=0 returned HTTP 200 during validation. Spotify supplies any cover artwork/audio through its own iframe after consent; no tracks or cover artwork have been downloaded into the repository and no ownership/licensing claim is made. It is not presented as fictional artist Nova Reign’s official catalogue. Sign-in, regional availability, previews and playback restrictions remain Spotify’s responsibility.
+
+## Stan Army composer icons
+`src/components/stan-icons.tsx` contains original inline SVG UI drawings for Photo and GIF, created for Stan Army. The Photo silhouette incorporates a small star detail; GIF uses an explicit letterform inside a frame. They use currentColor and decorative SVG semantics inside labelled buttons. No external artwork, icon font or generated image asset is used for these two icons; other existing interface icons remain unchanged.
+- `StanPollIcon` extends the original SVG set with a familiar chart silhouette. It is drawn locally in the same component file; no borrowed artwork.
+
+## GIF/emoji picker
+`public/gifs/leave-your-mark.gif` and `bside-people.gif` are original two-second, 240px-wide GIF conversions of the existing original silent MP4 typography studies, generated with FFmpeg at 8 fps. Matching PNGs are still frames from 0.6 seconds, used for reduced-motion-friendly picker previews. Each GIF is under 20 KB; no artist recording, fan art or GIPHY asset is copied. Emoji are Unicode characters rendered using the visitor’s system font. `StanEmojiIcon` is another original inline SVG. GIPHY is an explicitly labelled external search destination (`https://giphy.com/search/<encoded-query>`), not the source of the local GIF collection or an active API integration.
+
+## Consistent interface markers
+StanStarIcon and StanCommunityIcon in src/components/stan-icons.tsx are original inline SVG interface drawings. They replace colour-font glyphs in identity/chat/board headings so the theme’s accent/contrast controls affect their strokes reliably. They do not redraw or replace the supplied hand-drawn Stan Army logo, which remains the original image asset.
+
+## Culture-first landing hero — user-authorised original illustration
+`public/brand/stan-army-welcome-sneaks.png` is a 1448×1086 original generated marketing collage made with imagegen, using the user’s attached welcome-image preview as visual reference under their express “feel free to make your own” instruction. Their `/Users/armi/.../stanarmy-welcomeimage.png` path was not available as a downloadable workspace file; this is an original matching illustration, not a byte-for-byte copy or licensed stock photograph. The central figure is an anonymous fictional fan, not a claimed artist identity or Nova artwork. Existing artist/fan stock photographs and the original supplied hand-drawn logo are unchanged.
+
+The user explicitly restored the `s/` visual labels and then changed the footwear label to `s/sneaks`: the final image reads `s/brie`, `s/popmusic`, `s/sneaks`. These are conceptual visual nods, not links, reserved boards or routing changes. No artist endorsement, brand affiliation, photography licence or actual membership is claimed. Original generated outputs are retained under `/workspace/generated_images/`; the final source output is `exec-ebab6886-688d-4116-a273-8971a46d4b7a.png`. The public filename is distinct to avoid stale image-optimizer caches after label revisions.
+
+## Landing: celebrity pets and Brie concept Armies
+- `public/images/celebrity-pets.jpg`: https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=900&q=85 under the Unsplash License. Illustrative stock cat, not represented as a real celebrity's pet.
+- `public/images/brie.jpg`: original https://upload.wikimedia.org/wikipedia/commons/8/88/Brie_01.jpg by Coyau, [source](https://commons.wikimedia.org/wiki/File:Brie_01.jpg), [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). Preserved original; responsive display crops via existing card styling. Visible source/author/license attribution appears beneath the card. This photograph retains its CC BY-SA licence.
+- These are explicitly marked concept Armies linking to the creation wizard, without fabricated members or live community claims. Nova remains the working demo; shared discovery fixtures and saved themes are unchanged.
+
+## Homepage campaign montage — original photo-style imagery
+The user requested original imagery using their supplied style preview as inspiration, then refined the direction to realistic flash-lit photography, one widescreen image per frame. Midjourney IDs/profile codes were not resolved or used as a model interface. The preview itself is not used as a product asset. The earlier pastel 3D concept was not shipped.
+
+Four original imagegen marketing illustrations are displayed as a 1.4-second-per-frame CSS sequence, not represented as documentary photographs, artist imagery, real fans or licensed stock photography:
+
+| Public image | Retained original generation |
+| --- | --- |
+| `public/brand/obsessions/sneakers.png` | `/workspace/generated_images/exec-81e997e2-80c7-4667-8579-8e1b6cddc0be.png` |
+| `public/brand/obsessions/cheese.png` | `/workspace/generated_images/exec-a10b062a-30a8-4574-8b0b-c6bd72258233.png` |
+| `public/brand/obsessions/tv.png` | `/workspace/generated_images/exec-6b054aeb-c5f5-4c63-9476-e9b90439bd34.png` |
+| `public/brand/obsessions/music.png` | `/workspace/generated_images/exec-ca82078e-2dc2-4926-bc8d-941bede42fb1.png` |
+
+Sneakers, Brie/pets, TV/books and pop-music objects/cameras cover the requested obsessions in original scenes. No real celebrity likeness, existing artist artwork, TV footage or fan work is used. The original hero collage and community photograph remain unchanged. Next Image supplies lazy loading and responsive optimisation; originals remain preserved. Reduced motion shows the first still frame; pause freezes every frame without moving the CTA.
+
+`public/images/sneakers.jpg`: https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=85, downloaded 2026-11-07 under the Unsplash License. Used for the Sneakers concept card; no brand endorsement is implied. Brie retains its visible CC BY-SA attribution. Celebrity Pets' earlier asset remains in the repository for preservation, but is no longer featured.
+
+## Homepage leopard actions
+`public/decorations/stan-leopard.svg` is an original locally drawn rosette pattern in fuchsia and purple, inspired by the user's colour/pattern direction. The attached Mac-local leopard JPG was not accessible and is not copied or represented as licensed source artwork. The original SVG is used only on landing-page primary buttons, with solid light-pink label areas for readable dark text.
+
+### Denser leopard button refinement
+`public/decorations/stan-leopard-dense.png` replaces the simple SVG in landing actions. It is an original imagegen pattern created using the user's attached pattern as reference, with denser irregular purple rosettes on hot pink. It is not the inaccessible Mac-local JPG. Retained generated original: `/workspace/generated_images/exec-80578d01-1d2f-4ff0-b2ae-085a88d1193d.png`. The older SVG remains preserved. White button labels now have a dark stroke/shadow for separation from both pattern colours, without a solid label panel.
+
+## ZIP-supplied transparent header logo and chunky action type
+`public/brand/stanarmy-header.png` is the exact 16,888-byte `stanarmy.png` extracted from the user's `stanarmy.png.zip`, received 2026-11-07. It is a 502×224 RGBA image with white artwork and variable alpha, preserved byte-for-byte. It replaces the old header image without inversion, cropping or regeneration. The old supplied asset remains preserved.
+
+`public/fonts/Anton-Regular.ttf` is Anton by Vernon Adams, locally hosted from https://raw.githubusercontent.com/google/fonts/main/ofl/anton/Anton-Regular.ttf under SIL Open Font License 1.1, preserved in `public/fonts/Anton-OFL.txt` from the same directory. It supplies consistent chunky Impact-like landing action lettering without requiring external font requests or a locally installed commercial font. White text has no outline or shadow.
+
+## Rotating mint-strip typography
+`public/fonts/Bungee-Regular.ttf` and `RubikMonoOne-Regular.ttf` are locally hosted from Google Fonts' `ofl/bungee` and `ofl/rubikmonoone` directories at https://github.com/google/fonts. Their SIL Open Font License files are preserved as `bungee-OFL.txt` and `rubikmonoone-OFL.txt`. Together with the existing Anton they supply the ticker's discrete four-second typography changes; no remote runtime font service is used. Button photography/pattern provenance is unchanged; a CSS dark overlay improves white-label contrast without strokes.
+
+## Outside the Army
+No social post images, avatars, captions or timestamps were copied into product assets. Instagram's official profile iframe and X's official widgets render their own content after visitor consent, under their own availability and display rules. The user supplied both test profile URLs. Globe/Instagram/settings/action icons are from existing ISC-licensed Lucide; the X marker is text. `docs/screenshots/outside-army-instagram.png` is a review capture of a real provider-rendered public profile/thumbnail preview, not a reusable stock asset or a claim to ownership of the social artwork. Other new module screenshots show local interface/settings only. See OUTSIDE_THE_ARMY.md for sources and measured provider limitations.
+
+## Campaign friendship frame and focal crops
+`public/brand/obsessions/community.png` is an original imagegen photographic-style marketing illustration requested by the user: fictional adult friends laughing in a side hug, using the existing music/dog frame as the lighting/location reference. It is not documentary photography of real fans, artist artwork or an actual event. Retained original: `/workspace/generated_images/exec-be271cc3-104b-4342-9ae8-193442ec6106.png`. Existing campaign image files are unchanged. The component now supplies separate desktop/mobile focal points per scene, with a modest mobile zoom for the dog; no pixels in the existing images were redrawn.
