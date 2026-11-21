@@ -25,6 +25,8 @@ const names: Record<PanelId, string> = { feed: "The Army", chat: "Army Chat", bo
 const icons = { feed: Newspaper, chat: MessageCircle, board: MessageSquare, music: Music2, stancam: Camera };
 const eventName = "stan-army:desktop-updated";
 const serverSnapshot = () => null;
+const clientReady = () => true;
+const serverReady = () => false;
 function read(key: string) { try { return window.localStorage.getItem(key); } catch { return null; } }
 function subscribe(callback: () => void) {
   window.addEventListener("storage", callback); window.addEventListener(eventName, callback);
@@ -46,6 +48,7 @@ type Gesture = {
 
 export function ArmyDesktopPlayground() {
   const demo = useDemo();
+  const ready = useSyncExternalStore(subscribe, clientReady, serverReady);
   const joined = demo.enlisted.includes("army-nova");
   const ownerRaw = useSyncExternalStore(subscribe, () => read(OWNER_DESKTOP_KEY), serverSnapshot);
   const personalRaw = useSyncExternalStore(subscribe, () => read(PERSONAL_DESKTOP_KEY), serverSnapshot);
@@ -64,6 +67,7 @@ export function ArmyDesktopPlayground() {
   const layout = unsavedLayout ?? savedLayout;
   const desktop = useSyncExternalStore(subscribeDesktop, desktopSnapshot, () => false);
   const [modern, setModern] = useState(true);
+  const [musicEditing, setMusicEditing] = useState(false);
   const [warning, setWarning] = useState(false);
   const [interacting, setInteracting] = useState(false);
   const [active, setActive] = useState<PanelId>("chat");
@@ -276,7 +280,7 @@ export function ArmyDesktopPlayground() {
           const visiblePlacement = placement;
           return <section key={id} ref={(element) => { frames.current[id] = element; }} hidden={hidden}
             className={`${s.window} ${active === id ? s.active : ""} ${preview?.id === id ? s.moving : ""}`}
-            data-panel-id={id} data-style-selected={editorVisible && styleScope === id ? "true" : undefined} data-window-colour={owner.windows[id].colour} data-window-skin={owner.windows[id].skin} data-panel-surface={owner.windows[id].surface} data-panel-typeface={owner.windows[id].typeface} data-expanded={focused === id ? "true" : undefined} aria-labelledby={`window-title-${id}`}
+            data-panel-id={id} data-player-size={id === "music" && owner.music?.startsWith("https://open.spotify.com/") && !musicEditing ? size.height >= 5 ? "full" : "compact" : undefined} data-style-selected={editorVisible && styleScope === id ? "true" : undefined} data-window-colour={owner.windows[id].colour} data-window-skin={owner.windows[id].skin} data-panel-surface={owner.windows[id].surface} data-panel-typeface={owner.windows[id].typeface} data-expanded={focused === id ? "true" : undefined} aria-labelledby={`window-title-${id}`}
             style={{ ...(owner.windows[id].surface === "custom" ? {
                 "--surface-bg": owner.windows[id].customSurface,
                 "--surface-ink": readableColor("#f3f4f3", owner.windows[id].customSurface),
@@ -300,6 +304,10 @@ export function ArmyDesktopPlayground() {
               }}>
                 <summary aria-label={`Panel options ${names[id]}`} title="Panel options"><MoreHorizontal size={15} /></summary>
                 <div>
+                  {id === "music" && <>
+                    <button onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); setMusicEditing(true); }}><Music2 size={14} />Change music</button>
+                    <button onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); resize(id, size.width, size.height >= 5 ? 3 : 5); }}>{size.height >= 5 ? "Compact player" : "Show full playlist"}</button>
+                  </>}
                   <div className={s.rowMoves} role="group" aria-label="Move entire row">
                   <button aria-label="Move row up" title="Move entire row up" disabled={desktop ? !canMovePanelRow(layout,id,-1) : layout.order.indexOf(id) === 0} onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); moveRow(id,-1); }}><ArrowUp size={15} />Move up</button>
                   <button aria-label="Move row down" title="Move entire row down" disabled={desktop ? !canMovePanelRow(layout,id,1) : layout.order.indexOf(id) === layout.order.length - 1} onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); moveRow(id,1); }}><ArrowDown size={15} />Move down</button>
@@ -318,7 +326,7 @@ export function ArmyDesktopPlayground() {
             <div className={s.windowBody} data-window-content={id}>
               {id === "feed" && <div className={s.feedContents}><DesktopComposer joined={joined} join={join} />{[...(demo.notes["army-nova"] ?? []), fanNotes[1], fanNotes[0], fanNotes[2], fanNotes[3]].map((note) => <DesktopPost key={note.id} note={note} />)}<Link className={s.archive} href="/armies/nova/posts">View all posts <ArrowUpRight size={16} /></Link></div>}
               {id === "chat" && <DesktopChat joined={joined} join={join} windowed />}
-              {id === "music" && <ArmyStreamPlayer key={owner.music ?? "empty"} source={owner.music} edit={() => openStyle("music")} />}
+              {id === "music" && ready && <ArmyStreamPlayer source={owner.music} full={size.height >= 5} editing={musicEditing} edit={() => setMusicEditing(true)} cancel={() => setMusicEditing(false)} save={(music) => { saveOwner({...committedOwner,music}, music ? "Music link saved on this device." : "Music removed on this device."); setMusicEditing(false); }} />}
               {id === "board" && <DesktopDiscussions windowed />}
               {id === "stancam" && <StanCam />}
             </div>

@@ -324,3 +324,13 @@
 /* StanCam is the photograph itself; navigation floats over its lower edge. */
 .desktop .windowBody:has(> [data-window-body=stancam]) { padding:0; overflow:hidden; }
 .desktop .windowBody > [data-window-body=stancam] { border-radius:0 0 8px 8px; }
+
+/* The window owns its skin; provider artwork, typography and controls remain native. */
+.desktop[data-interface] .windowBody > [data-window-body=music] { min-height:0; padding:8px; }
+.desktop[data-interface] .window[data-panel-id=music] .windowBody { display:flex; align-items:stretch; }
+
+/* Spotify's compact layout is 152px tall: snap the frame instead of stretching blank space. */
+.desktop[data-interface] .window[data-panel-id=music][data-player-size=compact] { align-self:start; height:auto; }
+.desktop[data-interface] .window[data-panel-id=music][data-player-size=compact] .windowBody { flex:none; }
+.desktop[data-interface] .window[data-panel-id=music][data-player-size=compact] [data-window-body=music] { height:auto; }
+.desktop[data-interface] .window[data-panel-id=music][data-player-size=compact] iframe { flex:none; height:152px; min-height:152px; }

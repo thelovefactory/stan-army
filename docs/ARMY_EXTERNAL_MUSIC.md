@@ -24,3 +24,21 @@ Providers determine playback availability, previews, login/subscription requirem
 ## Validation scope
 
 Unit tests cover supported/canonical URLs, invalid hosts and executable input, migration, explicit removal and theme independence. Browser checks cover click-to-load, Stop/unload, source editing, undo, Apple artist fallback and iframe DOM continuity during rearrangement. Automated provider-frame checks use clearly labelled fixtures to isolate app behaviour; they do not certify third-party playback.
+
+## Native Spotify window refinement — 21 November 2026
+
+The playground now displays the official player directly, with no duplicate transport controls or fabricated metadata. Spotify retains its branding, artwork, internal corners and controls; the Army window retains the host's frame and corner treatment. There is no automatic playback request. Loading the panel contacts the provider, whose cookies, account state and browser support determine the listening experience.
+
+Army Stereo → panel menu → **Change music** opens a small native Stan Army form. Save validates and canonicalises the link and stores it in the existing device-local owner configuration. Cancel leaves the current source intact; Remove music explicitly clears it. This is prototype configuration, not authenticated owner authorization or server persistence. The existing style editor remains compatible.
+
+**Show full playlist / Compact player** adjusts the window height and uses Spotify's 352px / 152px embed layouts. Ordinary resizing uses the full layout at five rows or taller. Source changes intentionally reload the player; changing size or opening settings preserves the iframe node. The provider frame is not recoloured by Army skins. When the available embed width falls below Spotify's 280px audio layout minimum, a source link is shown instead of a clipped player. Apple Music links remain supported.
+
+References: Spotify's Creating an Embed, Widget Terms of Use, and Troubleshooting documentation (linked above). A custom Web Playback SDK player is outside this implementation.
+
+Validation for this refinement: TypeScript, ESLint, the existing 10 test files, and the production build passed. Browser checks with a clearly labelled provider fixture passed edit/save/cancel/remove, invalid-link rejection, refresh persistence, compact/full sizes, iframe node preservation through settings/resize/minimise, and page overflow at 1440/390/320px. Provider fixtures verify only Stan Army behaviour; full Spotify playback was not certified.
+
+### Responsive surface follow-up
+
+The native iframe now fills the available width and height in expanded windows, with a 352px minimum for the full layout. Spotify's compact view retains a fixed internal height, so compact Spotify windows snap to the 152px player plus the Army title bar and padding rather than displaying a blank strip. Grid slots remain intact; expanding to five rows or more restores the fluid playlist surface. Link editing temporarily allows the form and player to scroll together. At mobile widths, the same bounds and narrow-width source-link fallback apply.
+
+Browser geometry checks cover compact/full, wider and taller keyboard resizing, consistent 8px inset, no internal outer-window overflow, mobile fit, and retention of the same iframe node. Screenshots use the actual public Spotify embed; no authenticated playback was tested.
