@@ -19,6 +19,14 @@ export type Placement = PanelSize & GridPosition & { id: PanelId };
 export const DESKTOP_COLUMNS = 12;
 export const DESKTOP_ROW = 72;
 export const DESKTOP_GAP = 16;
+export const MIN_PANEL_WIDTH = 3;
+export const MIN_PANEL_HEIGHT = 2;
+export const MAX_PANEL_HEIGHT = 64;
+export const DESKTOP_VERTICAL_STEP = 0.5;
+export const DESKTOP_HORIZONTAL_STEP = 0.5;
+const MAX_PANEL_Y = 10000;
+const gridBound = (value: unknown, min: number, max: number, fallback: number) =>
+  typeof value === "number" && Number.isFinite(value) ? Math.min(max, Math.max(min, Math.round(value * 2) / 2)) : fallback;
 export const PERSONAL_DESKTOP_KEY = "stan-army:desktop:personal:v1:army-nova";
 export const OWNER_DESKTOP_KEY = "stan-army:desktop:owner:v1:army-nova";
 export const DEFAULT_DESKTOP: DesktopLayout = {
@@ -30,26 +38,21 @@ const record = (value: unknown): Record<string, unknown> => value && typeof valu
 const bounded = (value: unknown, min: number, max: number, fallback: number) => typeof value === "number" && Number.isFinite(value) ? Math.min(max, Math.max(min, Math.round(value))) : fallback;
 export function overlaps(a: Placement, b: Placement) { return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y; }
 function nearestSlot(item: Placement, placed: Placement[]): Placement {
+  // A nearest free rectangle starts at the requested row or at an obstacle edge.
+  // Candidate edges avoid a fixed search horizon (which previously lost tall panels).
+  const rows = new Set([0, item.y, ...placed.flatMap((other) => [other.y + other.height, Math.max(0, other.y - item.height)])]);
   let best: Placement | null = null, cost = Infinity;
-  for (let y = 0; y < 64; y++) for (let x = 0; x <= 12 - item.width; x++) {
+  for (const y of [...rows].sort((a,b) => a-b)) for (let x = 0; x <= DESKTOP_COLUMNS - item.width; x += DESKTOP_HORIZONTAL_STEP) {
     const next = { ...item, x, y };
     if (placed.some((other) => overlaps(next, other))) continue;
-    const score = Math.abs(y - item.y) * 12 + Math.abs(x - item.x) + (y < item.y ? .5 : 0);
+    const score = Math.abs(y - item.y) * DESKTOP_COLUMNS + Math.abs(x - item.x) + (y < item.y ? .5 : 0);
     if (score < cost) { best = next; cost = score; }
   }
-  // All registered windows, each at most eight rows, fit within this search area.
-  return best!;
+  return best!; // The bottom edge of the lowest obstacle is always free.
 }
 function legacySlots(layout: DesktopLayout): Placement[] {
   const placed: Placement[] = [];
-  for (const id of layout.order) {
-    let next: Placement | undefined;
-    for (let y = 0; y < 64 && !next; y++) for (let x = 0; x <= 12 - layout.sizes[id].width; x++) {
-      const candidate = { id, ...layout.sizes[id], x, y };
-      if (placed.every((other) => !overlaps(candidate, other))) { next = candidate; break; }
-    }
-    placed.push(next!);
-  }
+  for (const id of layout.order) placed.push(nearestSlot({ id, ...layout.sizes[id], x:0, y:0 }, placed));
   return placed;
 }
 function allSlots(layout: DesktopLayout): Placement[] {
@@ -75,9 +78,9 @@ export function validateDesktop(value: unknown, fallback = DEFAULT_DESKTOP): Des
   const positions = {} as Record<PanelId, GridPosition>;
   for (const id of PANEL_IDS) {
     const size = record(record(raw.sizes)[id]);
-    sizes[id] = { width: bounded(size.width, 4, 12, fallback.sizes[id].width), height: bounded(size.height, 3, 8, fallback.sizes[id].height) };
+    sizes[id] = { width: gridBound(size.width, MIN_PANEL_WIDTH, DESKTOP_COLUMNS, fallback.sizes[id].width), height: gridBound(size.height, MIN_PANEL_HEIGHT, MAX_PANEL_HEIGHT, fallback.sizes[id].height) };
     const pos = record(record(raw.positions)[id]);
-    positions[id] = { x: bounded(pos.x, 0, 12 - sizes[id].width, 0), y: bounded(pos.y, 0, 48, 0) };
+    positions[id] = { x: gridBound(pos.x, 0, DESKTOP_COLUMNS - sizes[id].width, 0), y: gridBound(pos.y, 0, MAX_PANEL_Y, 0) };
   }
   const result: DesktopLayout = { version: 1, order, sizes, minimized: Array.isArray(raw.minimized) ? [...new Set(raw.minimized.filter(isPanel))] : [] };
   const isNewCamera = !Array.isArray(raw.order) || !raw.order.includes("stancam");
@@ -86,7 +89,9 @@ export function validateDesktop(value: unknown, fallback = DEFAULT_DESKTOP): Des
     const existing = isNewCamera ? order.filter((id) => id !== "stancam") : order;
     const previous: DesktopLayout = { ...result, order: existing };
     if (raw.positions && existing.every((id)=>record(raw.positions)[id])) previous.positions = positions;
-    const placed = allSlots(previous).reduce<Placement[]>((list,item)=>[...list,list.some((other)=>overlaps(item,other)) ? nearestSlot(item,list) : item],[]);
+    const original = allSlots(previous);
+    for (const item of original) positions[item.id] = {x:item.x,y:item.y};
+    const placed = original.filter((item) => !result.minimized.includes(item.id)).reduce<Placement[]>((list,item)=>[...list,list.some((other)=>overlaps(item,other)) ? nearestSlot(item,list) : item],[]);
     for (const item of placed) positions[item.id] = {x:item.x,y:item.y};
     if (isNewCamera) {
       const music = placed.find((item)=>item.id === "music");
@@ -124,38 +129,40 @@ export function swapPanelSlots(layout: DesktopLayout, first: PanelId, second: Pa
   next.order = next.order.map((id) => id === first ? second : id === second ? first : id);
   return next;
 }
-/** Place/resize the active panel first. Preserve unaffected slots and only move collisions. */
+/** Place the active rectangle exactly; preserve sizes and move only collisions down. */
 export function placePanel(layout: DesktopLayout, id: PanelId, position: GridPosition, size = layout.sizes[id]): DesktopLayout {
   const next = snapshot(layout);
-  const safeSize = { width: bounded(size.width, 4, 12, layout.sizes[id].width), height: bounded(size.height, 3, 8, layout.sizes[id].height) };
-  const active: Placement = { id, ...safeSize, x: bounded(position.x, 0, 12 - safeSize.width, 0), y: bounded(position.y, 0, 48, 0) };
+  const safeSize = {
+    width: gridBound(size.width, MIN_PANEL_WIDTH, DESKTOP_COLUMNS, layout.sizes[id].width),
+    height: gridBound(size.height, MIN_PANEL_HEIGHT, MAX_PANEL_HEIGHT, layout.sizes[id].height),
+  };
+  const active: Placement = { id, ...safeSize, x: gridBound(position.x, 0, DESKTOP_COLUMNS - safeSize.width, 0), y: gridBound(position.y, 0, MAX_PANEL_Y, 0) };
   next.sizes[id] = safeSize; next.positions![id] = { x: active.x, y: active.y };
   const old = packDesktop(layout).filter((item) => item.id !== id);
   const placed: Placement[] = [active];
-  const collisions: Placement[] = [];
-  for (const item of old) {
-    if (!overlaps(active, item)) { placed.push(item); continue; }
-    // A shared vertical divider can trade width with an adjacent neighbour.
-    let fitted: Placement | null = null;
-    if (item.y === active.y && item.x < active.x && active.x - item.x >= 4)
-      fitted = { ...item, width: active.x - item.x };
-    else if (item.y === active.y && item.x >= active.x && item.x + item.width - active.x - active.width >= 4)
-      fitted = { ...item, x: active.x + active.width, width: item.x + item.width - active.x - active.width };
-    if (fitted && placed.every((other) => !overlaps(fitted!, other)) && old.every((other) => other.id === item.id || !overlaps(fitted!, other))) placed.push(fitted);
-    else collisions.push(item);
+  // Resolve from top to bottom: displacement cascades naturally into later rows,
+  // rather than teleporting the first neighbour below the entire page.
+  for (const item of old.sort((a,b) => a.y-b.y || a.x-b.x)) {
+    let moved = { ...item };
+    let blockers = placed.filter((other) => overlaps(moved, other));
+    while (blockers.length) {
+      moved = { ...moved, y: Math.max(...blockers.map((other) => other.y + other.height)) };
+      blockers = placed.filter((other) => overlaps(moved, other));
+    }
+    placed.push(moved);
   }
-  for (const item of collisions) placed.push(nearestSlot(item, placed));
   for (const item of placed) {
     next.sizes[item.id] = { width: item.width, height: item.height };
     next.positions![item.id] = { x: item.x, y: item.y };
   }
+  next.order = [...placed.sort((a,b) => a.y-b.y || a.x-b.x).map((item) => item.id), ...layout.order.filter((item) => layout.minimized.includes(item))];
   return next;
 }
 export function resizePanel(layout: DesktopLayout, id: PanelId, size: PanelSize, fromLeft = false): DesktopLayout {
   const current = packDesktop(layout).find((item) => item.id === id) ?? allSlots(layout).find((item) => item.id === id)!;
-  const width = bounded(size.width, 4, 12, current.width);
-  const x = fromLeft ? Math.max(0, current.x + current.width - width) : Math.min(current.x, 12 - width);
-  return placePanel(layout, id, { x, y: current.y }, { width, height: size.height });
+  const right = current.x + current.width;
+  const width = gridBound(size.width, MIN_PANEL_WIDTH, fromLeft ? right : DESKTOP_COLUMNS - current.x, current.width);
+  return placePanel(layout, id, { x: fromLeft ? right - width : current.x, y: current.y }, { width, height: size.height });
 }
 export function movePanel(layout: DesktopLayout, id: PanelId, index: number): DesktopLayout {
   const order = layout.order.filter((item) => item !== id);

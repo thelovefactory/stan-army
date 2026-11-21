@@ -56,9 +56,9 @@ test("stored layouts reject foreign IDs, styling, forged roles and unsafe geomet
   }});
   assert.deepEqual(layout.order, ["chat", "feed", "music", "board", "stancam"]);
   assert.deepEqual(layout.minimized, ["music"]);
-  assert.deepEqual(layout.sizes.chat, {width: 4, height: 8});
+  assert.deepEqual(layout.sizes.chat, {width: 3, height: 64});
   assert.deepEqual(layout.sizes.feed, DEFAULT_DESKTOP.sizes.feed);
-  assert.deepEqual(layout.sizes.board, {width: 12, height: 3});
+  assert.deepEqual(layout.sizes.board, {width: 12, height: 2});
   assert.equal(JSON.stringify(layout).includes("host"), false);
   assert.equal(JSON.stringify(layout).includes("evil"), false);
   assertPacked(layout);
@@ -104,12 +104,13 @@ test("dropping windows exchanges their exact footprints without moving unrelated
   assert.deepEqual(parseDesktop(JSON.stringify(next)), next);
 });
 
-test("a shared divider trades width while the resized window stays under the pointer", () => {
+test("a left resize anchors the opposite edge and preserves neighbours’ chosen sizes", () => {
   const resized = resizePanel(DEFAULT_DESKTOP, "chat", {width:8,height:4}, true);
   const after = assertPacked(resized);
   assert.deepEqual(after.find((item) => item.id === "chat"), {id:"chat",x:4,y:0,width:8,height:4});
-  assert.deepEqual(after.find((item) => item.id === "feed"), {id:"feed",x:0,y:0,width:4,height:7});
-  assert.equal(after.find((item) => item.id === "board")!.y,7);
+  assert.equal(after.find((item) => item.id === "feed")!.width, 8);
+  assert.deepEqual(resized.sizes.feed, DEFAULT_DESKTOP.sizes.feed);
+  assert.ok(after.find((item) => item.id === "board")!.y >= 7);
   const small = resizePanel(resized,"chat",{width:4,height:3});
   assert.equal(assertPacked(small).find((item)=>item.id==="chat")!.y,0);
 });
@@ -171,4 +172,63 @@ test("connected rows keep unequal-height neighbours together and safely stop at 
   for(const old of before)assert.deepEqual(packDesktop(restored).find(item=>item.id===old.id),old);
   let repeated=restored;
   for(let i=0;i<60;i++){repeated=movePanelRow(repeated,PANEL_IDS[i%PANEL_IDS.length],i%2 ? -1 : 1);assertPacked(repeated);assert.equal(packDesktop(repeated).length,PANEL_IDS.length);}
+});
+
+
+test("empty-space moves retain dimensions and can leave a deliberate gap", () => {
+  const moved = placePanel(DEFAULT_DESKTOP, "music", {x:3.5,y:20.5});
+  assertPacked(moved);
+  assert.deepEqual(moved.positions!.music, {x:3.5,y:20.5});
+  assert.deepEqual(moved.sizes, DEFAULT_DESKTOP.sizes);
+  assert.deepEqual(parseDesktop(JSON.stringify(moved)), moved);
+});
+
+test("moving then resizing can fill the space beside another panel without shrinking it", () => {
+  let layout = placePanel(DEFAULT_DESKTOP, "chat", {x:9,y:20}, {width:3,height:4});
+  layout = placePanel(layout, "feed", {x:0,y:20}, {width:6,height:4});
+  const before = structuredClone(layout.sizes);
+  const filled = resizePanel(layout, "feed", {width:9,height:4});
+  assertPacked(filled);
+  assert.deepEqual(filled.positions!.feed, {x:0,y:20});
+  assert.equal(filled.positions!.chat.x,9);
+  assert.equal(filled.sizes.chat.width,3);
+  assert.deepEqual(filled.sizes.chat,before.chat);
+});
+
+test("right resizing stops at the page edge; left resizing grows into a left-hand gap", () => {
+  const moved = placePanel(DEFAULT_DESKTOP,"chat",{x:8,y:20});
+  const right = resizePanel(moved,"chat",{width:12,height:4});
+  assert.deepEqual(right.positions!.chat,{x:8,y:20});
+  assert.equal(right.sizes.chat.width,4);
+  const left = resizePanel(moved,"chat",{width:10,height:4},true);
+  assert.deepEqual(left.positions!.chat,{x:2,y:20});
+  assert.equal(left.sizes.chat.width,10);
+  assertPacked(left);
+});
+
+test("tall windows and half-row heights survive packing, saving and further resizing", () => {
+  const tall=validateDesktop({version:1,order:PANEL_IDS,sizes:Object.fromEntries(PANEL_IDS.map(id=>[id,{width:12,height:64}]))});
+  assert.equal(assertPacked(tall).length,5);
+  let layout=placePanel(DEFAULT_DESKTOP,"chat",{x:6,y:30.5},{width:6,height:12.5});
+  layout=resizePanel(layout,"chat",{width:6,height:24.5});
+  assert.equal(layout.sizes.chat.height,24.5);
+  assert.deepEqual(parseDesktop(JSON.stringify(layout)),layout);
+  assertPacked(layout);
+});
+
+test("hundreds of arbitrary moves, resizes and restores remain stable after refresh", () => {
+  let layout=structuredClone(DEFAULT_DESKTOP);
+  let seed=1873;
+  const random=(limit:number)=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed%limit;};
+  for(let i=0;i<400;i++) {
+    const id=PANEL_IDS[random(PANEL_IDS.length)];
+    if(layout.minimized.includes(id)) layout=setPanelMinimized(layout,id,false);
+    layout=placePanel(layout,id,{x:random(24)/2,y:random(120)/2},{width:3+random(19)/2,height:2+random(60)/2});
+    layout=resizePanel(layout,id,{width:3+random(19)/2,height:2+random(60)/2},i%2===0);
+    assertPacked(layout);
+    const saved=parseDesktop(JSON.stringify(layout));
+    assert.deepEqual(saved,layout);
+    layout=saved;
+    if(i%7===0) layout=setPanelMinimized(layout,id,true);
+  }
 });
