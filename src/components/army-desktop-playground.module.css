@@ -329,12 +329,13 @@
 .desktop[data-interface] .windowBody > [data-window-body=music] { min-height:0; padding:8px; }
 .desktop[data-interface] .window[data-panel-id=music] .windowBody { display:flex; align-items:stretch; }
 
-/* Spotify's compact layout is 152px tall: snap the frame instead of stretching blank space. */
-.desktop[data-interface] .window[data-panel-id=music][data-player-size=compact] { align-self:start; height:auto; }
-.desktop[data-interface] .window[data-panel-id=music][data-player-size=compact] .windowBody { flex:none; }
-.desktop[data-interface] .window[data-panel-id=music][data-player-size=compact] [data-window-body=music] { height:auto; }
-.desktop[data-interface] .window[data-panel-id=music][data-player-size=compact] iframe { flex:none; height:152px; min-height:152px; }
-
 .windowMenu input[type=number] { min-height:40px; width:100%; min-width:0; padding:8px; border:1px solid var(--rule); border-radius:6px; background:var(--paper); color:var(--ink); font:inherit; }
 /* The footer must not become a browser scroll anchor while the grid grows. */
 :global(html):has(.desktop[data-interacting=true]) { overflow-anchor:none; }
+
+/* Position rectangles directly: integer CSS grid spans must not quantise a pixel resize. */
+@media (min-width:1000px) {
+ .grid { display:block; height:var(--grid-height); }
+ .grid > .window,.grid > .ghost { position:absolute; left:var(--panel-left); top:var(--panel-top); width:var(--panel-width); height:var(--window-height); }
+ .grid > .empty { min-height:200px; }
+}

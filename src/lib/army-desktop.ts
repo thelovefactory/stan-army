@@ -26,7 +26,7 @@ export const DESKTOP_VERTICAL_STEP = 0.5;
 export const DESKTOP_HORIZONTAL_STEP = 0.5;
 const MAX_PANEL_Y = 10000;
 const gridBound = (value: unknown, min: number, max: number, fallback: number) =>
-  typeof value === "number" && Number.isFinite(value) ? Math.min(max, Math.max(min, Math.round(value * 2) / 2)) : fallback;
+  typeof value === "number" && Number.isFinite(value) ? Math.min(max, Math.max(min, Math.round(value * 1024) / 1024)) : fallback;
 export const PERSONAL_DESKTOP_KEY = "stan-army:desktop:personal:v1:army-nova";
 export const OWNER_DESKTOP_KEY = "stan-army:desktop:owner:v1:army-nova";
 export const DEFAULT_DESKTOP: DesktopLayout = {
@@ -42,7 +42,10 @@ function nearestSlot(item: Placement, placed: Placement[]): Placement {
   // Candidate edges avoid a fixed search horizon (which previously lost tall panels).
   const rows = new Set([0, item.y, ...placed.flatMap((other) => [other.y + other.height, Math.max(0, other.y - item.height)])]);
   let best: Placement | null = null, cost = Infinity;
-  for (const y of [...rows].sort((a,b) => a-b)) for (let x = 0; x <= DESKTOP_COLUMNS - item.width; x += DESKTOP_HORIZONTAL_STEP) {
+  const columns = new Set([item.x,0,DESKTOP_COLUMNS-item.width,...placed.flatMap((other)=>[other.x+other.width,other.x-item.width])]);
+  for(let x=0;x<=DESKTOP_COLUMNS-item.width;x+=DESKTOP_HORIZONTAL_STEP) columns.add(x);
+  for (const y of [...rows].sort((a,b) => a-b)) for (const x of [...columns].sort((a,b)=>a-b)) {
+    if(x<0 || x+item.width>DESKTOP_COLUMNS) continue;
     const next = { ...item, x, y };
     if (placed.some((other) => overlaps(next, other))) continue;
     const score = Math.abs(y - item.y) * DESKTOP_COLUMNS + Math.abs(x - item.x) + (y < item.y ? .5 : 0);

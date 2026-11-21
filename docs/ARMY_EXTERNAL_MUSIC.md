@@ -39,6 +39,9 @@ Validation for this refinement: TypeScript, ESLint, the existing 10 test files, 
 
 ### Responsive surface follow-up
 
-The native iframe now fills the available width and height in expanded windows, with a 352px minimum for the full layout. Spotify's compact view retains a fixed internal height, so compact Spotify windows snap to the 152px player plus the Army title bar and padding rather than displaying a blank strip. Grid slots remain intact; expanding to five rows or more restores the fluid playlist surface. Link editing temporarily allows the form and player to scroll together. At mobile widths, the same bounds and narrow-width source-link fallback apply.
+The native iframe now fills the available width and height in expanded windows, with a 352px minimum for the full layout. Spotify's compact view retains a fixed internal height. The earlier compact-only frame snap has been removed so the outer window can align precisely with its neighbours at any height. Grid slots remain intact; expanding to five rows or more restores the fluid playlist surface. Link editing temporarily allows the form and player to scroll together. At mobile widths, the same bounds and narrow-width source-link fallback apply.
 
 Browser geometry checks cover compact/full, wider and taller keyboard resizing, consistent 8px inset, no internal outer-window overflow, mobile fit, and retention of the same iframe node. Screenshots use the actual public Spotify embed; no authenticated playback was tested.
+
+
+The official playlist embed was inspected at multiple viewport heights. Below 352px of player space it retains a 152px compact internal surface; at 352px it changes to the full playlist layout. The iframe fills the Army window, but Spotify may leave transparent space inside its own compact view at intermediate heights. We do not scale, crop or replace the provider controls to conceal this. Outer window resizing and edge alignment remain continuous and independent of these Spotify breakpoints.

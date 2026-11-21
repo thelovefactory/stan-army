@@ -14,6 +14,7 @@ import {
   canMovePanelRow, movePanelRow, movePanel, packDesktop, parseDesktop, parseOwnerDesktop, placePanel, resizePanel, setPanelMinimized, swapPanelSlots,
 } from "@/lib/army-desktop";
 import type { DesktopLayout, OwnerDesktop, PanelId } from "@/lib/army-desktop";
+import { edgeScrollSpeed, resizeRect } from "@/lib/army-grid-geometry";
 import { StanCam } from "./stan-cam";
 import { ArmyStreamPlayer } from "./army-stream-player";
 import { ArmyStyleEditor } from "./army-style-editor";
@@ -42,9 +43,10 @@ type Gesture = {
   id: PanelId; kind: "move" | "resize" | "resize-left"; pointerId: number;
   startX: number; startY: number; stepX: number; base: DesktopLayout;
   handle: HTMLButtonElement;
-  slots: Record<PanelId, { x: number; y: number; width: number; height: number }>;
+  slots: Record<PanelId, { x: number; y: number; width: number; height: number; titleHeight:number }>;
   pointer: {x:number; y:number; altKey:boolean};
   moved: boolean;
+  verticalIntent: -1 | 0 | 1;
 };
 
 export function ArmyDesktopPlayground() {
@@ -203,20 +205,18 @@ export function ArmyDesktopPlayground() {
     const slots = {} as Gesture["slots"];
     for (const item of packDesktop(displayLayout)) {
       const rect = frames.current[item.id]!.getBoundingClientRect();
-      slots[item.id] = { x: rect.x, y: rect.y + window.scrollY, width: rect.width, height: rect.height };
+      slots[item.id] = { x: rect.x, y: rect.y + window.scrollY, width: rect.width, height: rect.height, titleHeight:frames.current[item.id]!.querySelector("header")!.getBoundingClientRect().height };
     }
     setActive(id); setInteracting(true);
     gesture.current = { id, kind, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY + window.scrollY,
       stepX: (grid.current.getBoundingClientRect().width + DESKTOP_GAP) / DESKTOP_COLUMNS,
       base: displayLayout, handle: event.currentTarget, slots,
-      pointer: {x:event.clientX,y:event.clientY,altKey:event.altKey}, moved:false };
+      pointer: {x:event.clientX,y:event.clientY,altKey:event.altKey}, moved:false, verticalIntent:0 };
     const started = gesture.current;
     const scrollAtEdge = () => {
       if (gesture.current !== started) return;
       if (started.kind === "move" && started.moved) {
-        const y = started.pointer.y, edge = 56;
-        const speed = y >= 0 && y < edge ? -Math.ceil(14 * (edge-y)/edge)
-          : y > window.innerHeight-edge && y <= window.innerHeight ? Math.ceil(14 * (y-window.innerHeight+edge)/edge) : 0;
+        const speed = edgeScrollSpeed(started.pointer.y,window.innerHeight,started.verticalIntent);
         if (speed) {
           const before = window.scrollY;
           window.scrollBy({top:speed,behavior:"instant"});
@@ -235,20 +235,25 @@ export function ArmyDesktopPlayground() {
   function updateGesture(clientX: number, clientY: number, altKey: boolean) {
     const current = gesture.current;
     if (!current) return;
+    const pointerDy = clientY-current.pointer.y;
+    if (Math.abs(pointerDy)>=.5) current.verticalIntent = pointerDy<0 ? -1 : 1;
     current.pointer = {x:clientX,y:clientY,altKey};
     const dx = clientX - current.startX, dy = clientY + window.scrollY - current.startY;
     if (Math.abs(dx) + Math.abs(dy) < 6) { current.moved = false; draft.current = null; setPreview(null); return; }
     current.moved = true;
     let next: DesktopLayout;
     if (current.kind !== "move") {
-      const size = current.base.sizes[current.id];
-      next = resizePanel(current.base, current.id, { width: size.width + Math.round(dx / (current.stepX * DESKTOP_HORIZONTAL_STEP)) * DESKTOP_HORIZONTAL_STEP * (current.kind === "resize-left" ? -1 : 1), height: size.height + Math.round(dy / ((DESKTOP_ROW + DESKTOP_GAP) * DESKTOP_VERTICAL_STEP)) * DESKTOP_VERTICAL_STEP }, current.kind === "resize-left");
+      const box = resizeRect(current.slots[current.id],Object.entries(current.slots).filter(([id])=>id!==current.id).map(([,rect])=>rect),dx,dy,current.kind === "resize-left",DESKTOP_GAP);
+      next = resizePanel(current.base,current.id,{width:(box.width+DESKTOP_GAP)/current.stepX,height:(box.height+DESKTOP_GAP)/(DESKTOP_ROW+DESKTOP_GAP)},current.kind === "resize-left");
     } else {
       const x = clientX, y = clientY + window.scrollY;
-      const hit = altKey ? current.base.order.find((id) => {
+      const hit = current.base.order.find((id) => {
         const rect = current.slots[id];
-        return id !== current.id && rect && x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;
-      }) : undefined;
+        if (id === current.id || !rect || x < rect.x || x > rect.x+rect.width || y < rect.y || y > rect.y+rect.height) return false;
+        const onHeader = y <= rect.y+rect.titleHeight;
+        const inCentre = x >= rect.x+rect.width*.18 && x <= rect.x+rect.width*.82 && y <= rect.y+rect.height*.82;
+        return altKey || onHeader || inCentre;
+      });
       const origin = packDesktop(current.base).find((item) => item.id === current.id)!;
       const position = {
         x: origin.x + Math.round(dx / (current.stepX * DESKTOP_HORIZONTAL_STEP)) * DESKTOP_HORIZONTAL_STEP,
@@ -310,10 +315,10 @@ export function ArmyDesktopPlayground() {
       </header>
 
       <p className={warning ? s.status : "sr-only"} role="status" aria-live="polite">{notice}</p>
-      <p id="desktop-key-help" className="sr-only">Drag a window anywhere on the grid. Neighbours keep their sizes and move down if needed. Hold Alt while dropping onto another window to exchange spaces. Arrow keys on a title move it across the grid. Shift plus arrows resizes it. Arrow keys on the corner resize. Escape cancels dragging. Sizing also has a menu. Mobile uses stacked windows.</p>
+      <p id="desktop-key-help" className="sr-only">Drag a window anywhere on the grid. Neighbours keep their sizes and move down if needed. Drop onto another window’s title bar or centre to exchange spaces. Drop in an empty gap to place it there. Arrow keys on a title move it across the grid. Shift plus arrows resizes it. Arrow keys on the corner resize. Escape cancels dragging. Sizing also has a menu. Mobile uses stacked windows.</p>
       {focused && <button className={s.focusReturn} onClick={() => setFocused(null)}><ArrowLeft size={16} />Restore layout</button>}
 
-      <div ref={grid} className={`${s.grid} ${preview ? s.gridActive : ""}`} style={interacting ? {minHeight:gridMinHeight} : undefined} data-window-grid>
+      <div ref={grid} className={`${s.grid} ${preview ? s.gridActive : ""}`} style={{"--grid-height":`${Math.max(placements.length ? 0 : 200,...placements.map((item)=>(item.y+item.height)*(DESKTOP_ROW+DESKTOP_GAP)-DESKTOP_GAP))}px`,...(interacting ? {minHeight:gridMinHeight} : {})} as CSSProperties} data-window-grid>
         {ordered.map((id) => {
           const placement = placements.find((item) => item.id === id);
           const hidden = layout.minimized.includes(id);
@@ -322,14 +327,16 @@ export function ArmyDesktopPlayground() {
           const visiblePlacement = placement;
           return <section key={id} ref={(element) => { frames.current[id] = element; }} hidden={hidden}
             className={`${s.window} ${active === id ? s.active : ""} ${preview?.id === id ? s.moving : ""}`}
-            data-panel-id={id} data-player-size={id === "music" && owner.music?.startsWith("https://open.spotify.com/") && !musicEditing ? size.height === 3 ? "compact" : "full" : undefined} data-style-selected={editorVisible && styleScope === id ? "true" : undefined} data-window-colour={owner.windows[id].colour} data-window-skin={owner.windows[id].skin} data-panel-surface={owner.windows[id].surface} data-panel-typeface={owner.windows[id].typeface} data-expanded={focused === id ? "true" : undefined} aria-labelledby={`window-title-${id}`}
+            data-panel-id={id} data-player-size={id === "music" && owner.music?.startsWith("https://open.spotify.com/") && !musicEditing ? size.height >= 5 ? "full" : "compact" : undefined} data-style-selected={editorVisible && styleScope === id ? "true" : undefined} data-window-colour={owner.windows[id].colour} data-window-skin={owner.windows[id].skin} data-panel-surface={owner.windows[id].surface} data-panel-typeface={owner.windows[id].typeface} data-expanded={focused === id ? "true" : undefined} aria-labelledby={`window-title-${id}`}
             style={{ ...(owner.windows[id].surface === "custom" ? {
                 "--surface-bg": owner.windows[id].customSurface,
                 "--surface-ink": readableColor("#f3f4f3", owner.windows[id].customSurface),
                 "--surface-muted": readableColor("#9caaa3", owner.windows[id].customSurface),
                 "--surface-rule": `color-mix(in srgb,${owner.windows[id].customSurface} 70%,${readableColor("#f3f4f3", owner.windows[id].customSurface)})`,
-              } : {}), ...(owner.windows[id].colour === "custom" ? { "--accent": owner.windows[id].customAccent } : {}), gridColumn: visiblePlacement ? `${visiblePlacement.x * 2 + 1} / span ${visiblePlacement.width * 2}` : undefined,
-              gridRow: visiblePlacement ? `${visiblePlacement.y * 2 + 1} / span ${visiblePlacement.height * 2}` : undefined,
+              } : {}), ...(owner.windows[id].colour === "custom" ? { "--accent": owner.windows[id].customAccent } : {}),
+              "--panel-left": `calc(${(visiblePlacement?.x ?? 0) / DESKTOP_COLUMNS} * (100% + ${DESKTOP_GAP}px))`,
+              "--panel-top": `${(visiblePlacement?.y ?? 0) * (DESKTOP_ROW+DESKTOP_GAP)}px`,
+              "--panel-width": `calc(${size.width / DESKTOP_COLUMNS} * (100% + ${DESKTOP_GAP}px) - ${DESKTOP_GAP}px)`,
               "--window-height": `${size.height * DESKTOP_ROW + (size.height - 1) * DESKTOP_GAP}px` } as CSSProperties}
             onFocusCapture={() => setActive(id)} onPointerDownCapture={() => setActive(id)}>
             <header className={s.titlebar}>
@@ -337,7 +344,7 @@ export function ArmyDesktopPlayground() {
               <button className={s.dragHandle} aria-label={`Move ${names[id]}`} aria-describedby="desktop-key-help"
                 onPointerDown={(event) => start(event, id, "move")} onPointerMove={track}
                 onPointerUp={() => finish(true)} onPointerCancel={() => finish(false)} onLostPointerCapture={() => { if (gesture.current) finish(false); }}
-                onKeyDown={(event) => keys(event, id)} title="Drag to place · Alt + drop to swap · arrow keys to move">
+                onKeyDown={(event) => keys(event, id)} title="Drop on a panel to swap · drop in a gap to place · arrow keys to move">
                 <GripVertical className={s.grip} size={15} /><Icon size={17} /><span className={s.windowTitle}>{names[id]}</span>
               </button>
               <button className={s.windowControl} aria-label={`Edit ${names[id]} style`} title={`Style ${names[id]}`} onClick={() => openStyle(id)}><Palette size={13} /></button>
@@ -356,10 +363,10 @@ export function ArmyDesktopPlayground() {
                   </div>
                   <button aria-label={`${focused === id ? "Restore" : "Expand"} ${names[id]}`} onClick={(event) => { const menu = event.currentTarget.closest("details"); const trigger = menu?.querySelector("summary"); for (const submenu of menu?.querySelectorAll("details[open]") ?? []) submenu.removeAttribute("open"); menu?.removeAttribute("open"); trigger?.focus({preventScroll:true}); setFocused(focused === id ? null : id); setActive(id); requestAnimationFrame(() => { frames.current[id]?.scrollIntoView({block:"nearest", behavior:"instant"}); }); }}><Maximize2 size={14} />{focused === id ? "Restore size" : "Expand panel"}</button>
                   <details className={s.sizeOptions}><summary aria-label={`Size and position ${names[id]}`}>Size & position<ChevronDown size={13} /></summary><div>
-                  <label>Window width<select aria-label={`${names[id]} width`} disabled={!desktop} value={size.width} onChange={(event) => resize(id, Number(event.target.value))}>{Array.from({ length: (DESKTOP_COLUMNS - MIN_PANEL_WIDTH) / DESKTOP_HORIZONTAL_STEP + 1 }, (_, index) => index * DESKTOP_HORIZONTAL_STEP + MIN_PANEL_WIDTH).map((width) => <option value={width} key={width}>{width}/12{width === 4 ? " · narrow" : width === 8 ? " · wide" : width === 12 ? " · full" : ""}</option>)}</select></label>
-                  <label>Window height<input aria-label={`${names[id]} height`} type="number" step={DESKTOP_VERTICAL_STEP} min={MIN_PANEL_HEIGHT} max={MAX_PANEL_HEIGHT} disabled={!desktop} value={size.height} onChange={(event) => { if (event.currentTarget.value && event.currentTarget.validity.valid) resize(id, size.width, Number(event.currentTarget.value)); }} /></label>
-                  <label>Column<input aria-label={`${names[id]} column`} type="number" step={DESKTOP_HORIZONTAL_STEP} min={1} max={DESKTOP_COLUMNS - size.width + 1} disabled={!desktop} value={(placement?.x ?? 0) + 1} onChange={(event) => { if (event.currentTarget.value && event.currentTarget.validity.valid) { setFocused(null); save(placePanel(displayLayout,id,{x:Number(event.currentTarget.value)-1,y:placement?.y ?? 0}), `${names[id]} moved.`); } }} /></label>
-                  <label>Row<input aria-label={`${names[id]} row`} type="number" min={1} max={10001} step={DESKTOP_VERTICAL_STEP} disabled={!desktop} value={(placement?.y ?? 0) + 1} onChange={(event) => { if (event.currentTarget.value && event.currentTarget.validity.valid) { setFocused(null); save(placePanel(displayLayout,id,{x:placement?.x ?? 0,y:Number(event.currentTarget.value)-1}), `${names[id]} moved.`); } }} /></label>
+                  <label>Window width<select aria-label={`${names[id]} width`} disabled={!desktop} value={size.width} onChange={(event) => resize(id, Number(event.target.value))}>{size.width % DESKTOP_HORIZONTAL_STEP !== 0 && <option value={size.width}>{Number(size.width.toFixed(3))}/12 · custom</option>}{Array.from({ length: (DESKTOP_COLUMNS - MIN_PANEL_WIDTH) / DESKTOP_HORIZONTAL_STEP + 1 }, (_, index) => index * DESKTOP_HORIZONTAL_STEP + MIN_PANEL_WIDTH).map((width) => <option value={width} key={width}>{width}/12{width === 4 ? " · narrow" : width === 8 ? " · wide" : width === 12 ? " · full" : ""}</option>)}</select></label>
+                  <label>Window height<input aria-label={`${names[id]} height`} type="number" step="any" min={MIN_PANEL_HEIGHT} max={MAX_PANEL_HEIGHT} disabled={!desktop} value={size.height} onChange={(event) => { if (event.currentTarget.value && event.currentTarget.validity.valid) resize(id, size.width, Number(event.currentTarget.value)); }} /></label>
+                  <label>Column<input aria-label={`${names[id]} column`} type="number" step="any" min={1} max={DESKTOP_COLUMNS - size.width + 1} disabled={!desktop} value={(placement?.x ?? 0) + 1} onChange={(event) => { if (event.currentTarget.value && event.currentTarget.validity.valid) { setFocused(null); save(placePanel(displayLayout,id,{x:Number(event.currentTarget.value)-1,y:placement?.y ?? 0}), `${names[id]} moved.`); } }} /></label>
+                  <label>Row<input aria-label={`${names[id]} row`} type="number" min={1} max={10001} step="any" disabled={!desktop} value={(placement?.y ?? 0) + 1} onChange={(event) => { if (event.currentTarget.value && event.currentTarget.validity.valid) { setFocused(null); save(placePanel(displayLayout,id,{x:placement?.x ?? 0,y:Number(event.currentTarget.value)-1}), `${names[id]} moved.`); } }} /></label>
 
                   </div></details>
                 </div>
@@ -384,7 +391,7 @@ export function ArmyDesktopPlayground() {
               onKeyDown={(event) => keys(event, id, true)}><span aria-hidden="true" /></button>
           </section>;
         })}
-        {ghost && <div className={s.ghost} data-drop-preview aria-hidden="true" style={{ gridColumn: `${ghost.x * 2 + 1} / span ${ghost.width * 2}`, gridRow: `${ghost.y * 2 + 1} / span ${ghost.height * 2}` }} /> }
+        {ghost && <div className={s.ghost} data-drop-preview aria-hidden="true" style={{ "--panel-left":`calc(${ghost.x / DESKTOP_COLUMNS} * (100% + ${DESKTOP_GAP}px))`, "--panel-top":`${ghost.y * (DESKTOP_ROW+DESKTOP_GAP)}px`, "--panel-width":`calc(${ghost.width / DESKTOP_COLUMNS} * (100% + ${DESKTOP_GAP}px) - ${DESKTOP_GAP}px)`, "--window-height":`${ghost.height * (DESKTOP_ROW+DESKTOP_GAP)-DESKTOP_GAP}px` } as CSSProperties} /> }
         {layout.minimized.length === PANEL_IDS.length && <div className={s.empty}><StanStarIcon size={40} /><h2>Everyone’s in the dock.</h2></div>}
       </div>
       <section className={s.communityInvite} aria-label="Create your own Army"><StanStarIcon size={30} /><strong>MAKE SOME NOISE.</strong><Link href="/create">Start your own Army <ArrowUpRight size={17} /></Link></section>

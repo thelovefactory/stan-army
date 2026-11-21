@@ -17,5 +17,4 @@
 .embed + .fallback { display:none; }
 @container (max-width:279px) { .embed + .fallback { display:flex; } }
 
-.player[data-player-size=full] .embed { min-height:352px; }
 .settings { flex-shrink:0; }
