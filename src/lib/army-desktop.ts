@@ -138,7 +138,7 @@ export function placePanel(layout: DesktopLayout, id: PanelId, position: GridPos
   };
   const active: Placement = { id, ...safeSize, x: gridBound(position.x, 0, DESKTOP_COLUMNS - safeSize.width, 0), y: gridBound(position.y, 0, MAX_PANEL_Y, 0) };
   next.sizes[id] = safeSize; next.positions![id] = { x: active.x, y: active.y };
-  const old = packDesktop(layout).filter((item) => item.id !== id);
+  const old = allSlots(layout).filter((item) => item.id !== id && !layout.minimized.includes(item.id));
   const placed: Placement[] = [active];
   // Resolve from top to bottom: displacement cascades naturally into later rows,
   // rather than teleporting the first neighbour below the entire page.
@@ -226,9 +226,14 @@ export function parseOwnerDesktop(raw: string | null): OwnerDesktop {
 }
 
 /** Rows are vertically connected groups: a wide window moves past a whole paired row. */
-function desktopRows(layout: DesktopLayout): Placement[][] {
+function desktopRows(layout: DesktopLayout, id: PanelId): Placement[][] {
+  const visible = packDesktop(layout);
+  const active = visible.find((item) => item.id === id);
+  if (!active) return [];
+  // Only this panel's horizontal lane matters. A tall panel in the next column
+  // must not connect every staggered row and disable vertical movement.
   const rows: Placement[][] = [];
-  for (const panel of packDesktop(layout).sort((a,b) => a.y-b.y || a.x-b.x)) {
+  for (const panel of visible.filter((item) => item.x < active.x + active.width && item.x + item.width > active.x).sort((a,b) => a.y-b.y || a.x-b.x)) {
     const current = rows.at(-1);
     const bottom = current ? Math.max(...current.map((item)=>item.y+item.height)) : -1;
     if (current && panel.y < bottom) current.push(panel);
@@ -237,13 +242,23 @@ function desktopRows(layout: DesktopLayout): Placement[][] {
   return rows;
 }
 export function canMovePanelRow(layout: DesktopLayout, id: PanelId, direction: -1 | 1): boolean {
-  const rows = desktopRows(layout), index = rows.findIndex((row)=>row.some((item)=>item.id===id));
-  return index >= 0 && index + direction >= 0 && index + direction < rows.length;
+  const rows = desktopRows(layout, id), index = rows.findIndex((row)=>row.some((item)=>item.id===id));
+  const active = packDesktop(layout).find((item) => item.id === id);
+  return !!active && (direction === -1 ? active.y > 0 : active.y < MAX_PANEL_Y) && index >= 0;
 }
 export function movePanelRow(layout: DesktopLayout, id: PanelId, direction: -1 | 1): DesktopLayout {
-  const rows = desktopRows(layout), index = rows.findIndex((row)=>row.some((item)=>item.id===id));
+  if (!canMovePanelRow(layout,id,direction)) return layout;
+  const rows = desktopRows(layout, id), index = rows.findIndex((row)=>row.some((item)=>item.id===id));
   const active = rows[index], target = rows[index + direction];
-  if (!active || !target) return layout;
+  if (!active) return layout;
+  const selected = active.find((item) => item.id === id)!;
+  if (!target) return placePanel(layout, id, { x:selected.x, y:direction === -1 ? 0 : selected.y + selected.height });
+  const targetBottom = Math.max(...target.map((item) => item.y + item.height));
+  const targetTop = Math.min(...target.map((item) => item.y));
+  if (direction === -1 && selected.y > targetBottom)
+    return placePanel(layout,id,{x:selected.x,y:targetBottom});
+  if (direction === 1 && selected.y + selected.height < targetTop)
+    return placePanel(layout,id,{x:selected.x,y:targetTop-selected.height});
   const first = direction === -1 ? target : active, second = direction === -1 ? active : target;
   const firstTop = Math.min(...first.map((item)=>item.y)), firstBottom = Math.max(...first.map((item)=>item.y+item.height));
   const secondTop = Math.min(...second.map((item)=>item.y)), secondBottom = Math.max(...second.map((item)=>item.y+item.height));
@@ -251,6 +266,5 @@ export function movePanelRow(layout: DesktopLayout, id: PanelId, direction: -1 |
   const next = snapshot(layout);
   for (const item of first) next.positions![item.id].y += secondBottom-secondTop+gap;
   for (const item of second) next.positions![item.id].y -= firstBottom-firstTop+gap;
-  next.order = [...packDesktop(next).sort((a,b)=>a.y-b.y || a.x-b.x).map((item)=>item.id),...layout.order.filter((item)=>layout.minimized.includes(item))];
-  return next;
+  return placePanel(next,id,next.positions![id]);
 }

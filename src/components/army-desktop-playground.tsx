@@ -43,6 +43,8 @@ type Gesture = {
   startX: number; startY: number; stepX: number; base: DesktopLayout;
   handle: HTMLButtonElement;
   slots: Record<PanelId, { x: number; y: number; width: number; height: number }>;
+  pointer: {x:number; y:number; altKey:boolean};
+  moved: boolean;
 };
 
 export function ArmyDesktopPlayground() {
@@ -75,6 +77,7 @@ export function ArmyDesktopPlayground() {
   const [notice, setNotice] = useState("");
   const [preview, setPreview] = useState<{ id: PanelId; kind: "move" | "resize" | "resize-left"; layout: DesktopLayout } | null>(null);
   const gesture = useRef<Gesture | null>(null);
+  const edgeScrollFrame = useRef<number | null>(null);
   const draft = useRef<DesktopLayout | null>(null);
   const grid = useRef<HTMLDivElement>(null);
   const dockRefs = useRef<Partial<Record<PanelId, HTMLButtonElement | null>>>({});
@@ -133,8 +136,9 @@ export function ArmyDesktopPlayground() {
     save(setPanelMinimized(layout, id, !hidden), `${names[id]} ${hidden ? "restored" : "minimized to the dock"}. Drafts stay in the window.`);
     if (!hidden) requestAnimationFrame(() => dockRefs.current[id]?.focus());
   }
-  function resize(id: PanelId, width: number, height = layout.sizes[id].height) {
-    const next = resizePanel(layout, id, { width, height });
+  function resize(id: PanelId, width: number, height = displayLayout.sizes[id].height) {
+    const next = resizePanel(displayLayout, id, { width, height });
+    setFocused(null);
     save(next, `${names[id]}: ${next.sizes[id].width} columns wide, ${next.sizes[id].height} rows high. Neighbours made room.`);
   }
   function move(id: PanelId, index: number) {
@@ -144,7 +148,8 @@ export function ArmyDesktopPlayground() {
   function moveRow(id: PanelId, direction: -1 | 1) {
     if (!desktop) { move(id,layout.order.indexOf(id)+direction); return; }
     const before = frames.current[id]?.getBoundingClientRect().top;
-    save(movePanelRow(layout,id,direction), `${names[id]} row moved ${direction === -1 ? "up" : "down"}.`);
+    setFocused(null);
+    save(movePanelRow(displayLayout,id,direction), `${names[id]} row moved ${direction === -1 ? "up" : "down"}.`);
     requestAnimationFrame(() => {
       const after = frames.current[id]?.getBoundingClientRect().top;
       if (before !== undefined && after !== undefined) window.scrollBy({top:after-before,behavior:"instant"});
@@ -154,10 +159,12 @@ export function ArmyDesktopPlayground() {
   function finish(commit: boolean) {
     const current = gesture.current;
     const next = draft.current;
+    if (edgeScrollFrame.current !== null) cancelAnimationFrame(edgeScrollFrame.current);
+    edgeScrollFrame.current = null;
     gesture.current = null; draft.current = null; setPreview(null); setInteracting(false);
     if (current?.handle.hasPointerCapture(current.pointerId)) current.handle.releasePointerCapture(current.pointerId);
     const scrollY = window.scrollY;
-    if (commit && current && next) { save(next, `${names[current.id]} ${current.kind === "move" ? "moved" : "resized"}. Your arrangement is saved on this device.`); requestAnimationFrame(() => window.scrollTo({top:scrollY,behavior:"instant"})); }
+    if (commit && current && next) { setFocused(null); save(next, `${names[current.id]} ${current.kind === "move" ? "moved" : "resized"}. Your arrangement is saved on this device.`); requestAnimationFrame(() => window.scrollTo({top:scrollY,behavior:"instant"})); }
   }
   useEffect(() => {
     const dismiss = (event: globalThis.PointerEvent) => {
@@ -173,6 +180,8 @@ export function ArmyDesktopPlayground() {
     const cancel = () => {
       const current = gesture.current;
       if (!current) return;
+      if (edgeScrollFrame.current !== null) cancelAnimationFrame(edgeScrollFrame.current);
+      edgeScrollFrame.current = null;
       gesture.current = null; draft.current = null; setPreview(null); setInteracting(false);
       if (current.handle.hasPointerCapture(current.pointerId)) current.handle.releasePointerCapture(current.pointerId);
     };
@@ -181,39 +190,62 @@ export function ArmyDesktopPlayground() {
       if (event.key === "Escape" && gesture.current) { event.preventDefault(); event.stopPropagation(); cancel(); }
     };
     window.addEventListener("resize", cancel); window.addEventListener("blur", cancel); document.addEventListener("visibilitychange", visibility); window.addEventListener("keydown", escape, true);
-    return () => { window.removeEventListener("resize", cancel); window.removeEventListener("blur", cancel); document.removeEventListener("visibilitychange", visibility); window.removeEventListener("keydown", escape, true); };
+    return () => { if (edgeScrollFrame.current !== null) cancelAnimationFrame(edgeScrollFrame.current); gesture.current = null; window.removeEventListener("resize", cancel); window.removeEventListener("blur", cancel); document.removeEventListener("visibilitychange", visibility); window.removeEventListener("keydown", escape, true); };
   }, []);
 
   function start(event: PointerEvent<HTMLButtonElement>, id: PanelId, kind: Gesture["kind"]) {
-    if (!desktop || focused || event.button !== 0 || !grid.current) return;
+    if (!desktop || gesture.current || event.button !== 0 || !grid.current) return;
     event.preventDefault();
     event.currentTarget.focus({preventScroll:true});
     for (const menu of grid.current.querySelectorAll("details[open]")) menu.removeAttribute("open");
     const bounds = grid.current.getBoundingClientRect();
     setGridMinHeight(bounds.height);
     const slots = {} as Gesture["slots"];
-    for (const item of packDesktop(layout)) {
+    for (const item of packDesktop(displayLayout)) {
       const rect = frames.current[item.id]!.getBoundingClientRect();
       slots[item.id] = { x: rect.x, y: rect.y + window.scrollY, width: rect.width, height: rect.height };
     }
     setActive(id); setInteracting(true);
     gesture.current = { id, kind, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY + window.scrollY,
       stepX: (grid.current.getBoundingClientRect().width + DESKTOP_GAP) / DESKTOP_COLUMNS,
-      base: layout, handle: event.currentTarget, slots };
+      base: displayLayout, handle: event.currentTarget, slots,
+      pointer: {x:event.clientX,y:event.clientY,altKey:event.altKey}, moved:false };
+    const started = gesture.current;
+    const scrollAtEdge = () => {
+      if (gesture.current !== started) return;
+      if (started.kind === "move" && started.moved) {
+        const y = started.pointer.y, edge = 56;
+        const speed = y >= 0 && y < edge ? -Math.ceil(14 * (edge-y)/edge)
+          : y > window.innerHeight-edge && y <= window.innerHeight ? Math.ceil(14 * (y-window.innerHeight+edge)/edge) : 0;
+        if (speed) {
+          const before = window.scrollY;
+          window.scrollBy({top:speed,behavior:"instant"});
+          if (window.scrollY !== before) updateGesture(started.pointer.x,started.pointer.y,started.pointer.altKey);
+        }
+      }
+      edgeScrollFrame.current = requestAnimationFrame(scrollAtEdge);
+    };
+    edgeScrollFrame.current = requestAnimationFrame(scrollAtEdge);
     event.currentTarget.setPointerCapture(event.pointerId);
   }
   function track(event: PointerEvent<HTMLButtonElement>) {
+    if (gesture.current?.pointerId !== event.pointerId) return;
+    updateGesture(event.clientX,event.clientY,event.altKey);
+  }
+  function updateGesture(clientX: number, clientY: number, altKey: boolean) {
     const current = gesture.current;
-    if (!current || current.pointerId !== event.pointerId) return;
-    const dx = event.clientX - current.startX, dy = event.clientY + window.scrollY - current.startY;
-    if (Math.abs(dx) + Math.abs(dy) < 6) { draft.current = null; setPreview(null); return; }
+    if (!current) return;
+    current.pointer = {x:clientX,y:clientY,altKey};
+    const dx = clientX - current.startX, dy = clientY + window.scrollY - current.startY;
+    if (Math.abs(dx) + Math.abs(dy) < 6) { current.moved = false; draft.current = null; setPreview(null); return; }
+    current.moved = true;
     let next: DesktopLayout;
     if (current.kind !== "move") {
       const size = current.base.sizes[current.id];
       next = resizePanel(current.base, current.id, { width: size.width + Math.round(dx / (current.stepX * DESKTOP_HORIZONTAL_STEP)) * DESKTOP_HORIZONTAL_STEP * (current.kind === "resize-left" ? -1 : 1), height: size.height + Math.round(dy / ((DESKTOP_ROW + DESKTOP_GAP) * DESKTOP_VERTICAL_STEP)) * DESKTOP_VERTICAL_STEP }, current.kind === "resize-left");
     } else {
-      const x = event.clientX, y = event.clientY + window.scrollY;
-      const hit = event.altKey ? current.base.order.find((id) => {
+      const x = clientX, y = clientY + window.scrollY;
+      const hit = altKey ? current.base.order.find((id) => {
         const rect = current.slots[id];
         return id !== current.id && rect && x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;
       }) : undefined;
@@ -233,13 +265,15 @@ export function ArmyDesktopPlayground() {
     const direction = directions[event.key]; if (!direction) return;
     event.preventDefault(); setActive(id);
     if (resizing || event.shiftKey) {
-      if (!desktop || focused) { setNotice("Window sizes fit this view. Restore the desktop on a larger screen to resize."); return; }
-      const size = layout.sizes[id];
-      const next = resizePanel(layout, id, { width: size.width + (/Left|Right/.test(event.key) ? direction * DESKTOP_HORIZONTAL_STEP * (fromLeft ? -1 : 1) : 0), height: size.height + (/Up|Down/.test(event.key) ? direction * DESKTOP_VERTICAL_STEP : 0) }, fromLeft);
+      if (!desktop) { setNotice("Window sizes fit this view. Restore the desktop on a larger screen to resize."); return; }
+      const size = displayLayout.sizes[id];
+      const next = resizePanel(displayLayout, id, { width: size.width + (/Left|Right/.test(event.key) ? direction * DESKTOP_HORIZONTAL_STEP * (fromLeft ? -1 : 1) : 0), height: size.height + (/Up|Down/.test(event.key) ? direction * DESKTOP_VERTICAL_STEP : 0) }, fromLeft);
+      setFocused(null);
       save(next, `${names[id]} resized. Your arrangement is saved on this device.`);
-    } else if (desktop && !focused) {
-      const slot = packDesktop(layout).find((item) => item.id === id)!;
-      save(placePanel(layout, id, { x: slot.x + (/Left|Right/.test(event.key) ? direction * DESKTOP_HORIZONTAL_STEP : 0), y: slot.y + (/Up|Down/.test(event.key) ? direction * DESKTOP_VERTICAL_STEP : 0) }), `${names[id]} moved.`);
+    } else if (desktop) {
+      setFocused(null);
+      const slot = packDesktop(displayLayout).find((item) => item.id === id)!;
+      save(placePanel(displayLayout, id, { x: slot.x + (/Left|Right/.test(event.key) ? direction * DESKTOP_HORIZONTAL_STEP : 0), y: slot.y + (/Up|Down/.test(event.key) ? direction * DESKTOP_VERTICAL_STEP : 0) }), `${names[id]} moved.`);
     } else if (/Up|Down/.test(event.key)) moveRow(id,direction as -1 | 1);
   }
 
@@ -317,15 +351,15 @@ export function ArmyDesktopPlayground() {
                     <button onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); resize(id, size.width, size.height >= 5 ? 3 : 5); }}>{size.height >= 5 ? "Compact player" : "Show full playlist"}</button>
                   </>}
                   <div className={s.rowMoves} role="group" aria-label="Move entire row">
-                  <button aria-label="Move row up" title="Move entire row up" disabled={desktop ? !canMovePanelRow(layout,id,-1) : layout.order.indexOf(id) === 0} onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); moveRow(id,-1); }}><ArrowUp size={15} />Move up</button>
-                  <button aria-label="Move row down" title="Move entire row down" disabled={desktop ? !canMovePanelRow(layout,id,1) : layout.order.indexOf(id) === layout.order.length - 1} onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); moveRow(id,1); }}><ArrowDown size={15} />Move down</button>
+                  <button aria-label="Move row up" title="Move entire row up" disabled={desktop ? !canMovePanelRow(displayLayout,id,-1) : layout.order.indexOf(id) === 0} onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); moveRow(id,-1); }}><ArrowUp size={15} />Move up</button>
+                  <button aria-label="Move row down" title="Move entire row down" disabled={desktop ? !canMovePanelRow(displayLayout,id,1) : layout.order.indexOf(id) === layout.order.length - 1} onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); moveRow(id,1); }}><ArrowDown size={15} />Move down</button>
                   </div>
                   <button aria-label={`${focused === id ? "Restore" : "Expand"} ${names[id]}`} onClick={(event) => { const menu = event.currentTarget.closest("details"); const trigger = menu?.querySelector("summary"); for (const submenu of menu?.querySelectorAll("details[open]") ?? []) submenu.removeAttribute("open"); menu?.removeAttribute("open"); trigger?.focus({preventScroll:true}); setFocused(focused === id ? null : id); setActive(id); requestAnimationFrame(() => { frames.current[id]?.scrollIntoView({block:"nearest", behavior:"instant"}); }); }}><Maximize2 size={14} />{focused === id ? "Restore size" : "Expand panel"}</button>
                   <details className={s.sizeOptions}><summary aria-label={`Size and position ${names[id]}`}>Size & position<ChevronDown size={13} /></summary><div>
-                  <label>Window width<select aria-label={`${names[id]} width`} disabled={!desktop || !!focused} value={size.width} onChange={(event) => resize(id, Number(event.target.value))}>{Array.from({ length: (DESKTOP_COLUMNS - MIN_PANEL_WIDTH) / DESKTOP_HORIZONTAL_STEP + 1 }, (_, index) => index * DESKTOP_HORIZONTAL_STEP + MIN_PANEL_WIDTH).map((width) => <option value={width} key={width}>{width}/12{width === 4 ? " · narrow" : width === 8 ? " · wide" : width === 12 ? " · full" : ""}</option>)}</select></label>
-                  <label>Window height<input aria-label={`${names[id]} height`} type="number" step={DESKTOP_VERTICAL_STEP} min={MIN_PANEL_HEIGHT} max={MAX_PANEL_HEIGHT} disabled={!desktop || !!focused} value={size.height} onChange={(event) => { if (event.currentTarget.value && event.currentTarget.validity.valid) resize(id, size.width, Number(event.currentTarget.value)); }} /></label>
-                  <label>Column<input aria-label={`${names[id]} column`} type="number" step={DESKTOP_HORIZONTAL_STEP} min={1} max={DESKTOP_COLUMNS - size.width + 1} disabled={!desktop || !!focused} value={(placement?.x ?? 0) + 1} onChange={(event) => { if (event.currentTarget.value && event.currentTarget.validity.valid) save(placePanel(layout,id,{x:Number(event.currentTarget.value)-1,y:placement?.y ?? 0}), `${names[id]} moved.`); }} /></label>
-                  <label>Row<input aria-label={`${names[id]} row`} type="number" min={1} max={10001} step={DESKTOP_VERTICAL_STEP} disabled={!desktop || !!focused} value={(placement?.y ?? 0) + 1} onChange={(event) => { if (event.currentTarget.value && event.currentTarget.validity.valid) save(placePanel(layout,id,{x:placement?.x ?? 0,y:Number(event.currentTarget.value)-1}), `${names[id]} moved.`); }} /></label>
+                  <label>Window width<select aria-label={`${names[id]} width`} disabled={!desktop} value={size.width} onChange={(event) => resize(id, Number(event.target.value))}>{Array.from({ length: (DESKTOP_COLUMNS - MIN_PANEL_WIDTH) / DESKTOP_HORIZONTAL_STEP + 1 }, (_, index) => index * DESKTOP_HORIZONTAL_STEP + MIN_PANEL_WIDTH).map((width) => <option value={width} key={width}>{width}/12{width === 4 ? " · narrow" : width === 8 ? " · wide" : width === 12 ? " · full" : ""}</option>)}</select></label>
+                  <label>Window height<input aria-label={`${names[id]} height`} type="number" step={DESKTOP_VERTICAL_STEP} min={MIN_PANEL_HEIGHT} max={MAX_PANEL_HEIGHT} disabled={!desktop} value={size.height} onChange={(event) => { if (event.currentTarget.value && event.currentTarget.validity.valid) resize(id, size.width, Number(event.currentTarget.value)); }} /></label>
+                  <label>Column<input aria-label={`${names[id]} column`} type="number" step={DESKTOP_HORIZONTAL_STEP} min={1} max={DESKTOP_COLUMNS - size.width + 1} disabled={!desktop} value={(placement?.x ?? 0) + 1} onChange={(event) => { if (event.currentTarget.value && event.currentTarget.validity.valid) { setFocused(null); save(placePanel(displayLayout,id,{x:Number(event.currentTarget.value)-1,y:placement?.y ?? 0}), `${names[id]} moved.`); } }} /></label>
+                  <label>Row<input aria-label={`${names[id]} row`} type="number" min={1} max={10001} step={DESKTOP_VERTICAL_STEP} disabled={!desktop} value={(placement?.y ?? 0) + 1} onChange={(event) => { if (event.currentTarget.value && event.currentTarget.validity.valid) { setFocused(null); save(placePanel(displayLayout,id,{x:placement?.x ?? 0,y:Number(event.currentTarget.value)-1}), `${names[id]} moved.`); } }} /></label>
 
                   </div></details>
                 </div>
@@ -340,14 +374,14 @@ export function ArmyDesktopPlayground() {
               {id === "board" && <DesktopDiscussions windowed />}
               {id === "stancam" && <StanCam />}
             </div>
-            {!focused && <button className={`${s.resizeHandle} ${s.resizeLeft}`} aria-label={`Resize ${names[id]} from left`} aria-describedby="desktop-key-help" title="Drag left to make this window wider"
+            <button className={`${s.resizeHandle} ${s.resizeLeft}`} aria-label={`Resize ${names[id]} from left`} aria-describedby="desktop-key-help" title="Drag left to make this window wider"
               onPointerDown={(event) => start(event, id, "resize-left")} onPointerMove={track}
               onPointerUp={() => finish(true)} onPointerCancel={() => finish(false)} onLostPointerCapture={() => { if (gesture.current) finish(false); }}
-              onKeyDown={(event) => keys(event, id, true, true)}><span aria-hidden="true" /></button>}
-            {!focused && <button className={s.resizeHandle} aria-label={`Resize ${names[id]}`} aria-describedby="desktop-key-help" title="Drag to resize · arrow keys to resize"
+              onKeyDown={(event) => keys(event, id, true, true)}><span aria-hidden="true" /></button>
+            <button className={s.resizeHandle} aria-label={`Resize ${names[id]}`} aria-describedby="desktop-key-help" title="Drag to resize · arrow keys to resize"
               onPointerDown={(event) => start(event, id, "resize")} onPointerMove={track}
               onPointerUp={() => finish(true)} onPointerCancel={() => finish(false)} onLostPointerCapture={() => { if (gesture.current) finish(false); }}
-              onKeyDown={(event) => keys(event, id, true)}><span aria-hidden="true" /></button>}
+              onKeyDown={(event) => keys(event, id, true)}><span aria-hidden="true" /></button>
           </section>;
         })}
         {ghost && <div className={s.ghost} data-drop-preview aria-hidden="true" style={{ gridColumn: `${ghost.x * 2 + 1} / span ${ghost.width * 2}`, gridRow: `${ghost.y * 2 + 1} / span ${ghost.height * 2}` }} /> }

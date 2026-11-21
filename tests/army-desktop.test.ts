@@ -232,3 +232,25 @@ test("hundreds of arbitrary moves, resizes and restores remain stable after refr
     if(i%7===0) layout=setPanelMinimized(layout,id,true);
   }
 });
+
+
+test("staggered columns do not lock the whole page into one immovable row", () => {
+  const layout=validateDesktop({version:1,order:PANEL_IDS,minimized:[],sizes:{feed:{width:8,height:8},board:{width:8,height:8},chat:{width:4,height:4},stancam:{width:4,height:3},music:{width:4,height:5}},positions:{feed:{x:0,y:0},board:{x:0,y:8},chat:{x:8,y:0},stancam:{x:8,y:5.5},music:{x:8,y:10}}});
+  assert.equal(canMovePanelRow(layout,"music",-1),true);
+  const closedGap=movePanelRow(layout,"music",-1);
+  assert.equal(closedGap.positions!.music.y,8.5);
+  const movedAgain=movePanelRow(closedGap,"music",-1);
+  assert.ok(movedAgain.positions!.music.y<closedGap.positions!.music.y);
+  assert.deepEqual(movedAgain.positions!.feed,layout.positions!.feed);
+  assert.deepEqual(movedAgain.positions!.board,layout.positions!.board);
+  assert.deepEqual(movedAgain.sizes,layout.sizes);
+  assertPacked(movedAgain);
+  assert.deepEqual(parseDesktop(JSON.stringify(movedAgain)),movedAgain);
+});
+
+test("a panel alone in its lane can move upward into an empty space", () => {
+  const layout=placePanel(DEFAULT_DESKTOP,"music",{x:8,y:30});
+  const hidden={...layout,minimized:PANEL_IDS.filter(id=>id!=="music")};
+  assert.equal(canMovePanelRow(hidden,"music",-1),true);
+  assert.equal(movePanelRow(hidden,"music",-1).positions!.music.y,0);
+});
